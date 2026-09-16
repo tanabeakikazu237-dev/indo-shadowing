@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- スマホのホーム画面に追加したときにアプリっぽく見せる設定 (PWA対応) -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="印シャドーイング">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <title>インドネシア語 シャドーイング & 単語帳</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 15px;
+            padding-top: env(safe-area-inset-top, 15px); /* iPhoneなどのノッチ対策 */
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+        h1 { 
+            font-size: 1.1rem; 
+            text-align: center; 
+            margin: 0 0 10px 0; 
+            color: #fff; 
+            flex-shrink: 0;
+        }
+        .card {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        label { font-size: 0.85rem; color: #aaa; display: block; width: 100%; }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            resize: vertical;
+            display: block;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2c2c2c;
+            padding: 10px 14px;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .control-group span { font-size: 0.9rem; color: #ddd; }
+        input[type="range"] { flex: 1; margin: 0 12px; }
+        
+        .btn {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-secondary { background-color: #3a3a3c; }
+
+        /* プレイヤー画面 */
+        #player-area {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            gap: 10px;
+        }
+        
+        /* モード切替タブ */
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #2c2c2c;
+            border: none;
+            border-radius: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #007aff;
+            color: #fff;
+        }
+
+        .script-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #1e1e1e;
+            border-radius: 14px;
+            padding: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .line-item {
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #252528;
+            border-left: 4px solid transparent;
+            transition: background 0.15s, border-left 0.15s;
+        }
+        .line-item.active {
+            background-color: #1a2f4c !important;
+            border-left: 4px solid #007aff !important;
+        }
+
+        .id-text {
+            font-size: var(--font-size-id, 1.1rem);
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.6;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .word-token {
+            display: inline-block;
+            padding: 2px 4px;
+            margin: 1px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .word-token:hover {
+            background: rgba(0, 122, 255, 0.3);
+        }
+        .word-token.highlighted {
+            background: #ff9500;
+            color: #000;
+        }
+
+        .jp-text {
+            font-size: var(--font-size-jp, 0.9rem);
+            color: #a0a0a5;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 6px;
+            line-height: 1.3;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🇮🇩 インドネシア語 シャドーイング</h1>
+
+    <div class="card" id="setup-card">
+        <div id="history-section" style="display:none;">
+            <label for="history-select">📜 過去の履歴から読み込む</label>
+            <select id="history-select" onchange="loadHistory(this.value)">
+                <option value="">-- 履歴を選択 --</option>
+            </select>
+        </div>
+
+        <label for="script-input">テキスト貼り付け (「#」で文節を区切れます。対訳つきもOK)</label>
+        <textarea id="script-input" placeholder="例: Saya ingin pergi ke toko # untuk membeli buah-buahan fresh."></textarea>
+        
+        <div class="control-group">
+            <span>再生速度: <strong id="speed-val">1.0</strong>x</span>
+            <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0" oninput="updateSpeedVal(this.value)">
+        </div>
+
+        <div class="control-group">
+            <span>文字サイズ: <strong id="fontsize-val">標準</strong></span>
+            <input type="range" id="fontsize-range" min="0.8" max="1.6" step="0.1" value="1.1" oninput="updateFontSizeVal(this.value)">
+        </div>
+
+        <button class="btn" onclick="startApp()">プレイヤーを起動</button>
+    </div>
+
+    <div id="player-area">
+        <div class="tab-container">
+            <button class="tab-btn active" id="tab-sentence" onclick="switchMode('sentence')">📖 文章モード</button>
+            <button class="tab-btn" id="tab-word" onclick="switchMode('word')">🔤 単語帳モード</button>
+        </div>
+
+        <div class="script-list" id="script-list"></div>
+        <button class="btn btn-secondary" onclick="backToSetup()">テキスト修正に戻る</button>
+    </div>
+
+<script>
+    let linesData = [];
+    let uniqueWords = [];
+    let currentMode = 'sentence';
+
+    window.onload = function() {
+        updateHistoryUI();
+        updateFontSizeVal(document.getElementById('fontsize-range').value);
+    };
+
+    function updateSpeedVal(val) {
+        document.getElementById('speed-val').textContent = val;
+    }
+
+    function updateFontSizeVal(val) {
+        const numVal = parseFloat(val);
+        let label = '標準';
+        if (numVal <= 0.9) label = '小';
+        else if (numVal >= 1.3 && numVal < 1.5) label = '大';
+        else if (numVal >= 1.5) label = '特大';
+        
+        document.getElementById('fontsize-val').textContent = label;
+        document.documentElement.style.setProperty('--font-size-id', val + 'rem');
+        document.documentElement.style.setProperty('--font-size-jp', (numVal * 0.8) + 'rem');
+    }
+
+    function getHistory() {
+        try {
+            const h = localStorage.getItem('indo_shadowing_history');
+            return h ? JSON.parse(h) : [];
+        } catch(e) {
+            return [];
+        }
+    }
+
+    function saveToHistory(text) {
+        if (!text) return;
+        let history = getHistory();
+        history = history.filter(item => item !== text);
+        history.unshift(text);
+        if (history.length > 3) history = history.slice(0, 3);
+        try {
+            localStorage.setItem('indo_shadowing_history', JSON.stringify(history));
+        } catch(e) {}
+    }
+
+    function updateHistoryUI() {
+        const history = getHistory();
+        const section = document.getElementById('history-section');
+        const select = document.getElementById('history-select');
+        
+        if (history.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        select.innerHTML = '<option value="">-- 履歴を選択 --</option>';
+        history.forEach((text, idx) => {
+            const snippet = text.replace(/\n/g, ' ').substring(0, 25) + '...';
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `[${idx + 1}] ${snippet}`;
+            select.appendChild(opt);
+        });
+    }
+
+    function loadHistory(idx) {
+        if (idx === "") return;
+        const history = getHistory();
+        if (history[idx]) document.getElementById('script-input').value = history[idx];
+        document.getElementById('history-select').value = "";
+    }
+
+    function startApp() {
+        const rawText = document.getElementById('script-input').value.trim();
+        if (!rawText) {
+            alert('テキストを入力してください。');
+            return;
+        }
+
+        saveToHistory(rawText);
+        updateHistoryUI();
+
+        linesData = [];
+        
+        if (rawText.includes('#')) {
+            let blocks = rawText.split('#').map(b => b.trim()).filter(b => b.length > 0);
+            blocks.forEach(b => {
+                linesData.push({
+                    id: b,
+                    jp: '（タップして発音・単語選択で一時停止）'
+                });
+            });
+        } else {
+            const rawLines = rawText.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            let hasJapanese = /[一-龠ぁ-んァ-ン]/.test(rawText);
+
+            if (hasJapanese && rawLines.length % 2 === 0) {
+                for (let i = 0; i < rawLines.length; i += 2) {
+                    linesData.push({
+                        id: rawLines[i],
+                        jp: (i + 1 < rawLines.length) ? rawLines[i + 1] : ''
+                    });
+                }
+            } else {
+                let joinedText = rawLines.join(' ');
+                let splitted = joinedText.split(/[\.,\?]+/).map(s => s.trim()).filter(s => s.length > 0);
+                splitted.forEach(s => {
+                    linesData.push({
+                        id: s,
+                        jp: '（タップして発音・単語選択で一時停止）'
+                    });
+                });
+            }
+        }
+
+        if (linesData.length === 0) {
+            alert('有効なテキストが見つかりませんでした。');
+            return;
+        }
+
+        let wordSet = new Set();
+        linesData.forEach(item => {
+            let cleanStr = item.id.toLowerCase().replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "");
+            let words = cleanStr.split(/\s+/);
+            words.forEach(w => {
+                if (w.length > 1) wordSet.add(w);
+            });
+        });
+        uniqueWords = Array.from(wordSet).sort();
+
+        currentMode = 'sentence';
+        updateTabUI();
+        renderSentenceList();
+
+        document.getElementById('setup-card').style.display = 'none';
+        document.getElementById('player-area').style.display = 'flex';
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        updateTabUI();
+        if (currentMode === 'sentence') renderSentenceList();
+        else renderWordList();
+    }
+
+    function updateTabUI() {
+        if (currentMode === 'sentence') {
+            document.getElementById('tab-sentence').classList.add('active');
+            document.getElementById('tab-word').classList.remove('active');
+        } else {
+            document.getElementById('tab-sentence').classList.remove('active');
+            document.getElementById('tab-word').classList.add('active');
+        }
+    }
+
+    function renderSentenceList() {
+        const container = document.getElementById('script-list');
+        container.innerHTML = '';
+
+        linesData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'line-item';
+            div.id = `line-${index}`;
+            
+            const words = item.id.split(/\s+/);
+            const wordsHtml = words.map((w, wIdx) => `<span class="word-token" onclick="onWordClick(event, ${index}, ${wIdx}, '${w.replace(/'/g, "\\'")}')">${w}</span>`).join(' ');
+
+            div.innerHTML = `
+                <div class="id-text" id="text-container-${index}">${wordsHtml}</div>
+                <div class="jp-text">${item.jp}</div>
+            `;
+            
+            div.onclick = (e) => {
+                if (e.target.classList.contains('word-token')) return;
+                playText(item.id, index, 'sentence');
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function renderWordList() {
+        const container = document.getElementById('script-list');
+        container.innerHTML = '';
+
+        if (uniqueWords.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#888; padding:20px;">抽出できる単語がありません</div>';
+            return;
+        }
+
+        uniqueWords.forEach((word, index) => {
+            const div = document.createElement('div');
+            div.className = 'line-item';
+            div.id = `word-${index}`;
+            div.innerHTML = `
+                <div class="id-text">${word}</div>
+                <div class="jp-text" style="color: #666;">（タップして単語発音）</div>
+            `;
+            div.onclick = () => playText(word, index, 'word');
+            container.appendChild(div);
+        });
+    }
+
+    function onWordClick(event, lineIndex, wordIndex, clickedWord) {
+        event.stopPropagation();
+
+        if (!('speechSynthesis' in window)) return;
+
+        window.speechSynthesis.cancel();
+
+        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
+
+        const targetDiv = document.getElementById(`line-${lineIndex}`);
+        targetDiv.classList.add('active');
+        targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const tokens = targetDiv.querySelectorAll('.word-token');
+        if (tokens[wordIndex]) {
+            tokens[wordIndex].classList.add('highlighted');
+        }
+
+        const fullText = linesData[lineIndex].id;
+        const wordsArray = fullText.split(/\s+/);
+        const subText = wordsArray.slice(wordIndex).join(' ');
+
+        const utterance = new SpeechSynthesisUtterance(subText);
+        utterance.lang = 'id-ID';
+        utterance.rate = parseFloat(document.getElementById('speed-range').value);
+
+        utterance.onend = () => {
+            if (tokens[wordIndex]) tokens[wordIndex].classList.remove('highlighted');
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function playText(textToSpeech, index, mode) {
+        if (!('speechSynthesis' in window)) {
+            alert('お使いのブラウザは音声読み上げに対応していません。');
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
+
+        const targetId = (mode === 'sentence') ? `line-${index}` : `word-${index}`;
+        const targetDiv = document.getElementById(targetId);
+        if (!targetDiv) return;
+
+        targetDiv.classList.add('active');
+        targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeech);
+        utterance.lang = 'id-ID';
+        utterance.rate = parseFloat(document.getElementById('speed-range').value);
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function backToSetup() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        document.getElementById('player-area').style.display = 'none';
+        document.getElementById('setup-card').style.display = 'flex';
+        updateHistoryUI();
+    }
+</script>
+
+</body>
+</html>
