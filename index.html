@@ -1,290 +1,671 @@
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="印シャドーイング">
-<meta name="mobile-web-app-capable" content="yes">
-
-<title>インドネシア語 シャドーイング & フラッシュカード</title>
-<style>
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        background-color: #121212;
-        color: #e0e0e0;
-        margin: 0;
-        padding: 15px;
-        padding-top: env(safe-area-inset-top, 15px);
-        padding-bottom: env(safe-area-inset-bottom, 15px);
-        display: flex;
-        flex-direction: column;
-        height: 100vh;
-        height: 100dvh;
-    }
-    h1 { 
-        font-size: 1.1rem; 
-        text-align: center; 
-        margin: 0 0 10px 0; 
-        color: #fff; 
-        flex-shrink: 0;
-    }
-    .card {
-        background: #1e1e1e;
-        padding: 16px;
-        border-radius: 14px;
-        margin-bottom: 12px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-    label { font-size: 0.85rem; color: #aaa; display: block; width: 100%; }
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
-    textarea {
-        width: 100%;
-        height: 200px;
-        padding: 12px;
-        background: #2c2c2c;
-        border: 1px solid #444;
-        border-radius: 8px;
-        color: #fff;
-        font-size: 0.95rem;
-        resize: vertical;
-        display: block;
-    }
-    
-    select {
-        width: 100%;
-        padding: 10px;
-        background: #2c2c2c;
-        border: 1px solid #444;
-        border-radius: 8px;
-        color: #fff;
-        font-size: 0.9rem;
-    }
-    .control-group {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: #2c2c2c;
-        padding: 10px 14px;
-        border-radius: 8px;
-        width: 100%;
-    }
-    .control-group span { font-size: 0.9rem; color: #ddd; }
-    input[type="range"] { flex: 1; margin: 0 12px; }
-    
-    .btn {
-        background-color: #007aff;
-        color: white;
-        border: none;
-        padding: 14px;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: bold;
-        width: 100%;
-        text-align: center;
-    }
-    .btn:active { opacity: 0.8; }
-    .btn-secondary { background-color: #3a3a3c; }
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="印シャドーイング">
+    <meta name="mobile-web-app-capable" content="yes">
 
-    /* プレイヤー画面 */
-    #player-area {
-        display: none;
-        flex-direction: column;
-        flex: 1;
-        overflow: hidden;
-        gap: 10px;
-    }
-    
-    /* モード切替タブ */
-    .tab-container {
-        display: flex;
-        gap: 8px;
-        flex-shrink: 0;
-    }
-    .tab-btn {
-        flex: 1;
-        padding: 10px;
-        background: #2c2c2c;
-        border: none;
-        border-radius: 8px;
-        color: #aaa;
-        font-size: 0.9rem;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .tab-btn.active {
-        background: #007aff;
-        color: #fff;
-    }
+    <title>インドネシア語 シャドーイング & フラッシュカード</title>
+    <style>
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 15px;
+            padding-top: env(safe-area-inset-top, 15px);
+            padding-bottom: env(safe-area-inset-bottom, 15px);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            height: 100dvh;
+        }
+        h1 { 
+            font-size: 1.1rem; 
+            text-align: center; 
+            margin: 0 0 10px 0; 
+            color: #fff; 
+            flex-shrink: 0;
+        }
+        .card {
+            background: #1e1e1e;
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        label { font-size: 0.85rem; color: #aaa; display: block; width: 100%; }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            padding: 12px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.95rem;
+            resize: vertical;
+            display: block;
+        }
+        
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+        }
+        .control-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2c2c2c;
+            padding: 10px 14px;
+            border-radius: 8px;
+            width: 100%;
+        }
+        .control-group span { font-size: 0.9rem; color: #ddd; }
+        input[type="range"] { flex: 1; margin: 0 12px; }
+        
+        .btn {
+            background-color: #007aff;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            width: 100%;
+            text-align: center;
+        }
+        .btn:active { opacity: 0.8; }
+        .btn-secondary { background-color: #3a3a3c; }
 
-    .script-list {
-        flex: 1;
-        overflow-y: auto;
-        background: #1e1e1e;
-        border-radius: 14px;
-        padding: 12px;
-        -webkit-overflow-scrolling: touch;
-    }
-    .line-item {
-        padding: 14px 16px;
-        margin-bottom: 10px;
-        border-radius: 10px;
-        background: #252528;
-        border-left: 4px solid transparent;
-        transition: background 0.15s, border-left 0.15s;
-    }
-    .line-item.active {
-        background-color: #1a2f4c !important;
-        border-left: 4px solid #007aff !important;
-    }
+        /* プレイヤー画面 */
+        #player-area {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            gap: 10px;
+        }
+        
+        /* モード切替タブ */
+        .tab-container {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            background: #2c2c2c;
+            border: none;
+            border-radius: 8px;
+            color: #aaa;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .tab-btn.active {
+            background: #007aff;
+            color: #fff;
+        }
 
-    .id-text {
-        font-size: var(--font-size-id, 1.1rem);
-        font-weight: bold;
-        color: #ffffff;
-        line-height: 1.6;
-        word-break: break-word;
-        overflow-wrap: break-word;
-    }
-    
-    .word-token {
-        display: inline-block;
-        padding: 2px 4px;
-        margin: 1px 2px;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background 0.1s;
-    }
-    .word-token:hover {
-        background: rgba(0, 122, 255, 0.3);
-    }
-    .word-token.highlighted {
-        background: #ff9500;
-        color: #000;
-    }
+        .script-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #1e1e1e;
+            border-radius: 14px;
+            padding: 12px;
+            -webkit-overflow-scrolling: touch;
+        }
+        .line-item {
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            background: #252528;
+            border-left: 4px solid transparent;
+            transition: background 0.15s, border-left 0.15s;
+        }
+        .line-item.active {
+            background-color: #1a2f4c !important;
+            border-left: 4px solid #007aff !important;
+        }
 
-    .jp-text {
-        font-size: var(--font-size-jp, 0.9rem);
-        color: #a0a0a5;
-        margin-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.08);
-        padding-top: 6px;
-        line-height: 1.3;
-        word-break: break-word;
-        overflow-wrap: break-word;
-    }
+        .id-text {
+            font-size: var(--font-size-id, 1.1rem);
+            font-weight: bold;
+            color: #ffffff;
+            line-height: 1.6;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+        
+        .word-token {
+            display: inline-block;
+            padding: 2px 4px;
+            margin: 1px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+        .word-token:hover {
+            background: rgba(0, 122, 255, 0.3);
+        }
+        .word-token.highlighted {
+            background: #ff9500;
+            color: #000;
+        }
 
-    /* フラッシュカードモード用スタイル */
-    .flashcard-container {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        justify-content: center;
-        align-items: center;
-        gap: 15px;
-        padding: 10px;
-        height: 100%;
-    }
-    .flashcard {
-        background: #252528;
-        width: 100%;
-        max-width: 400px;
-        min-height: 280px;
-        border-radius: 16px;
-        padding: 24px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        align-items: center;
-        text-align: center;
-        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        cursor: pointer;
-        border: 1px solid #333;
-        transition: transform 0.2s;
-    }
-    .flashcard:active { transform: scale(0.98); }
-    .fc-word {
-        font-size: 2rem;
-        font-weight: bold;
-        color: #007aff;
-        margin-bottom: 10px;
-        word-break: break-word;
-    }
-    .fc-hint {
-        font-size: 0.8rem;
-        color: #888;
-    }
-    .fc-back-content {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        width: 100%;
-        border-top: 1px solid rgba(255,255,255,0.1);
-        padding-top: 15px;
-    }
-    .fc-meaning {
-        font-size: 1.2rem;
-        color: #fff;
-        font-weight: bold;
-    }
-    .fc-example {
-        font-size: 0.95rem;
-        color: #ddd;
-        font-style: italic;
-    }
-    .fc-controls {
-        display: flex;
-        gap: 10px;
-        width: 100%;
-        max-width: 400px;
-    }
-    .fc-btn {
-        flex: 1;
-        padding: 12px;
-        background: #2c2c2c;
-        border: 1px solid #444;
-        border-radius: 10px;
-        color: #fff;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .fc-btn:active { opacity: 0.8; }
-    .fc-btn-primary { background: #007aff; border: none; }
-</style>
+        .jp-text {
+            font-size: var(--font-size-jp, 0.9rem);
+            color: #a0a0a5;
+            margin-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+            padding-top: 6px;
+            line-height: 1.3;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
 
+        /* フラッシュカードモード用スタイル */
+        .flashcard-container {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            height: 100%;
+        }
+        .flashcard {
+            background: #252528;
+            width: 100%;
+            max-width: 400px;
+            min-height: 280px;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border: 1px solid #333;
+            transition: transform 0.2s;
+        }
+        .flashcard:active { transform: scale(0.98); }
+        .fc-word {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #007aff;
+            margin-bottom: 10px;
+            word-break: break-word;
+        }
+        .fc-hint {
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .fc-back-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+        .fc-meaning {
+            font-size: 1.2rem;
+            color: #fff;
+            font-weight: bold;
+        }
+        .fc-example {
+            font-size: 0.95rem;
+            color: #ddd;
+            font-style: italic;
+        }
+        .fc-controls {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .fc-btn {
+            flex: 1;
+            padding: 12px;
+            background: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .fc-btn:active { opacity: 0.8; }
+        .fc-btn-primary { background: #007aff; border: none; }
+    </style>
+</head>
+<body>
 
-<h1>🇮🇩 インドネシア語 シャドーイング</h1>
+    <h1>🇮🇩 インドネシア語 シャドーイング</h1>
 
-<div class="card" id="setup-card">
-    <div id="history-section" style="display:none;">
-        <label for="history-select">📜 過去の履歴から読み込む</label>
-        <select id="history-select" onchange="loadHistory(this.value)">
-            <option value="">-- 履歴を選択 --</option>
-        </select>
+    <div class="card" id="setup-card">
+        <div id="history-section" style="display:none;">
+            <label for="history-select">📜 過去の履歴から読み込む</label>
+            <select id="history-select" onchange="loadHistory(this.value)">
+                <option value="">-- 履歴を選択 --</option>
+            </select>
+        </div>
+
+        <label for="script-input">インドネシア語テキスト貼り付け (#, ., ? または改行で文節区切り。日本語混入OK)</label>
+        <textarea id="script-input" placeholder="例: Saya ingin pergi ke toko # untuk membeli buah-buahan segar. (日本語が含まれていても自動で無視されます)"></textarea>
+        
+        <div class="control-group">
+            <span>再生速度: <strong id="speed-val">1.0</strong>x</span>
+            <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0" oninput="updateSpeedVal(this.value)">
+        </div>
+
+        <div class="control-group">
+            <span>文字サイズ: <strong id="fontsize-val">標準</strong></span>
+            <input type="range" id="fontsize-range" min="0.8" max="1.6" step="0.1" value="1.1" oninput="updateFontSizeVal(this.value)">
+        </div>
+
+        <button class="btn" onclick="startApp()">プレイヤーを起動</button>
     </div>
 
-    <label for="script-input">インドネシア語テキスト貼り付け (#, ., ? で文節区切り。日本語が含まれていても自動で無視されます)</label>
-    <textarea id="script-input" placeholder="例: Saya ingin pergi ke toko # untuk membeli buah-buahan fresh. (日本語混入OK)"></textarea>
-    
-    <div class="control-group">
-        <span>再生速度: <strong id="speed-val">1.0</strong>x</span>
-        <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0" oninput="updateSpeedVal(this.value)">
+    <div id="player-area">
+        <div class="tab-container">
+            <button class="tab-btn active" id="tab-sentence" onclick="switchMode('sentence')">📖 文章モード</button>
+            <button class="tab-btn" id="tab-word" onclick="switchMode('word')">🔤 フラッシュカード</button>
+        </div>
+
+        <div class="script-list" id="script-list"></div>
+        <button class="btn btn-secondary" onclick="backToSetup()">テキスト修正に戻る</button>
     </div>
 
-    <div class="control-group">
-        <span>文字サイズ: <strong id="fontsize-val">標準</strong></span>
-        <input type="range" id="fontsize-range" min="0.8" max="1.6" step="0.1" value="1.1" oninput="updateFontSizeVal(this.value)">
-    </div>
+<script>
+    let linesData = [];
+    let flashcardsData = [];
+    let currentFcIndex = 0;
+    let isCardFlipped = false;
+    let currentMode = 'sentence';
 
-    <button class="btn" onclick="startApp()">プレイヤーを起動</button>
-</div>
+    // 簡易辞書（意味・例文のモック）
+    const sampleDictionary = {
+        "saya": { meaning: "私", example: "Saya pergi ke sekolah." },
+        "ingin": { meaning: "~したい", example: "Saya ingin makan." },
+        "pergi": { meaning: "行く", example: "Dia pergi ke Bali." },
+        "ke": { meaning: "~へ", example: "Mari kita pergi ke sana." },
+        "toko": { meaning: "店", example: "Toko itu buka 24 jam." },
+        "untuk": { meaning: "~のために", example: "Hadiah ini untuk ibu." },
+        "membeli": { meaning: "買う", example: "Membeli buah segar." },
+        "buah": { meaning: "果物", example: "Suka makan buah." },
+        "makan": { meaning: "食べる", example: "Makan nasi goreng." },
+        "minum": { meaning: "飲む", example: "Minum air putih." },
+        "rumah": { meaning: "家", example: "Rumah saya besar." },
+        "bersama": { meaning: "一緒に", example: "Bersama teman-teman." },
+        "keluarga": { meaning: "家族", example: "Keluarga bahagia." },
+        "segar": { meaning: "新鮮な", example: "Buah segar dari pasar." }
+    };
 
-<div id="player-area">
-    <div class="tab-container">
-        <button class="tab-btn active" id="tab-sentence" onclick="switchMode('sentence')">📖 文章モード</button>
-        <button class="tab-btn" id="tab-word" onclick="switchMode('word')">🔤 フラッシュカード</button>
-    </div>
+    window.onload = function() {
+        updateHistoryUI();
+        updateFontSizeVal(document.getElementById('fontsize-range').value);
+    };
 
-    <div class="script-list" id="script-list"></div>
-    <button class="btn btn-secondary" onclick="backToSetup()">テキスト修正に戻る</button>
-</div>
+    function updateSpeedVal(val) {
+        document.getElementById('speed-val').textContent = val;
+    }
+
+    function updateFontSizeVal(val) {
+        const numVal = parseFloat(val);
+        let label = '標準';
+        if (numVal <= 0.9) label = '小';
+        else if (numVal >= 1.3 && numVal < 1.5) label = '大';
+        else if (numVal >= 1.5) label = '特大';
+        
+        document.getElementById('fontsize-val').textContent = label;
+        document.documentElement.style.setProperty('--font-size-id', val + 'rem');
+        document.documentElement.style.setProperty('--font-size-jp', (numVal * 0.8) + 'rem');
+    }
+
+    function getHistory() {
+        try {
+            const h = localStorage.getItem('indo_shadowing_history');
+            return h ? JSON.parse(h) : [];
+        } catch(e) {
+            return [];
+        }
+    }
+
+    function saveToHistory(text) {
+        if (!text) return;
+        let history = getHistory();
+        history = history.filter(item => item !== text);
+        history.unshift(text);
+        if (history.length > 3) history = history.slice(0, 3);
+        try {
+            localStorage.setItem('indo_shadowing_history', JSON.stringify(history));
+        } catch(e) {}
+    }
+
+    function updateHistoryUI() {
+        const history = getHistory();
+        const section = document.getElementById('history-section');
+        const select = document.getElementById('history-select');
+        
+        if (history.length === 0) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = 'block';
+        select.innerHTML = '<option value="">-- 履歴を選択 --</option>';
+        history.forEach((text, idx) => {
+            const snippet = text.replace(/\n/g, ' ').substring(0, 25) + '...';
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.textContent = `[${idx + 1}] ${snippet}`;
+            select.appendChild(opt);
+        });
+    }
+
+    function loadHistory(idx) {
+        if (idx === "") return;
+        const history = getHistory();
+        if (history[idx]) document.getElementById('script-input').value = history[idx];
+        document.getElementById('history-select').value = "";
+    }
+
+    // 日本語混入テキストをクレンジングし、#や句読点で文節ブロックを抽出して対訳をつける関数
+    function cleanAndExtractBlocks(rawText) {
+        let lines = rawText.split('\n');
+        let cleanIndoLines = [];
+
+        lines.forEach(line => {
+            // 日本語文字（ひらがな、カタカナ、漢字）が多く含まれる行は翻訳行や説明文としてスキップ
+            let jpCharCount = (line.match(/[一-龠ぁ-んァ-ン]/g) || []).length;
+            if (jpCharCount > line.length * 0.3) {
+                return;
+            }
+            // 万が一混ざった日本語文字を除去してインドネシア語文字列を抽出
+            let purified = line.replace(/[一-龠ぁ-んァ-ン]/g, '').trim();
+            if (purified.length > 0) {
+                cleanIndoLines.push(purified);
+            }
+        });
+
+        let fullIndoText = cleanIndoLines.join(' ');
+
+        // #, ., ? で文節ブロックに分解
+        let rawBlocks = fullIndoText.split(/[\#\.\?]+/).map(b => b.trim()).filter(b => b.length > 0);
+        
+        let results = [];
+        rawBlocks.forEach(block => {
+            results.push({
+                id: block,
+                jp: generateMockTranslation(block)
+            });
+        });
+
+        return results;
+    }
+
+    // 単語ごとの意味推測・対訳生成
+    function generateMockTranslation(text) {
+        let words = text.toLowerCase().replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "").split(/\s+/);
+        let translatedParts = words.map(w => {
+            if (sampleDictionary[w]) return sampleDictionary[w].meaning;
+            return null;
+        }).filter(Boolean);
+
+        if (translatedParts.length > 0) {
+            return "（意味推測: " + translatedParts.join(' / ') + "）";
+        }
+        return "（インドネシア語文節・タップで発音）";
+    }
+
+    function startApp() {
+        // iOSブラウザの音声合成エンジンを強制アンロックするためのダミー初期化
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            const dummy = new SpeechSynthesisUtterance('');
+            window.speechSynthesis.speak(dummy);
+        }
+
+        const rawText = document.getElementById('script-input').value.trim();
+        if (!rawText) {
+            alert('テキストを入力してください。');
+            return;
+        }
+
+        saveToHistory(rawText);
+        updateHistoryUI();
+
+        // 日本語を無視して #, ., ? や文節ごとに抽出
+        linesData = cleanAndExtractBlocks(rawText);
+
+        if (linesData.length === 0) {
+            alert('有効なインドネシア語テキストが見つかりませんでした（日本語文を除外したため空になった可能性があります）。');
+            return;
+        }
+
+        // フラッシュカード用の単語データ生成
+        let wordMap = new Map();
+        linesData.forEach(item => {
+            let cleanStr = item.id.toLowerCase().replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "");
+            let words = cleanStr.split(/\s+/);
+            words.forEach(w => {
+                if (w.length > 2) {
+                    if (!wordMap.has(w)) {
+                        let dictInfo = sampleDictionary[w] || { meaning: "（抽出単語）", example: item.id };
+                        wordMap.set(w, {
+                            word: w,
+                            meaning: dictInfo.meaning,
+                            example: dictInfo.example
+                        });
+                    }
+                }
+            });
+        });
+        flashcardsData = Array.from(wordMap.values());
+        currentFcIndex = 0;
+        isCardFlipped = false;
+
+        currentMode = 'sentence';
+        updateTabUI();
+        renderSentenceList();
+
+        document.getElementById('setup-card').style.display = 'none';
+        document.getElementById('player-area').style.display = 'flex';
+    }
+
+    function switchMode(mode) {
+        currentMode = mode;
+        updateTabUI();
+        if (currentMode === 'sentence') {
+            renderSentenceList();
+        } else {
+            renderFlashcardMode();
+        }
+    }
+
+    function updateTabUI() {
+        if (currentMode === 'sentence') {
+            document.getElementById('tab-sentence').classList.add('active');
+            document.getElementById('tab-word').classList.remove('active');
+        } else {
+            document.getElementById('tab-sentence').classList.remove('active');
+            document.getElementById('tab-word').classList.add('active');
+        }
+    }
+
+    function renderSentenceList() {
+        const container = document.getElementById('script-list');
+        container.innerHTML = '';
+
+        linesData.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'line-item';
+            div.id = `line-${index}`;
+            
+            const words = item.id.split(/\s+/);
+            const wordsHtml = words.map((w, wIdx) => `<span class="word-token" onclick="onWordClick(event, ${index}, ${wIdx}, '${w.replace(/'/g, "\\'")}')">${w}</span>`).join(' ');
+
+            div.innerHTML = `
+                <div class="id-text" id="text-container-${index}">${wordsHtml}</div>
+                <div class="jp-text">${item.jp}</div>
+            `;
+            
+            div.onclick = (e) => {
+                if (e.target.classList.contains('word-token')) return;
+                playText(item.id, index, 'sentence');
+            };
+            container.appendChild(div);
+        });
+    }
+
+    // フラッシュカード描画（表面: 単語・音声ボタン / 裏面: 意味・例文）
+    function renderFlashcardMode() {
+        const container = document.getElementById('script-list');
+        container.innerHTML = '';
+
+        if (flashcardsData.length === 0) {
+            container.innerHTML = '<div style="text-align:center; color:#888; padding:20px;">フラッシュカード用の単語が見つかりませんでした</div>';
+            return;
+        }
+
+        const cardObj = flashcardsData[currentFcIndex];
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flashcard-container';
+        wrapper.innerHTML = `
+            <div style="font-size: 0.85rem; color: #888;">カード ${currentFcIndex + 1} / ${flashcardsData.length}</div>
+            <div class="flashcard" onclick="toggleCardFlip()">
+                <div>
+                    <div class="fc-hint">${isCardFlipped ? '【裏面：意味・例文】' : '【表面：タップして裏返す】'}</div>
+                    <div class="fc-word">${cardObj.word}</div>
+                </div>
+                ${isCardFlipped ? `
+                    <div class="fc-back-content">
+                        <div class="fc-meaning">${cardObj.meaning}</div>
+                        <div class="fc-example">例文: "${cardObj.example}"</div>
+                    </div>
+                ` : `
+                    <div class="fc-hint" style="margin-top:20px; color:#007aff;">🔊 タップしてカードを裏返す / 音声再生</div>
+                `}
+            </div>
+            <div class="fc-controls">
+                <button class="fc-btn" onclick="prevCard()">前のカード</button>
+                <button class="fc-btn fc-btn-primary" onclick="playCardAudio('${cardObj.word.replace(/'/g, "\\'")}')">音声再生</button>
+                <button class="fc-btn" onclick="nextCard()">次のカード</button>
+            </div>
+        `;
+        container.appendChild(wrapper);
+        
+        playCardAudio(cardObj.word);
+    }
+
+    function toggleCardFlip() {
+        isCardFlipped = !isCardFlipped;
+        renderFlashcardMode();
+    }
+
+    function playCardAudio(word) {
+        if (!('speechSynthesis' in window)) return;
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(word);
+        utterance.lang = 'id-ID';
+        utterance.rate = parseFloat(document.getElementById('speed-range').value);
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function nextCard() {
+        isCardFlipped = false;
+        currentFcIndex = (currentFcIndex + 1) % flashcardsData.length;
+        renderFlashcardMode();
+    }
+
+    function prevCard() {
+        isCardFlipped = false;
+        currentFcIndex = (currentFcIndex - 1 + flashcardsData.length) % flashcardsData.length;
+        renderFlashcardMode();
+    }
+
+    function onWordClick(event, lineIndex, wordIndex, clickedWord) {
+        event.stopPropagation();
+        if (!('speechSynthesis' in window)) return;
+
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
+
+        const targetDiv = document.getElementById(`line-${lineIndex}`);
+        targetDiv.classList.add('active');
+        targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const tokens = targetDiv.querySelectorAll('.word-token');
+        if (tokens[wordIndex]) tokens[wordIndex].classList.add('highlighted');
+
+        const fullText = linesData[lineIndex].id;
+        const wordsArray = fullText.split(/\s+/);
+        const subText = wordsArray.slice(wordIndex).join(' ');
+
+        const utterance = new SpeechSynthesisUtterance(subText);
+        utterance.lang = 'id-ID';
+        utterance.rate = parseFloat(document.getElementById('speed-range').value);
+
+        utterance.onend = () => {
+            if (tokens[wordIndex]) tokens[wordIndex].classList.remove('highlighted');
+        };
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function playText(textToSpeech, index, mode) {
+        if (!('speechSynthesis' in window)) {
+            alert('お使いのブラウザは音声読み上げに対応していません。');
+            return;
+        }
+
+        window.speechSynthesis.cancel();
+        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
+
+        const targetId = (mode === 'sentence') ? `line-${index}` : `word-${index}`;
+        const targetDiv = document.getElementById(targetId);
+        if (!targetDiv) return;
+
+        targetDiv.classList.add('active');
+        targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        const utterance = new SpeechSynthesisUtterance(textToSpeech);
+        utterance.lang = 'id-ID';
+        utterance.rate = parseFloat(document.getElementById('speed-range').value);
+
+        window.speechSynthesis.speak(utterance);
+    }
+
+    function backToSetup() {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        document.getElementById('player-area').style.display = 'none';
+        document.getElementById('setup-card').style.display = 'flex';
+        updateHistoryUI();
+    }
+</script>
+
+</body>
+</html>
