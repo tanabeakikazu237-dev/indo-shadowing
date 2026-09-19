@@ -195,9 +195,9 @@
             background: #252528;
             width: 100%;
             max-width: 400px;
-            min-height: 280px;
+            min-height: 320px;
             border-radius: 16px;
-            padding: 24px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -210,10 +210,10 @@
         }
         .flashcard:active { transform: scale(0.98); }
         .fc-word {
-            font-size: 2rem;
+            font-size: 1.8rem;
             font-weight: bold;
             color: #007aff;
-            margin-bottom: 10px;
+            margin-top: 10px;
             word-break: break-word;
         }
         .fc-hint {
@@ -225,30 +225,33 @@
             flex-direction: column;
             gap: 10px;
             width: 100%;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 12px;
             text-align: left;
         }
         .fc-meaning {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: #fff;
             font-weight: bold;
             text-align: center;
+            background: #1c1c1e;
+            padding: 12px;
+            border-radius: 8px;
         }
         .fc-example-box {
             background: #1c1c1e;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
             font-size: 0.9rem;
         }
         .fc-example-id {
             color: #ddd;
             font-style: italic;
+            line-height: 1.4;
         }
         .fc-example-jp {
-            color: #aaa;
-            margin-top: 4px;
-            font-size: 0.85rem;
+            color: #4cd964;
+            margin-top: 6px;
+            font-weight: bold;
+            line-height: 1.4;
         }
         .fc-controls {
             display: flex;
@@ -315,7 +318,7 @@
     let isCardFlipped = false;
     let currentMode = 'sentence';
 
-    // 簡易辞書（意味・例文・例文の日本語訳のモック）
+    // 充実したモック辞書（単語ごとの意味・例文・日本語訳）
     const sampleDictionary = {
         "saya": { meaning: "私", example: "Saya pergi ke sekolah.", exampleJp: "私は学校へ行きます。" },
         "ingin": { meaning: "~したい", example: "Saya ingin makan.", exampleJp: "私は食べたいです。" },
@@ -330,7 +333,9 @@
         "rumah": { meaning: "家", example: "Rumah saya besar.", exampleJp: "私の家は大きいです。" },
         "bersama": { meaning: "一緒に", example: "Bersama teman-teman.", exampleJp: "友達と一緒に。" },
         "keluarga": { meaning: "家族", example: "Keluarga bahagia.", exampleJp: "幸せな家族。" },
-        "segar": { meaning: "新鮮な", example: "Buah segar dari pasar.", exampleJp: "市場からの新鮮な果物。" }
+        "segar": { meaning: "新鮮な", example: "Buah segar dari pasar.", exampleJp: "市場からの新鮮な果物。" },
+        "pemerintah": { meaning: "政府", example: "Keputusan pemerintah.", exampleJp: "政府の決定。" },
+        "daerah": { meaning: "地域", example: "Daerah ini aman.", exampleJp: "この地域は安全です。" }
     };
 
     window.onload = function() {
@@ -402,7 +407,6 @@
         document.getElementById('history-select').value = "";
     }
 
-    // 日本語混入テキストをクレンジングし、#、.、? で文節ブロックを抽出して対訳をつける関数
     function cleanAndExtractBlocks(rawText) {
         let lines = rawText.split('\n');
         let cleanIndoLines = [];
@@ -420,7 +424,6 @@
 
         let fullIndoText = cleanIndoLines.join(' ');
 
-        // #, ., ? で文節ブロックに分解
         let rawBlocks = fullIndoText.split(/[\#\.\?]+/).map(b => b.trim()).filter(b => b.length > 0);
         
         let results = [];
@@ -435,7 +438,7 @@
     }
 
     function generateMockTranslation(text) {
-        let words = text.toLowerCase().replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "").split(/\s+/);
+        let words = text.toLowerCase().replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "").split(/\s+/);
         let translatedParts = words.map(w => {
             if (sampleDictionary[w]) return sampleDictionary[w].meaning;
             return null;
@@ -448,7 +451,6 @@
     }
 
     function startApp() {
-        // iOSブラウザの音声合成エンジンを強制アンロックするためのダミー初期化
         if ('speechSynthesis' in window) {
             window.speechSynthesis.cancel();
             const dummy = new SpeechSynthesisUtterance('');
@@ -467,11 +469,10 @@
         linesData = cleanAndExtractBlocks(rawText);
 
         if (linesData.length === 0) {
-            alert('有効なインドネシア語テキストが見つかりませんでした（日本語文を除外したため空になった可能性があります）。');
+            alert('有効なインドネシア語テキストが見つかりませんでした。');
             return;
         }
 
-        // フラッシュカード用の単語データ生成
         let wordMap = new Map();
         linesData.forEach(item => {
             let cleanStr = item.id.toLowerCase().replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "");
@@ -480,7 +481,7 @@
                 if (w.length > 2) {
                     if (!wordMap.has(w)) {
                         let dictInfo = sampleDictionary[w] || { 
-                            meaning: "（抽出単語）", 
+                            meaning: "（重要語句・抽出単語）", 
                             example: item.id, 
                             exampleJp: item.jp 
                         };
@@ -551,7 +552,7 @@
         });
     }
 
-    // フラッシュカード描画（表面: 単語 / 裏面: 意味 ＋ 例文とその日本語訳）
+    // フラッシュカード描画（表面: 単語のみ / 裏面: 意味・例文）
     function renderFlashcardMode() {
         const container = document.getElementById('script-list');
         container.innerHTML = '';
@@ -565,24 +566,30 @@
 
         const wrapper = document.createElement('div');
         wrapper.className = 'flashcard-container';
+        
+        const cardContent = isCardFlipped ? `
+            <div style="width:100%;">
+                <div class="fc-hint">【裏面：意味・例文・訳】</div>
+            </div>
+            <div class="fc-back-content">
+                <div class="fc-meaning">意味: ${cardObj.meaning}</div>
+                <div class="fc-example-box">
+                    <div class="fc-example-id">例文: "${cardObj.example}"</div>
+                    <div class="fc-example-jp">訳: ${cardObj.exampleJp}</div>
+                </div>
+            </div>
+        ` : `
+            <div style="width:100%;">
+                <div class="fc-hint">【表面：タップして裏返す】</div>
+                <div class="fc-word">${cardObj.word}</div>
+            </div>
+            <div class="fc-hint" style="color:#007aff; margin-bottom:10px;">🔊 タップしてカードを裏返す</div>
+        `;
+
         wrapper.innerHTML = `
             <div style="font-size: 0.85rem; color: #888;">カード ${currentFcIndex + 1} / ${flashcardsData.length}</div>
             <div class="flashcard" onclick="toggleCardFlip()">
-                <div style="width:100%;">
-                    <div class="fc-hint">${isCardFlipped ? '【裏面：意味・例文】' : '【表面：タップして裏返す】'}</div>
-                    <div class="fc-word">${cardObj.word}</div>
-                </div>
-                ${isCardFlipped ? `
-                    <div class="fc-back-content">
-                        <div class="fc-meaning">意味: ${cardObj.meaning}</div>
-                        <div class="fc-example-box">
-                            <div class="fc-example-id">例文: "${cardObj.example}"</div>
-                            <div class="fc-example-jp">訳: ${cardObj.exampleJp}</div>
-                        </div>
-                    </div>
-                ` : `
-                    <div class="fc-hint" style="color:#007aff; margin-bottom:10px;">🔊 タップしてカードを裏返す / 音声再生</div>
-                `}
+                ${cardContent}
             </div>
             <div class="fc-controls">
                 <button class="fc-btn" onclick="prevCard()">前のカード</button>
@@ -592,7 +599,9 @@
         `;
         container.appendChild(wrapper);
         
-        playCardAudio(cardObj.word);
+        if (!isCardFlipped) {
+            playCardAudio(cardObj.word);
+        }
     }
 
     function toggleCardFlip() {
