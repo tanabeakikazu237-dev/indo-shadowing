@@ -223,20 +223,32 @@
         .fc-back-content {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 15px;
+            padding-top: 12px;
+            text-align: left;
         }
         .fc-meaning {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: #fff;
             font-weight: bold;
+            text-align: center;
         }
-        .fc-example {
-            font-size: 0.95rem;
+        .fc-example-box {
+            background: #1c1c1e;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .fc-example-id {
             color: #ddd;
             font-style: italic;
+        }
+        .fc-example-jp {
+            color: #aaa;
+            margin-top: 4px;
+            font-size: 0.85rem;
         }
         .fc-controls {
             display: flex;
@@ -303,22 +315,22 @@
     let isCardFlipped = false;
     let currentMode = 'sentence';
 
-    // 簡易辞書（意味・例文のモック）
+    // 簡易辞書（意味・例文・例文の日本語訳のモック）
     const sampleDictionary = {
-        "saya": { meaning: "私", example: "Saya pergi ke sekolah." },
-        "ingin": { meaning: "~したい", example: "Saya ingin makan." },
-        "pergi": { meaning: "行く", example: "Dia pergi ke Bali." },
-        "ke": { meaning: "~へ", example: "Mari kita pergi ke sana." },
-        "toko": { meaning: "店", example: "Toko itu buka 24 jam." },
-        "untuk": { meaning: "~のために", example: "Hadiah ini untuk ibu." },
-        "membeli": { meaning: "買う", example: "Membeli buah segar." },
-        "buah": { meaning: "果物", example: "Suka makan buah." },
-        "makan": { meaning: "食べる", example: "Makan nasi goreng." },
-        "minum": { meaning: "飲む", example: "Minum air putih." },
-        "rumah": { meaning: "家", example: "Rumah saya besar." },
-        "bersama": { meaning: "一緒に", example: "Bersama teman-teman." },
-        "keluarga": { meaning: "家族", example: "Keluarga bahagia." },
-        "segar": { meaning: "新鮮な", example: "Buah segar dari pasar." }
+        "saya": { meaning: "私", example: "Saya pergi ke sekolah.", exampleJp: "私は学校へ行きます。" },
+        "ingin": { meaning: "~したい", example: "Saya ingin makan.", exampleJp: "私は食べたいです。" },
+        "pergi": { meaning: "行く", example: "Dia pergi ke Bali.", exampleJp: "彼はバリ島へ行きます。" },
+        "ke": { meaning: "~へ", example: "Mari kita pergi ke sana.", exampleJp: "そこへ行きましょう。" },
+        "toko": { meaning: "店", example: "Toko itu buka 24 jam.", exampleJp: "その店は24時間営業しています。" },
+        "untuk": { meaning: "~のために", example: "Hadiah ini untuk ibu.", exampleJp: "この贈り物は母のためです。" },
+        "membeli": { meaning: "買う", example: "Membeli buah segar.", exampleJp: "新鮮な果物を買う。" },
+        "buah": { meaning: "果物", example: "Suka makan buah.", exampleJp: "果物を食べるのが好きです。" },
+        "makan": { meaning: "食べる", example: "Makan nasi goreng.", exampleJp: "ナシゴレンを食べる。" },
+        "minum": { meaning: "飲む", example: "Minum air putih.", exampleJp: "ミネラルウォーターを飲む。" },
+        "rumah": { meaning: "家", example: "Rumah saya besar.", exampleJp: "私の家は大きいです。" },
+        "bersama": { meaning: "一緒に", example: "Bersama teman-teman.", exampleJp: "友達と一緒に。" },
+        "keluarga": { meaning: "家族", example: "Keluarga bahagia.", exampleJp: "幸せな家族。" },
+        "segar": { meaning: "新鮮な", example: "Buah segar dari pasar.", exampleJp: "市場からの新鮮な果物。" }
     };
 
     window.onload = function() {
@@ -390,18 +402,16 @@
         document.getElementById('history-select').value = "";
     }
 
-    // 日本語混入テキストをクレンジングし、#や句読点で文節ブロックを抽出して対訳をつける関数
+    // 日本語混入テキストをクレンジングし、#、.、? で文節ブロックを抽出して対訳をつける関数
     function cleanAndExtractBlocks(rawText) {
         let lines = rawText.split('\n');
         let cleanIndoLines = [];
 
         lines.forEach(line => {
-            // 日本語文字（ひらがな、カタカナ、漢字）が多く含まれる行は翻訳行や説明文としてスキップ
             let jpCharCount = (line.match(/[一-龠ぁ-んァ-ン]/g) || []).length;
             if (jpCharCount > line.length * 0.3) {
                 return;
             }
-            // 万が一混ざった日本語文字を除去してインドネシア語文字列を抽出
             let purified = line.replace(/[一-龠ぁ-んァ-ン]/g, '').trim();
             if (purified.length > 0) {
                 cleanIndoLines.push(purified);
@@ -424,7 +434,6 @@
         return results;
     }
 
-    // 単語ごとの意味推測・対訳生成
     function generateMockTranslation(text) {
         let words = text.toLowerCase().replace(/[\.,\/#!$%\^&\*;:{}=\-_`~()？。、]/g, "").split(/\s+/);
         let translatedParts = words.map(w => {
@@ -455,7 +464,6 @@
         saveToHistory(rawText);
         updateHistoryUI();
 
-        // 日本語を無視して #, ., ? や文節ごとに抽出
         linesData = cleanAndExtractBlocks(rawText);
 
         if (linesData.length === 0) {
@@ -471,11 +479,16 @@
             words.forEach(w => {
                 if (w.length > 2) {
                     if (!wordMap.has(w)) {
-                        let dictInfo = sampleDictionary[w] || { meaning: "（抽出単語）", example: item.id };
+                        let dictInfo = sampleDictionary[w] || { 
+                            meaning: "（抽出単語）", 
+                            example: item.id, 
+                            exampleJp: item.jp 
+                        };
                         wordMap.set(w, {
                             word: w,
                             meaning: dictInfo.meaning,
-                            example: dictInfo.example
+                            example: dictInfo.example,
+                            exampleJp: dictInfo.exampleJp
                         });
                     }
                 }
@@ -538,7 +551,7 @@
         });
     }
 
-    // フラッシュカード描画（表面: 単語・音声ボタン / 裏面: 意味・例文）
+    // フラッシュカード描画（表面: 単語 / 裏面: 意味 ＋ 例文とその日本語訳）
     function renderFlashcardMode() {
         const container = document.getElementById('script-list');
         container.innerHTML = '';
@@ -555,17 +568,20 @@
         wrapper.innerHTML = `
             <div style="font-size: 0.85rem; color: #888;">カード ${currentFcIndex + 1} / ${flashcardsData.length}</div>
             <div class="flashcard" onclick="toggleCardFlip()">
-                <div>
+                <div style="width:100%;">
                     <div class="fc-hint">${isCardFlipped ? '【裏面：意味・例文】' : '【表面：タップして裏返す】'}</div>
                     <div class="fc-word">${cardObj.word}</div>
                 </div>
                 ${isCardFlipped ? `
                     <div class="fc-back-content">
-                        <div class="fc-meaning">${cardObj.meaning}</div>
-                        <div class="fc-example">例文: "${cardObj.example}"</div>
+                        <div class="fc-meaning">意味: ${cardObj.meaning}</div>
+                        <div class="fc-example-box">
+                            <div class="fc-example-id">例文: "${cardObj.example}"</div>
+                            <div class="fc-example-jp">訳: ${cardObj.exampleJp}</div>
+                        </div>
                     </div>
                 ` : `
-                    <div class="fc-hint" style="margin-top:20px; color:#007aff;">🔊 タップしてカードを裏返す / 音声再生</div>
+                    <div class="fc-hint" style="color:#007aff; margin-bottom:10px;">🔊 タップしてカードを裏返す / 音声再生</div>
                 `}
             </div>
             <div class="fc-controls">
