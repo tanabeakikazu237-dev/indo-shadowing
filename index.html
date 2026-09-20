@@ -115,7 +115,6 @@
         .btn:active { opacity: 0.8; }
         .btn-secondary { background-color: #3a3a3c; }
 
-        /* API Key Warning Badge */
         .api-badge {
             font-size: 0.75rem;
             padding: 4px 8px;
@@ -212,16 +211,68 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             height: 100%;
-            gap: 16px;
+            gap: 12px;
+            width: 100%;
+        }
+
+        /* 曖昧検索エリア */
+        .search-container {
+            width: 100%;
+            max-width: 340px;
+            position: relative;
+            margin-bottom: 4px;
+        }
+
+        .search-input-box {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--card-sub-bg);
+            border: 1px solid #444;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-input-box:focus {
+            border-color: var(--accent-color);
+        }
+
+        .search-results-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            max-height: 180px;
+            overflow-y: auto;
+            background: #1e1e24;
+            border: 1px solid #444;
+            border-radius: 8px;
+            z-index: 100;
+            display: none;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+            margin-top: 4px;
+        }
+        .search-result-item {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2d2d32;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+        .search-result-item:hover {
+            background: #2a2a35;
         }
 
         .perspective-box {
             perspective: 1000px;
             width: 100%;
             max-width: 340px;
-            height: 220px;
+            height: 210px;
         }
 
         .flashcard {
@@ -270,7 +321,6 @@
             margin-bottom: 8px;
         }
 
-        /* 抽出・指定頻度バッジ */
         .tap-count-badge {
             position: absolute;
             top: 12px;
@@ -299,21 +349,50 @@
         .card-controls {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
             width: 100%;
             max-width: 340px;
             justify-content: space-between;
+            margin-top: 4px;
         }
 
         .ctrl-btn {
             background: var(--card-sub-bg);
             border: 1px solid #444;
             color: #fff;
-            padding: 10px 18px;
+            padding: 10px 16px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
+            flex: 1;
+            text-align: center;
         }
+        .ctrl-btn:active {
+            background: var(--accent-color);
+        }
+
+        .audio-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            background: var(--card-sub-bg);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            gap: 6px;
+        }
+        .audio-btn {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            flex: 1;
+            text-align: center;
+        }
+        .audio-btn:active { background: var(--accent-color); }
 
         .modal-overlay {
             display: none;
@@ -338,11 +417,7 @@
             border: 1px solid #444;
         }
 
-        .modal-title {
-            font-size: 1.1rem;
-            font-weight: bold;
-            margin: 0;
-        }
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin: 0; }
 
         input[type="password"], input[type="text"] {
             width: 100%;
@@ -365,7 +440,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Toast notification */
         #toast {
             position: fixed;
             bottom: 20px;
@@ -425,6 +499,13 @@
             <button class="tab-btn" id="tab-word" onclick="switchMode('word')">🎴 単語フラッシュカード</button>
         </div>
 
+        <!-- Audio Player Control Bar -->
+        <div class="audio-controls-bar" id="audio-bar" style="display:none;">
+            <button class="audio-btn" onclick="pauseSpeech()">⏸️ 一時停止</button>
+            <button class="audio-btn" onclick="resumeSpeech()">▶️ 再開</button>
+            <button class="audio-btn" onclick="stopSpeech()">⏹️ 停止</button>
+        </div>
+
         <div class="content-area" id="content-area"></div>
         <button class="btn btn-secondary" onclick="backToSetup()">テキスト修正に戻る</button>
     </div>
@@ -458,9 +539,11 @@
         sentences: [],
         vocabulary: []
     };
-    let wordTapCounts = {}; // 単語ごとの指定(タップ)頻度を記録するオブジェクト
+    let wordTapCounts = {};
     let currentMode = 'sentence';
     let cardIndex = 0;
+    let searchDebounceTimer = null;
+    let currentFilteredVocab = [];
 
     window.onload = function() {
         checkApiKeyStatus();
@@ -468,13 +551,20 @@
         updateFontSizeVal(document.getElementById('fontsize-range').value);
     };
 
-    // 記号や数字を除去して単語のキーを統一するヘパー関数
     function cleanWordKey(str) {
         if (!str) return '';
         return str.toLowerCase().replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、「」"'“”]/g, "").trim();
     }
 
-    // 指定頻度順（降順） → 同数の場合はアルファベット順（昇順）でソート
+    function hashCode(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) {
+            hash = (hash << 5) - hash + str.charCodeAt(i);
+            hash |= 0;
+        }
+        return 'cache_' + Math.abs(hash);
+    }
+
     function sortVocabulary() {
         if (!parsedData.vocabulary || parsedData.vocabulary.length === 0) return;
         
@@ -485,9 +575,9 @@
             const countB = wordTapCounts[keyB] || 0;
 
             if (countB !== countA) {
-                return countB - countA; // 頻度が多い順
+                return countB - countA;
             }
-            return keyA.localeCompare(keyB, 'en', { sensitivity: 'base' }); // アルファベット順
+            return keyA.localeCompare(keyB, 'en', { sensitivity: 'base' });
         });
     }
 
@@ -619,20 +709,32 @@
         saveToHistory(rawText);
         updateHistoryUI();
 
-        // タップカウントの初期化
         wordTapCounts = {};
 
         const btn = document.getElementById('analyze-btn');
         btn.disabled = true;
-        btn.innerHTML = '<span class="loading-spinner"></span> Gemini AI が全単語と対訳を解析中...';
+        btn.innerHTML = '<span class="loading-spinner"></span> 解析中...';
 
         try {
-            parsedData = await analyzeWithGemini(rawText, apiKey);
+            const cacheKey = hashCode(rawText);
+            const cachedResult = localStorage.getItem(cacheKey);
+
+            if (cachedResult) {
+                parsedData = JSON.parse(cachedResult);
+                showToast('⚡ キャッシュから復元しました（API消費 0）');
+            } else {
+                parsedData = await analyzeWithGemini(rawText, apiKey);
+                ensureAllWordsExtracted(rawText);
+
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify(parsedData));
+                } catch(e) {}
+            }
+
             if (!parsedData || !parsedData.sentences || parsedData.sentences.length === 0) {
                 throw new Error('有効な解析結果が得られませんでした。');
             }
 
-            // 初期ソート（すべて指定回数0回のためアルファベット順）
             sortVocabulary();
 
             currentMode = 'sentence';
@@ -650,13 +752,31 @@
         }
     }
 
+    function ensureAllWordsExtracted(rawText) {
+        if (!parsedData.vocabulary) parsedData.vocabulary = [];
+
+        const existingMap = new Set(parsedData.vocabulary.map(v => cleanWordKey(v.word)));
+        const rawWords = rawText.split(/\s+/);
+
+        rawWords.forEach(w => {
+            const cleanKey = cleanWordKey(w);
+            if (cleanKey && !/^\d+$/.test(cleanKey) && !existingMap.has(cleanKey)) {
+                parsedData.vocabulary.push({
+                    word: cleanKey,
+                    meaning: '（文脈単語）'
+                });
+                existingMap.add(cleanKey);
+            }
+        });
+    }
+
     async function analyzeWithGemini(text, apiKey) {
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
         
         const systemPrompt = `You are an expert Indonesian-Japanese language instructor.
 Given the input Indonesian text:
-1. Break down the text into logical sentences or clauses ("sentences") for shadowing practice, with natural Japanese translations.
-2. Extract ALL unique Indonesian words from the text EXCEPT pure numbers/digits (e.g. "123", "2024"). Every single non-numeric word present in the text MUST be included in the "vocabulary" list with its exact form and concise Japanese meaning. Do not skip any non-numeric words.`;
+1. Break down the text into logical sentences/clauses ("sentences") for shadowing practice, with natural Japanese translations.
+2. Extract ALL unique Indonesian words from the text EXCEPT pure numbers/digits (e.g. "123", "2024"). Every single word MUST have its exact Indonesian spelling ("word") and a concise, clear Japanese meaning ("meaning"). Do not skip any non-numeric words or leave meanings empty.`;
 
         const payload = {
             contents: [{ parts: [{ text: text }] }],
@@ -702,6 +822,9 @@ Given the input Indonesian text:
 
         if (!res.ok) {
             const errData = await res.json().catch(() => ({}));
+            if (res.status === 429) {
+                throw new Error('Gemini APIの利用制限(リクエスト頻度上限)に達しました。少し待ってからお試しください。');
+            }
             throw new Error(errData.error?.message || `HTTP ${res.status}`);
         }
 
@@ -709,87 +832,49 @@ Given the input Indonesian text:
         const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!jsonText) throw new Error('AIからのレスポンス構造が不正です。');
 
-        return JSON.parse(jsonText);
+        const parsed = JSON.parse(jsonText);
+        
+        if (parsed.vocabulary && Array.isArray(parsed.vocabulary)) {
+            const existingMap = new Map();
+            parsed.vocabulary.forEach(item => {
+                if (item.word) {
+                    existingMap.set(cleanWordKey(item.word), item.meaning || '（意味なし）');
+                }
+            });
+
+            const wordsInText = text.replace(/[\.,\/\/#!$%\^&\*;:{}=\-_`~()？。、「」"'“”]/g, ' ').split(/\s+/);
+            wordsInText.forEach(w => {
+                const cleanKey = cleanWordKey(w);
+                if (cleanKey && !/^\d+$/.test(cleanKey) && !existingMap.has(cleanKey)) {
+                    existingMap.set(cleanKey, '（文脈語句）');
+                }
+            });
+
+            parsed.vocabulary = Array.from(existingMap.entries()).map(([k, meaning]) => {
+                const origObj = parsed.vocabulary.find(v => cleanWordKey(v.word) === k);
+                return {
+                    word: origObj ? origObj.word : k,
+                    meaning: meaning
+                };
+            });
+        }
+
+        return parsed;
     }
 
     function switchMode(mode) {
         currentMode = mode;
         updateTabUI();
+        stopSpeech();
         if (currentMode === 'sentence') {
+            document.getElementById('audio-bar').style.display = 'flex';
             renderSentenceList();
         } else {
-            sortVocabulary(); // 単語帳表示前にソート更新
+            document.getElementById('audio-bar').style.display = 'none';
+            sortVocabulary();
+            cardIndex = 0;
             renderFlashcard();
         }
-    }
-
-    async function analyzeWithGemini(text, apiKey) {
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
-        
-        const systemPrompt = `You are an expert Indonesian-Japanese translator and language instructor.
-Given the input Indonesian text:
-1. Break down the text into logical sentences/clauses ("sentences") for shadowing practice. Provide natural Japanese translations for each clause.
-2. Extract important or useful key vocabulary ("vocabulary") from the text with exact Indonesian word/phrase and concise Japanese meaning.`;
-
-        const payload = {
-            contents: [{ parts: [{ text: text }] }],
-            systemInstruction: { parts: [{ text: systemPrompt }] },
-            generationConfig: {
-                responseMimeType: "application/json",
-                responseSchema: {
-                    type: "OBJECT",
-                    properties: {
-                        sentences: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    indonesian: { type: "STRING" },
-                                    japanese: { type: "STRING" }
-                                },
-                                required: ["indonesian", "japanese"]
-                            }
-                        },
-                        vocabulary: {
-                            type: "ARRAY",
-                            items: {
-                                type: "OBJECT",
-                                properties: {
-                                    word: { type: "STRING" },
-                                    meaning: { type: "STRING" }
-                                },
-                                required: ["word", "meaning"]
-                            }
-                        }
-                    },
-                    required: ["sentences", "vocabulary"]
-                }
-            }
-        };
-
-        const res = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-        });
-
-        if (!res.ok) {
-            const errData = await res.json().catch(() => ({}));
-            throw new Error(errData.error?.message || `HTTP ${res.status}`);
-        }
-
-        const data = await res.json();
-        const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (!jsonText) throw new Error('AIからのレスポンス構造が不正です。');
-
-        return JSON.parse(jsonText);
-    }
-
-    function switchMode(mode) {
-        currentMode = mode;
-        updateTabUI();
-        if (currentMode === 'sentence') renderSentenceList();
-        else renderFlashcard();
     }
 
     function updateTabUI() {
@@ -839,18 +924,16 @@ Given the input Indonesian text:
         document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
 
         const targetDiv = document.getElementById(`line-${lineIndex}`);
-        targetDiv.classList.add('active');
+        if (targetDiv) targetDiv.classList.add('active');
 
-        const tokens = targetDiv.querySelectorAll('.word-token');
+        const tokens = targetDiv ? targetDiv.querySelectorAll('.word-token') : [];
         if (tokens[wordIndex]) {
             tokens[wordIndex].classList.add('highlighted');
         }
 
-        // 単語指定（タップ）の頻度をカウント・ソート更新
         const key = cleanWordKey(clickedWord);
         if (key && !/^\d+$/.test(key)) {
             wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
-            sortVocabulary();
         }
 
         const fullText = parsedData.sentences[lineIndex].indonesian;
@@ -878,10 +961,12 @@ Given the input Indonesian text:
         document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
 
-        const targetDiv = document.getElementById(`line-${index}`);
-        if (targetDiv) {
-            targetDiv.classList.add('active');
-            targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (index !== undefined) {
+            const targetDiv = document.getElementById(`line-${index}`);
+            if (targetDiv) {
+                targetDiv.classList.add('active');
+                targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
         }
 
         const utterance = new SpeechSynthesisUtterance(textToSpeech);
@@ -889,6 +974,24 @@ Given the input Indonesian text:
         utterance.rate = parseFloat(document.getElementById('speed-range').value);
 
         window.speechSynthesis.speak(utterance);
+    }
+
+    function pauseSpeech() {
+        if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
+            window.speechSynthesis.pause();
+        }
+    }
+
+    function resumeSpeech() {
+        if ('speechSynthesis' in window && window.speechSynthesis.paused) {
+            window.speechSynthesis.resume();
+        }
+    }
+
+    function stopSpeech() {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+        }
     }
 
     function renderFlashcard() {
@@ -900,34 +1003,44 @@ Given the input Indonesian text:
             return;
         }
 
-        const vocab = parsedData.vocabulary[cardIndex];
-        const key = cleanWordKey(vocab.word);
-        const tapCount = wordTapCounts[key] || 0;
+        currentFilteredVocab = parsedData.vocabulary;
+        if (cardIndex >= currentFilteredVocab.length) cardIndex = 0;
 
         const wrapper = document.createElement('div');
         wrapper.className = 'flashcard-wrapper';
 
         wrapper.innerHTML = `
-            <div style="font-size:0.85rem; color:#aaa;">単語 ${cardIndex + 1} / ${parsedData.vocabulary.length}</div>
+            <!-- 曖昧検索エリア -->
+            <div class="search-container">
+                <input type="text" id="word-search-input" class="search-input-box" placeholder="🔍 単語・意味で曖昧検索..." oninput="handleSearchInput(this.value)" autocomplete="off">
+                <div id="search-results-list" class="search-results-list"></div>
+            </div>
 
-            <div class="perspective-box" onclick="flipCard(this, '${vocab.word.replace(/'/g, "\\'")}')">
-                <div class="flashcard" id="current-flashcard">
-                    <div class="card-face card-front">
-                        <div style="font-size:0.8rem; color:#888; position:absolute; top:12px; left:12px;">表：インドネシア語</div>
-                        <div class="tap-count-badge">📌 指定: ${tapCount}回</div>
-                        <div class="card-word">${vocab.word}</div>
-                        <div style="font-size:1.2rem; cursor:pointer;" onclick="event.stopPropagation(); playText('${vocab.word.replace(/'/g, "\\'")}')">🔊</div>
-                        <div class="card-hint">👆 タップして意味を表示</div>
-                    </div>
-                    <div class="card-face card-back">
-                        <div style="font-size:0.8rem; color:#ccc; position:absolute; top:12px; left:12px;">裏：日本語の意味</div>
-                        <div class="tap-count-badge">📌 指定: ${tapCount}回</div>
-                        <div class="card-meaning">${vocab.meaning}</div>
-                        <div style="font-size:0.9rem; color:#eee; margin-top:10px;">${vocab.word}</div>
+            <!-- カウンター -->
+            <div id="card-counter" style="font-size:0.85rem; color:#aaa;">単語 ${cardIndex + 1} / ${currentFilteredVocab.length}</div>
+
+            <!-- 3D フラッシュカード -->
+            <div style="width:100%; display:flex; justify-content:center;">
+                <div class="perspective-box" onclick="flipCard()">
+                    <div class="flashcard" id="current-flashcard">
+                        <div class="card-face card-front">
+                            <div style="font-size:0.8rem; color:#888; position:absolute; top:12px; left:12px;">表：インドネシア語</div>
+                            <div class="tap-count-badge" id="front-tap-badge">📌 指定: 0回</div>
+                            <div class="card-word" id="front-card-word">word</div>
+                            <div style="font-size:1.2rem; cursor:pointer;" onclick="event.stopPropagation(); playCurrentCardSpeech()">🔊</div>
+                            <div class="card-hint">👆 タップして意味を表示 & 音声再生</div>
+                        </div>
+                        <div class="card-face card-back">
+                            <div style="font-size:0.8rem; color:#ccc; position:absolute; top:12px; left:12px;">裏：日本語の意味</div>
+                            <div class="tap-count-badge" id="back-tap-badge">📌 指定: 0回</div>
+                            <div class="card-meaning" id="back-card-meaning">meaning</div>
+                            <div style="font-size:0.9rem; color:#eee; margin-top:12px; border-top:1px solid rgba(255,255,255,0.2); padding-top:6px;" id="back-card-word-sub">word</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
+            <!-- 操作コントロール -->
             <div class="card-controls">
                 <button class="ctrl-btn" onclick="prevCard()">◀ 前へ</button>
                 <button class="ctrl-btn" onclick="shuffleCards()">🔀 シャッフル</button>
@@ -936,26 +1049,64 @@ Given the input Indonesian text:
         `;
 
         container.appendChild(wrapper);
+        updateCardDisplay();
     }
 
-    function flipCard(boxEl, wordText) {
-        const card = boxEl.querySelector('.flashcard');
-        card.classList.toggle('flipped');
-        
-        // カードをタップした際に自動で音声再生
-        playText(wordText);
+    function updateCardDisplay() {
+        if (!currentFilteredVocab || currentFilteredVocab.length === 0) return;
+        if (cardIndex < 0) cardIndex = currentFilteredVocab.length - 1;
+        if (cardIndex >= currentFilteredVocab.length) cardIndex = 0;
+
+        const vocab = currentFilteredVocab[cardIndex];
+        const key = cleanWordKey(vocab.word);
+        const tapCount = wordTapCounts[key] || 0;
+        const wordMeaning = vocab.meaning && vocab.meaning.trim() !== '' ? vocab.meaning : '（日本語の意味なし）';
+
+        const counter = document.getElementById('card-counter');
+        if (counter) counter.textContent = `単語 ${cardIndex + 1} / ${currentFilteredVocab.length}`;
+
+        const frontWord = document.getElementById('front-card-word');
+        const frontBadge = document.getElementById('front-tap-badge');
+        const backMeaning = document.getElementById('back-card-meaning');
+        const backBadge = document.getElementById('back-tap-badge');
+        const backSub = document.getElementById('back-card-word-sub');
+
+        if (frontWord) frontWord.textContent = vocab.word;
+        if (frontBadge) frontBadge.textContent = `📌 指定: ${tapCount}回`;
+        if (backMeaning) backMeaning.textContent = wordMeaning;
+        if (backBadge) backBadge.textContent = `📌 指定: ${tapCount}回`;
+        if (backSub) backSub.textContent = vocab.word;
+
+        const flashcard = document.getElementById('current-flashcard');
+        if (flashcard) flashcard.classList.remove('flipped');
+    }
+
+    function playCurrentCardSpeech() {
+        if (!currentFilteredVocab || currentFilteredVocab.length === 0) return;
+        const vocab = currentFilteredVocab[cardIndex];
+        if (vocab && vocab.word) {
+            playText(vocab.word);
+        }
+    }
+
+    function flipCard() {
+        const flashcard = document.getElementById('current-flashcard');
+        if (flashcard) {
+            flashcard.classList.toggle('flipped');
+            playCurrentCardSpeech();
+        }
     }
 
     function prevCard() {
-        if (parsedData.vocabulary.length === 0) return;
-        cardIndex = (cardIndex - 1 + parsedData.vocabulary.length) % parsedData.vocabulary.length;
-        renderFlashcard();
+        if (!currentFilteredVocab || currentFilteredVocab.length === 0) return;
+        cardIndex = (cardIndex - 1 + currentFilteredVocab.length) % currentFilteredVocab.length;
+        updateCardDisplay();
     }
 
     function nextCard() {
-        if (parsedData.vocabulary.length === 0) return;
-        cardIndex = (cardIndex + 1) % parsedData.vocabulary.length;
-        renderFlashcard();
+        if (!currentFilteredVocab || currentFilteredVocab.length === 0) return;
+        cardIndex = (cardIndex + 1) % currentFilteredVocab.length;
+        updateCardDisplay();
     }
 
     function shuffleCards() {
@@ -965,12 +1116,68 @@ Given the input Indonesian text:
             [parsedData.vocabulary[i], parsedData.vocabulary[j]] = [parsedData.vocabulary[j], parsedData.vocabulary[i]];
         }
         cardIndex = 0;
+        currentFilteredVocab = parsedData.vocabulary;
         showToast('単語順をシャッフルしました！');
-        renderFlashcard();
+        updateCardDisplay();
+    }
+
+    function handleSearchInput(query) {
+        clearTimeout(searchDebounceTimer);
+        searchDebounceTimer = setTimeout(() => {
+            executeSearchFilter(query.trim());
+        }, 150);
+    }
+
+    function executeSearchFilter(query) {
+        const resultsList = document.getElementById('search-results-list');
+        if (!resultsList) return;
+
+        if (!query) {
+            resultsList.style.display = 'none';
+            resultsList.innerHTML = '';
+            currentFilteredVocab = parsedData.vocabulary;
+            cardIndex = 0;
+            updateCardDisplay();
+            return;
+        }
+
+        const qLower = query.toLowerCase();
+        const matches = parsedData.vocabulary.filter(v => 
+            v.word.toLowerCase().includes(qLower) || (v.meaning && v.meaning.toLowerCase().includes(qLower))
+        );
+
+        if (matches.length === 0) {
+            resultsList.innerHTML = '<div style="padding:10px; color:#888; font-size:0.85rem;">該当する単語が見つかりません</div>';
+            resultsList.style.display = 'block';
+            return;
+        }
+
+        resultsList.innerHTML = matches.map((item) => {
+            const origIndex = parsedData.vocabulary.indexOf(item);
+            const key = cleanWordKey(item.word);
+            const count = wordTapCounts[key] || 0;
+            return `
+                <div class="search-result-item" onclick="selectSearchWord(${origIndex})">
+                    <span><strong>${item.word}</strong> - ${item.meaning}</span>
+                    <span style="color:#ffcc00; font-size:0.75rem;">📌 ${count}回</span>
+                </div>
+            `;
+        }).join('');
+
+        resultsList.style.display = 'block';
+    }
+
+    function selectSearchWord(origIndex) {
+        currentFilteredVocab = parsedData.vocabulary;
+        cardIndex = origIndex;
+        const resultsList = document.getElementById('search-results-list');
+        if (resultsList) resultsList.style.display = 'none';
+
+        updateCardDisplay();
     }
 
     function backToSetup() {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        stopSpeech();
         document.getElementById('player-area').style.display = 'none';
         document.getElementById('setup-card').style.display = 'flex';
         updateHistoryUI();
