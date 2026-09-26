@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Indonesian Shadowing AI</title>
@@ -18,90 +17,94 @@ body {
         -apple-system,
         BlinkMacSystemFont,
         "Segoe UI",
-        "Hiragino Kaku Gothic ProN",
-        "Yu Gothic",
-        Meiryo,
+        "Noto Sans JP",
         sans-serif;
-    background: #f3f4f6;
+    background: #f4f7fb;
     color: #1f2937;
 }
 
 header {
-    background: #111827;
+    background: linear-gradient(135deg, #2563eb, #4f46e5);
     color: white;
-    padding: 18px 20px;
-    position: sticky;
-    top: 0;
-    z-index: 20;
+    padding: 24px 16px;
 }
 
 header h1 {
-    margin: 0;
-    font-size: 21px;
+    max-width: 1100px;
+    margin: 0 auto 8px;
+    font-size: 28px;
 }
 
-.version {
-    margin-top: 5px;
-    font-size: 12px;
-    opacity: .7;
+header p {
+    max-width: 1100px;
+    margin: 0 auto;
+    opacity: .9;
 }
 
 .container {
-    width: min(1100px, 100%);
-    margin: auto;
-    padding: 20px;
+    max-width: 1100px;
+    margin: 24px auto;
+    padding: 0 16px 60px;
 }
 
 .card {
     background: white;
-    border-radius: 14px;
-    padding: 18px;
+    border-radius: 16px;
+    padding: 20px;
     margin-bottom: 18px;
-    box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    box-shadow: 0 4px 18px rgba(0,0,0,.06);
 }
 
 .card h2 {
-    margin: 0 0 14px;
-    font-size: 18px;
+    margin-top: 0;
+    font-size: 20px;
 }
 
+label {
+    display: block;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+input,
 textarea,
-input {
+select {
     width: 100%;
     border: 1px solid #d1d5db;
-    border-radius: 9px;
+    border-radius: 10px;
     padding: 11px 12px;
     font-size: 15px;
     background: white;
 }
 
 textarea {
-    min-height: 230px;
+    min-height: 180px;
     resize: vertical;
-    line-height: 1.75;
+    line-height: 1.7;
 }
 
 button {
     border: 0;
-    border-radius: 9px;
-    padding: 10px 15px;
-    cursor: pointer;
+    border-radius: 10px;
+    padding: 11px 16px;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s;
+}
+
+button:hover {
+    transform: translateY(-1px);
 }
 
 button:disabled {
     opacity: .5;
     cursor: not-allowed;
+    transform: none;
 }
 
 .btn-primary {
     background: #2563eb;
-    color: white;
-}
-
-.btn-green {
-    background: #059669;
     color: white;
 }
 
@@ -110,198 +113,213 @@ button:disabled {
     color: #111827;
 }
 
+.btn-success {
+    background: #059669;
+    color: white;
+}
+
 .btn-danger {
     background: #dc2626;
     color: white;
 }
 
-.btn-small {
-    padding: 7px 10px;
-    font-size: 12px;
+.btn-warning {
+    background: #d97706;
+    color: white;
 }
 
 .button-row {
     display: flex;
-    gap: 8px;
     flex-wrap: wrap;
+    gap: 8px;
     margin-top: 12px;
 }
 
-.api-row {
+.grid {
     display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 8px;
-    align-items: end;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
 }
 
-.small {
-    color: #6b7280;
-    font-size: 12px;
+@media (max-width: 700px) {
+    .grid {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 23px;
+    }
 }
 
 .status {
-    margin-top: 10px;
-    padding: 11px 13px;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 10px;
+    padding: 12px 14px;
+    margin-top: 12px;
+    font-size: 14px;
     white-space: pre-wrap;
 }
 
-.status-info {
+.status.info {
     background: #eff6ff;
     color: #1d4ed8;
 }
 
-.status-success {
+.status.success {
     background: #ecfdf5;
     color: #047857;
 }
 
-.status-error {
+.status.error {
     background: #fef2f2;
     color: #b91c1c;
 }
 
-.status-warning {
+.status.warning {
     background: #fffbeb;
     color: #b45309;
 }
 
-.progress-wrap {
-    margin-top: 12px;
-}
-
-.progress {
-    width: 100%;
-    height: 8px;
-    background: #e5e7eb;
-    border-radius: 999px;
-    overflow: hidden;
-}
-
-.progress-bar {
-    height: 100%;
-    width: 0%;
-    background: #2563eb;
-    transition: width .2s;
-}
-
-.sentence-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.sentence-card {
+.sentence {
     border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 14px;
+    border-radius: 14px;
+    padding: 16px;
+    margin-bottom: 14px;
+    background: #fafafa;
 }
 
 .sentence-number {
-    color: #6b7280;
     font-size: 12px;
-    margin-bottom: 7px;
+    font-weight: 800;
+    color: #6b7280;
+    margin-bottom: 8px;
 }
 
 .indonesian {
-    font-size: 16px;
-    line-height: 1.75;
+    font-size: 18px;
+    line-height: 1.7;
     font-weight: 600;
+    margin-bottom: 10px;
 }
 
 .japanese {
-    margin-top: 9px;
-    padding: 10px;
-    background: #f9fafb;
-    border-radius: 8px;
-    line-height: 1.75;
+    font-size: 16px;
+    line-height: 1.7;
+    color: #374151;
+    padding-top: 10px;
+    border-top: 1px solid #e5e7eb;
 }
 
 .sentence-actions {
     display: flex;
+    gap: 8px;
+    margin-top: 12px;
     flex-wrap: wrap;
-    gap: 7px;
-    margin-top: 10px;
+}
+
+.small-button {
+    padding: 7px 10px;
+    font-size: 12px;
 }
 
 .vocab-grid {
     display: grid;
-    grid-template-columns:
-        repeat(auto-fill, minmax(220px, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
 }
 
-.vocab-card {
+@media (max-width: 700px) {
+    .vocab-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.vocab-item {
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     padding: 12px;
+    background: #fff;
 }
 
 .vocab-word {
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .vocab-meaning {
-    margin-top: 5px;
+    margin-top: 4px;
     color: #4b5563;
-    line-height: 1.5;
 }
 
 .history-item {
     border: 1px solid #e5e7eb;
-    border-radius: 9px;
-    padding: 10px;
-    margin-top: 8px;
-}
-
-.history-title {
-    font-weight: 600;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 8px;
 }
 
 .history-date {
-    margin-top: 4px;
     color: #6b7280;
     font-size: 12px;
 }
 
-.empty {
-    text-align: center;
-    color: #6b7280;
-    padding: 20px;
+.history-preview {
+    margin-top: 5px;
+    font-size: 14px;
 }
 
-.debug {
+pre {
     background: #111827;
-    color: #d1d5db;
-    padding: 13px;
-    border-radius: 9px;
-    font-family: monospace;
-    font-size: 12px;
-    white-space: pre-wrap;
+    color: #e5e7eb;
+    border-radius: 10px;
+    padding: 14px;
     overflow-x: auto;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.info-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.info-table td {
+    padding: 7px 4px;
+    border-bottom: 1px solid #eee;
+    vertical-align: top;
+}
+
+.info-table td:first-child {
+    width: 180px;
+    font-weight: 700;
+    color: #4b5563;
 }
 
 .hidden {
     display: none !important;
 }
 
-@media (max-width: 700px) {
-    .container {
-        padding: 12px;
-    }
+.counter {
+    text-align: right;
+    color: #6b7280;
+    font-size: 12px;
+    margin-top: 5px;
+}
 
-    .api-row {
-        grid-template-columns: 1fr;
-    }
+.loading {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,.5);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    vertical-align: -2px;
+    margin-right: 6px;
+}
 
-    header h1 {
-        font-size: 18px;
-    }
-
-    textarea {
-        min-height: 190px;
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
     }
 }
 </style>
@@ -311,185 +329,135 @@ button:disabled {
 
 <header>
     <h1>🇮🇩 Indonesian Shadowing AI</h1>
-    <div class="version">
-        Gemini 3.8 Flash / Interactions API / v4.1
-    </div>
+    <p>インドネシア語シャドーイング・AI翻訳・単語学習</p>
 </header>
 
 <div class="container">
 
-    <!-- API KEY -->
+    <!-- API設定 -->
     <section class="card">
+        <h2>🔑 Gemini API設定</h2>
 
-        <h2>🔑 Gemini API</h2>
-
-        <div class="api-row">
-
-            <div>
-                <div class="small">
-                    Gemini API Key
-                </div>
-
-                <input
-                    id="apiKey"
-                    type="password"
-                    autocomplete="off"
-                    placeholder="AIza..."
-                >
-            </div>
-
-            <button
-                id="saveApiKey"
-                class="btn-secondary"
-            >
-                保存
-            </button>
-
-        </div>
+        <label for="apiKey">Gemini API Key</label>
+        <input
+            id="apiKey"
+            type="password"
+            placeholder="AIza..."
+            autocomplete="off"
+        >
 
         <div class="button-row">
-
-            <button
-                id="clearApiKey"
-                class="btn-danger btn-small"
-            >
-                APIキー削除
+            <button class="btn-primary" id="saveKeyBtn">
+                APIキーを保存
             </button>
 
-            <button
-                id="testApi"
-                class="btn-secondary btn-small"
-            >
+            <button class="btn-secondary" id="testApiBtn">
                 API接続テスト
             </button>
 
+            <button class="btn-danger" id="deleteKeyBtn">
+                保存キー削除
+            </button>
         </div>
 
-        <div
-            id="apiStatus"
-            class="status status-info"
-        >
+        <div id="apiStatus" class="status info">
             APIキーを入力してください。
         </div>
-
-        <div class="small" style="margin-top:8px;">
-            APIキーはこのブラウザのlocalStorageに保存されます。
-        </div>
-
     </section>
 
-
-    <!-- INPUT -->
+    <!-- システム情報 -->
     <section class="card">
+        <h2>⚙️ システム情報</h2>
 
-        <h2>📝 インドネシア語</h2>
+        <table class="info-table">
+            <tr>
+                <td>モデル</td>
+                <td id="infoModel"></td>
+            </tr>
+            <tr>
+                <td>Endpoint</td>
+                <td id="infoEndpoint"></td>
+            </tr>
+            <tr>
+                <td>分割単位</td>
+                <td id="infoChunk"></td>
+            </tr>
+            <tr>
+                <td>APIキー保存</td>
+                <td id="infoKey"></td>
+            </tr>
+        </table>
+    </section>
+
+    <!-- 入力 -->
+    <section class="card">
+        <h2>📝 インドネシア語を入力</h2>
+
+        <label for="inputText">原文</label>
 
         <textarea
             id="inputText"
-            placeholder="インドネシア語をここに貼り付けてください。"
+            placeholder="ここにインドネシア語を入力してください。&#10;&#10;例：Yehuwa mau kita mengenal-Nya. Dia ingin kita mendekat kepada-Nya."
         ></textarea>
 
+        <div class="counter">
+            <span id="charCount">0</span> 文字
+        </div>
+
         <div class="button-row">
-
-            <button
-                id="translateBtn"
-                class="btn-primary"
-            >
-                🇮🇩 → 🇯🇵 翻訳する
+            <button class="btn-primary" id="translateBtn">
+                🇮🇩 日本語に翻訳
             </button>
 
-            <button
-                id="sampleBtn"
-                class="btn-secondary"
-            >
-                サンプル
+            <button class="btn-secondary" id="sampleBtn">
+                サンプル入力
             </button>
 
-            <button
-                id="clearBtn"
-                class="btn-secondary"
-            >
+            <button class="btn-secondary" id="clearBtn">
                 クリア
             </button>
-
         </div>
 
-        <div
-            id="progressContainer"
-            class="progress-wrap hidden"
-        >
-
-            <div class="progress">
-                <div
-                    id="progressBar"
-                    class="progress-bar"
-                ></div>
-            </div>
-
-            <div
-                id="progressText"
-                class="small"
-                style="margin-top:6px;"
-            ></div>
-
-        </div>
-
+        <div id="translateStatus"></div>
     </section>
 
+    <!-- 結果 -->
+    <section class="card" id="resultCard">
+        <h2>📖 翻訳結果</h2>
 
-    <!-- RESULT -->
-    <section class="card">
-
-        <h2>📖 対訳</h2>
-
-        <div
-            id="result"
-            class="sentence-list"
-        >
-            <div class="empty">
-                翻訳結果がここに表示されます。
+        <div id="resultContainer">
+            <div class="status info">
+                まだ翻訳されていません。
             </div>
         </div>
-
     </section>
 
-
-    <!-- VOCABULARY -->
+    <!-- 語彙 -->
     <section class="card">
-
         <h2>📚 語彙</h2>
 
-        <div
-            id="vocabulary"
-            class="vocab-grid"
-        >
-            <div class="empty">
-                語彙がここに表示されます。
+        <div id="vocabularyContainer">
+            <div class="status info">
+                翻訳すると重要語彙が表示されます。
             </div>
         </div>
-
     </section>
 
-
-    <!-- HISTORY -->
+    <!-- 履歴 -->
     <section class="card">
-
         <h2>🕘 履歴</h2>
 
         <div class="button-row">
-
-            <button
-                id="exportBtn"
-                class="btn-secondary btn-small"
-            >
-                JSONエクスポート
+            <button class="btn-secondary" id="exportBtn">
+                履歴をエクスポート
             </button>
 
-            <button
-                id="importBtn"
-                class="btn-secondary btn-small"
-            >
-                JSONインポート
+            <button class="btn-secondary" id="importBtn">
+                履歴をインポート
+            </button>
+
+            <button class="btn-danger" id="clearHistoryBtn">
+                履歴を全削除
             </button>
 
             <input
@@ -498,35 +466,16 @@ button:disabled {
                 accept=".json,application/json"
                 class="hidden"
             >
-
-            <button
-                id="clearHistoryBtn"
-                class="btn-danger btn-small"
-            >
-                履歴全削除
-            </button>
-
         </div>
 
-        <div id="history">
-            <div class="empty">
-                履歴はありません。
-            </div>
-        </div>
-
+        <div id="historyContainer" style="margin-top:14px;"></div>
     </section>
 
-
-    <!-- DEBUG -->
+    <!-- デバッグ -->
     <section class="card">
+        <h2>🐞 デバッグ情報</h2>
 
-        <h2>🔧 システム情報</h2>
-
-        <div
-            id="debugInfo"
-            class="debug"
-        ></div>
-
+        <pre id="debugOutput">待機中...</pre>
     </section>
 
 </div>
@@ -535,7 +484,6 @@ button:disabled {
 <script>
 "use strict";
 
-
 /* =========================================================
    CONFIG
    ========================================================= */
@@ -543,9 +491,7 @@ button:disabled {
 const CONFIG = Object.freeze({
 
     /*
-     * 現在使用するモデル。
-     *
-     * 古いモデル名はここには存在しない。
+     * 現在使用するGeminiモデル
      */
     model: "gemini-3.8-flash",
 
@@ -553,51 +499,31 @@ const CONFIG = Object.freeze({
      * Interactions API
      */
     endpoint:
-        "https://generativelanguage.googleapis.com/v1beta/interactions",
+        "https://generativelanguage.googleapis.com/v1/interactions",
 
     /*
-     * APIキー保存場所
+     * LocalStorage
      */
     apiKeyStorage:
-        "indonesian_shadowing_api_key_v41",
+        "indonesian_shadowing_api_key_v50",
 
-    /*
-     * 履歴保存場所
-     */
     historyStorage:
-        "indonesian_shadowing_history_v41",
+        "indonesian_shadowing_history_v50",
 
     /*
-     * 一度にGeminiへ送る文数。
-     *
-     * 長文JSONの途中切れ防止。
+     * 1回のAPIリクエストに送る文数
      */
     chunkSize: 5,
 
     /*
-     * 出力上限。
-     *
-     * Interactions APIでは
-     * max_tokensではなく
-     * max_output_tokens。
-     */
-    maxOutputTokens: 4096,
-
-    /*
-     * Gemini 3.xのthinking level。
-     */
-    thinkingLevel: "low",
-
-    /*
-     * 最大語彙数。
+     * 語彙最大数
      */
     maxVocabulary: 30,
 
     /*
-     * APIタイムアウト。
+     * APIタイムアウト
      */
     timeout: 90000
-
 });
 
 
@@ -605,175 +531,215 @@ const CONFIG = Object.freeze({
    DOM
    ========================================================= */
 
-const apiKeyInput =
-    document.getElementById("apiKey");
+const $ = (id) => document.getElementById(id);
 
-const saveApiKeyBtn =
-    document.getElementById("saveApiKey");
+const apiKeyInput = $("apiKey");
+const inputText = $("inputText");
 
-const clearApiKeyBtn =
-    document.getElementById("clearApiKey");
+const saveKeyBtn = $("saveKeyBtn");
+const testApiBtn = $("testApiBtn");
+const deleteKeyBtn = $("deleteKeyBtn");
 
-const testApiBtn =
-    document.getElementById("testApi");
+const translateBtn = $("translateBtn");
+const sampleBtn = $("sampleBtn");
+const clearBtn = $("clearBtn");
 
-const apiStatus =
-    document.getElementById("apiStatus");
+const apiStatus = $("apiStatus");
+const translateStatus = $("translateStatus");
 
-const inputText =
-    document.getElementById("inputText");
+const resultContainer = $("resultContainer");
+const vocabularyContainer = $("vocabularyContainer");
 
-const translateBtn =
-    document.getElementById("translateBtn");
+const historyContainer = $("historyContainer");
 
-const sampleBtn =
-    document.getElementById("sampleBtn");
+const exportBtn = $("exportBtn");
+const importBtn = $("importBtn");
+const importFile = $("importFile");
+const clearHistoryBtn = $("clearHistoryBtn");
 
-const clearBtn =
-    document.getElementById("clearBtn");
+const charCount = $("charCount");
+const debugOutput = $("debugOutput");
 
-const result =
-    document.getElementById("result");
-
-const vocabulary =
-    document.getElementById("vocabulary");
-
-const history =
-    document.getElementById("history");
-
-const exportBtn =
-    document.getElementById("exportBtn");
-
-const importBtn =
-    document.getElementById("importBtn");
-
-const importFile =
-    document.getElementById("importFile");
-
-const clearHistoryBtn =
-    document.getElementById("clearHistoryBtn");
-
-const progressContainer =
-    document.getElementById("progressContainer");
-
-const progressBar =
-    document.getElementById("progressBar");
-
-const progressText =
-    document.getElementById("progressText");
-
-const debugInfo =
-    document.getElementById("debugInfo");
+const infoModel = $("infoModel");
+const infoEndpoint = $("infoEndpoint");
+const infoChunk = $("infoChunk");
+const infoKey = $("infoKey");
 
 
 /* =========================================================
-   INITIALIZE
+   初期化
    ========================================================= */
 
-function initialize() {
+document.addEventListener("DOMContentLoaded", () => {
 
-    const savedKey =
+    infoModel.textContent = CONFIG.model;
+    infoEndpoint.textContent = CONFIG.endpoint;
+    infoChunk.textContent =
+        `${CONFIG.chunkSize}文 / リクエスト`;
+
+    loadApiKey();
+    updateCharCount();
+    renderHistory();
+
+    inputText.addEventListener(
+        "input",
+        updateCharCount
+    );
+
+    saveKeyBtn.addEventListener(
+        "click",
+        saveApiKey
+    );
+
+    testApiBtn.addEventListener(
+        "click",
+        testApi
+    );
+
+    deleteKeyBtn.addEventListener(
+        "click",
+        deleteApiKey
+    );
+
+    translateBtn.addEventListener(
+        "click",
+        translateAll
+    );
+
+    sampleBtn.addEventListener(
+        "click",
+        insertSample
+    );
+
+    clearBtn.addEventListener(
+        "click",
+        clearInput
+    );
+
+    exportBtn.addEventListener(
+        "click",
+        exportHistory
+    );
+
+    importBtn.addEventListener(
+        "click",
+        () => importFile.click()
+    );
+
+    importFile.addEventListener(
+        "change",
+        importHistory
+    );
+
+    clearHistoryBtn.addEventListener(
+        "click",
+        clearHistory
+    });
+
+
+    /*
+     * 重要：
+     * ページ内に古いAPIパラメータが存在していないか確認。
+     */
+    runStaticSelfCheck();
+});
+
+
+/* =========================================================
+   API KEY
+   ========================================================= */
+
+function loadApiKey() {
+
+    const key =
         localStorage.getItem(
             CONFIG.apiKeyStorage
         );
 
-    if (savedKey) {
+    if (key) {
 
-        apiKeyInput.value =
-            savedKey;
+        apiKeyInput.value = key;
 
-        setApiStatus(
-            "保存済みのAPIキーを読み込みました。",
-            "success"
+        apiStatus.className =
+            "status success";
+
+        apiStatus.textContent =
+            "APIキーが保存されています。";
+
+        infoKey.textContent =
+            "保存済み";
+
+    } else {
+
+        infoKey.textContent =
+            "未保存";
+    }
+}
+
+
+function saveApiKey() {
+
+    const key =
+        apiKeyInput.value.trim();
+
+    if (!key) {
+
+        showStatus(
+            apiStatus,
+            "error",
+            "APIキーを入力してください。"
         );
+
+        return;
     }
 
-    updateDebugInfo();
-
-    loadHistory();
-
-    /*
-     * コンソールでも確認できる。
-     */
-    console.log(
-        "================================"
+    localStorage.setItem(
+        CONFIG.apiKeyStorage,
+        key
     );
 
-    console.log(
-        "Indonesian Shadowing AI v4.1"
-    );
+    infoKey.textContent =
+        "保存済み";
 
-    console.log(
-        "Gemini model:",
-        CONFIG.model
-    );
-
-    console.log(
-        "Gemini endpoint:",
-        CONFIG.endpoint
-    );
-
-    console.log(
-        "max_output_tokens:",
-        CONFIG.maxOutputTokens
-    );
-
-    console.log(
-        "thinking_level:",
-        CONFIG.thinkingLevel
-    );
-
-    console.log(
-        "================================"
+    showStatus(
+        apiStatus,
+        "success",
+        "APIキーを保存しました。"
     );
 }
 
 
-/* =========================================================
-   DEBUG
-   ========================================================= */
+function deleteApiKey() {
 
-function updateDebugInfo() {
+    localStorage.removeItem(
+        CONFIG.apiKeyStorage
+    );
 
-    debugInfo.textContent =
-`App:
-Indonesian Shadowing AI v4.1
+    apiKeyInput.value = "";
 
-Gemini Model:
-${CONFIG.model}
+    infoKey.textContent =
+        "未保存";
 
-Endpoint:
-${CONFIG.endpoint}
+    showStatus(
+        apiStatus,
+        "info",
+        "保存されたAPIキーを削除しました。"
+    );
+}
 
-API:
-Interactions API
 
-Output:
-Structured JSON
+function getApiKey() {
 
-max_output_tokens:
-${CONFIG.maxOutputTokens}
+    const inputKey =
+        apiKeyInput.value.trim();
 
-thinking_level:
-${CONFIG.thinkingLevel}
+    if (inputKey) {
+        return inputKey;
+    }
 
-Chunk Size:
-${CONFIG.chunkSize}
-
-Source Indonesian:
-JavaScript original input
-
-Gemini Indonesian output:
-NOT USED
-
-Gemini Japanese output:
-USED
-
-重要:
-画面に表示するインドネシア語は、
-Geminiの出力ではありません。
-ユーザーが入力した原文そのものです。
-`;
+    return localStorage.getItem(
+        CONFIG.apiKeyStorage
+    ) || "";
 }
 
 
@@ -781,144 +747,112 @@ Geminiの出力ではありません。
    STATUS
    ========================================================= */
 
-function setApiStatus(
-    message,
-    type = "info"
+function showStatus(
+    element,
+    type,
+    message
 ) {
 
-    apiStatus.textContent =
+    element.className =
+        `status ${type}`;
+
+    element.textContent =
         message;
-
-    apiStatus.className =
-        "status status-" + type;
 }
 
 
 /* =========================================================
-   API KEY
+   CHAR COUNT
    ========================================================= */
 
-saveApiKeyBtn.addEventListener(
-    "click",
-    () => {
+function updateCharCount() {
 
-        const key =
-            apiKeyInput.value.trim();
-
-        if (!key) {
-
-            setApiStatus(
-                "APIキーが空です。",
-                "error"
-            );
-
-            return;
-        }
-
-        localStorage.setItem(
-            CONFIG.apiKeyStorage,
-            key
-        );
-
-        setApiStatus(
-            "APIキーを保存しました。",
-            "success"
-        );
-    }
-);
-
-
-clearApiKeyBtn.addEventListener(
-    "click",
-    () => {
-
-        localStorage.removeItem(
-            CONFIG.apiKeyStorage
-        );
-
-        apiKeyInput.value =
-            "";
-
-        setApiStatus(
-            "APIキーを削除しました。",
-            "success"
-        );
-    }
-);
-
-
-function getApiKey() {
-
-    const key =
-        apiKeyInput.value.trim() ||
-        localStorage.getItem(
-            CONFIG.apiKeyStorage
-        );
-
-    if (!key) {
-
-        throw new Error(
-            "Gemini APIキーが設定されていません。"
-        );
-    }
-
-    return key;
+    charCount.textContent =
+        inputText.value.length;
 }
 
 
 /* =========================================================
-   FETCH TIMEOUT
+   サンプル
    ========================================================= */
 
-async function fetchWithTimeout(
-    url,
-    options,
-    timeout
-) {
+function insertSample() {
 
-    const controller =
-        new AbortController();
+    inputText.value =
+`Yehuwa mau kita mengenal-Nya. Jika kita mencari-Nya, Dia akan membiarkan diri-Nya ditemukan. Melalui Yesus dan Alkitab, Yehuwa menyingkapkan perasaan-Nya kepada kita.`;
 
-    const timer =
-        setTimeout(
-            () => controller.abort(),
-            timeout
-        );
-
-    try {
-
-        return await fetch(
-            url,
-            {
-                ...options,
-                signal:
-                    controller.signal
-            }
-        );
-
-    } catch (error) {
-
-        if (
-            error.name ===
-            "AbortError"
-        ) {
-
-            throw new Error(
-                "Gemini APIがタイムアウトしました。"
-            );
-        }
-
-        throw error;
-
-    } finally {
-
-        clearTimeout(timer);
-    }
+    updateCharCount();
 }
 
 
 /* =========================================================
-   RESPONSE SCHEMA
+   入力クリア
+   ========================================================= */
+
+function clearInput() {
+
+    inputText.value = "";
+
+    updateCharCount();
+
+    resultContainer.innerHTML =
+        `<div class="status info">
+            まだ翻訳されていません。
+        </div>`;
+
+    vocabularyContainer.innerHTML =
+        `<div class="status info">
+            翻訳すると重要語彙が表示されます。
+        </div>`;
+
+    translateStatus.innerHTML = "";
+}
+
+
+/* =========================================================
+   インドネシア語文分割
+   ========================================================= */
+
+function splitIndonesianSentences(text) {
+
+    /*
+     * 改行を空白にする。
+     *
+     * ここでは日本語文字除去などを絶対にしない。
+     * 原文はそのまま保持する。
+     */
+    const normalized =
+        text
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .replace(/\n+/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+
+    if (!normalized) {
+        return [];
+    }
+
+    /*
+     * ., !, ? を文末として分割。
+     */
+    const matches =
+        normalized.match(
+            /[^.!?]+(?:[.!?]+|$)/g
+        );
+
+    if (!matches) {
+        return [normalized];
+    }
+
+    return matches
+        .map(s => s.trim())
+        .filter(Boolean);
+}
+
+
+/* =========================================================
+   Gemini Response Schema
    ========================================================= */
 
 function getResponseSchema() {
@@ -994,53 +928,41 @@ function getResponseSchema() {
 
 
 /* =========================================================
-   GEMINI PROMPT
+   Prompt
    ========================================================= */
 
-function buildPrompt(
-    sentences
-) {
+function buildPrompt(sentences) {
 
     const numbered =
         sentences
             .map(
-                (sentence, index) =>
-                    `[${index}] ${sentence}`
+                (sentence, i) =>
+                    `[${i}] ${sentence}`
             )
             .join("\n");
 
-
     return `
-あなたはインドネシア語学習用の日本語翻訳AIです。
+あなたはインドネシア語学習アプリの翻訳エンジンです。
 
-以下のインドネシア語を日本語に翻訳してください。
+以下のインドネシア語の各文を日本語に翻訳してください。
 
-【絶対ルール】
+重要なルール：
 
-1. 入力されたインドネシア語を変更しない。
-2. 入力されたインドネシア語を再生成しない。
-3. インドネシア語本文を回答として出力しない。
-4. translationsには日本語訳だけを入れる。
-5. indexは入力された番号をそのまま使用する。
-6. すべての入力文について1つずつ日本語訳を返す。
-7. 文を結合しない。
-8. 文を分割しない。
-9. 翻訳にインドネシア語を混ぜない。
-10. 翻訳以外の説明を書かない。
-11. vocabulary.wordはインドネシア語。
-12. vocabulary.meaningは日本語。
-13. JSON以外の文字を出力しない。
+1. 入力されたインドネシア語を絶対に変更しない。
+2. インドネシア語を生成し直さない。
+3. responseにはindonesianフィールドを作らない。
+4. 各文について日本語訳だけを作る。
+5. 入力の番号 [0], [1], [2] ... をそのままindexとして使用する。
+6. 1つの入力文につき、必ず1つの日本語訳を作る。
+7. 文を勝手に結合しない。
+8. 文を勝手に分割しない。
+9. インドネシア語と日本語を混ぜない。
+10. vocabulary.wordにはインドネシア語を入れる。
+11. vocabulary.meaningには日本語の意味を入れる。
+12. 説明文は出力しない。
+13. JSON形式だけを返す。
 
-【翻訳方針】
-
-・自然な日本語にする。
-・意味を勝手に追加しない。
-・意味を勝手に省略しない。
-・固有名詞は原文の意味を保つ。
-・聖書の書名、章、節などは正確に扱う。
-・敬意や宗教的表現など、原文のニュアンスを保つ。
-
-【入力】
+入力：
 
 ${numbered}
 `;
@@ -1048,161 +970,192 @@ ${numbered}
 
 
 /* =========================================================
-   GEMINI API
+   Gemini API
    ========================================================= */
 
 async function callGemini(
-    sentences
+    sentences,
+    options = {}
 ) {
 
     const apiKey =
         getApiKey();
 
-    const prompt =
-        buildPrompt(
-            sentences
+    if (!apiKey) {
+        throw new Error(
+            "Gemini APIキーが設定されていません。"
         );
+    }
+
+    const prompt =
+        buildPrompt(sentences);
 
 
     /*
-     * 送信内容を確認。
+     * 現在のInteractions API形式。
+     *
+     * response_mime_type
+     * responseMimeType
+     * max_tokens
+     *
+     * は使用しない。
      */
-    console.log(
-        "Gemini request model:",
-        CONFIG.model
-    );
-
-    console.log(
-        "Gemini request endpoint:",
-        CONFIG.endpoint
-    );
-
-    console.log(
-        "Gemini request sentences:",
-        sentences
-    );
-
-
     const requestBody = {
 
-        model:
-            CONFIG.model,
+        model: CONFIG.model,
 
-        input:
-            prompt,
+        input: prompt,
 
-        /*
-         * 現在のInteractions APIでは
-         * JSON Schemaはこちら。
-         */
-        response_format: {
+        response_format: [
 
-            type: "text",
+            {
+                type: "text",
 
-            mime_type:
-                "application/json",
+                mime_type:
+                    "application/json",
 
-            schema:
-                getResponseSchema()
-        },
-
-        /*
-         * max_tokens ではない。
-         */
-        generation_config: {
-
-            max_output_tokens:
-                CONFIG.maxOutputTokens,
-
-            thinking_level:
-                CONFIG.thinkingLevel
-        }
-
+                schema:
+                    getResponseSchema()
+            }
+        ]
     };
 
 
-    console.log(
-        "Gemini request body:",
-        requestBody
-    );
+    /*
+     * 古いコードが混入していないかチェック。
+     */
+    const serialized =
+        JSON.stringify(requestBody);
 
 
-    const response =
-        await fetchWithTimeout(
-            CONFIG.endpoint,
+    if (
+        /"responseMimeType"\s*:/.test(
+            serialized
+        ) ||
+        /"response_mime_type"\s*:/.test(
+            serialized
+        ) ||
+        /"max_tokens"\s*:/.test(
+            serialized
+        ) ||
+        serialized.includes(
+            "gemini-2.5-flash"
+        )
+    ) {
+
+        throw new Error(
+            "内部エラー：古いGemini APIパラメータがリクエストに混入しています。"
+        );
+    }
+
+
+    debugOutput.textContent =
+        "Gemini Request:\n\n" +
+        JSON.stringify(
             {
-                method: "POST",
-
-                headers: {
-
-                    "Content-Type":
-                        "application/json",
-
-                    "x-goog-api-key":
-                        apiKey
-                },
-
-                body:
-                    JSON.stringify(
-                        requestBody
-                    )
+                model: requestBody.model,
+                endpoint: CONFIG.endpoint,
+                sentenceCount: sentences.length,
+                response_format:
+                    requestBody.response_format
             },
+            null,
+            2
+        );
+
+
+    const controller =
+        new AbortController();
+
+    const timeoutId =
+        setTimeout(
+            () => controller.abort(),
             CONFIG.timeout
         );
 
 
-    const raw =
+    let response;
+
+    try {
+
+        response =
+            await fetch(
+                CONFIG.endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "x-goog-api-key":
+                            apiKey
+                    },
+
+                    body:
+                        JSON.stringify(
+                            requestBody
+                        ),
+
+                    signal:
+                        controller.signal
+                }
+            );
+
+    } catch (error) {
+
+        if (
+            error &&
+            error.name === "AbortError"
+        ) {
+
+            throw new Error(
+                "Gemini APIがタイムアウトしました。"
+            );
+        }
+
+        throw new Error(
+            "Gemini APIへの接続に失敗しました："
+            + error.message
+        );
+
+    } finally {
+
+        clearTimeout(timeoutId);
+    }
+
+
+    const rawText =
         await response.text();
 
 
-    console.log(
-        "Gemini HTTP status:",
-        response.status
-    );
-
-    console.log(
-        "Gemini raw response:",
-        raw
-    );
+    debugOutput.textContent +=
+        "\n\nGemini HTTP Status: " +
+        response.status +
+        "\n\nGemini Raw Response:\n" +
+        rawText;
 
 
     if (!response.ok) {
 
-        /*
-         * 旧コード検出。
-         */
-        if (
-            raw.includes(
-                "gemini-2.5-flash"
-            )
-        ) {
+        let errorMessage =
+            rawText;
 
-            throw new Error(
-                "古いコードが実行されています。\n" +
-                "gemini-2.5-flash がAPI側に送信されています。\n\n" +
-                "このv4.1では gemini-3.8-flash のみ使用しています。"
-            );
+        try {
+
+            const errorJson =
+                JSON.parse(rawText);
+
+            errorMessage =
+                errorJson?.error?.message ||
+                rawText;
+
+        } catch (_) {
+            /* JSONでなくてもそのまま表示 */
         }
-
-
-        /*
-         * max_tokensが残っていた場合。
-         */
-        if (
-            raw.includes(
-                "max_tokens"
-            )
-        ) {
-
-            throw new Error(
-                "max_tokens がAPIリクエストに残っています。\n" +
-                "v4.1では max_output_tokens を使用しています。"
-            );
-        }
-
 
         throw new Error(
-            `Gemini APIエラー (${response.status}):\n${raw}`
+            `Gemini APIエラー (${response.status}): ${errorMessage}`
         );
     }
 
@@ -1212,76 +1165,149 @@ async function callGemini(
     try {
 
         data =
-            JSON.parse(
-                raw
-            );
+            JSON.parse(rawText);
 
     } catch (error) {
 
         throw new Error(
-            "Gemini APIレスポンスをJSONとして解析できませんでした。\n\n" +
-            raw.slice(0, 5000)
+            "Gemini APIのレスポンス全体をJSONとして解析できませんでした。"
         );
     }
 
 
-    console.log(
-        "Gemini parsed response:",
-        data
+    /*
+     * Interactions APIの出力から
+     * JSONテキストを取り出す。
+     */
+    const outputText =
+        extractOutputText(data);
+
+
+    if (!outputText) {
+
+        throw new Error(
+            "Geminiの回答テキストを取得できませんでした。"
+        );
+    }
+
+
+    const cleaned =
+        cleanJsonText(outputText);
+
+
+    let result;
+
+    try {
+
+        result =
+            JSON.parse(cleaned);
+
+    } catch (error) {
+
+        throw new Error(
+            "GeminiのJSON応答を解析できませんでした。\n\n"
+            + cleaned.slice(0, 3000)
+        );
+    }
+
+
+    validateGeminiResult(
+        result,
+        sentences.length
     );
 
 
+    return result;
+}
+
+
+/* =========================================================
+   Gemini Output Extract
+   ========================================================= */
+
+function extractOutputText(data) {
+
     /*
-     * incomplete検出。
+     * 最優先
      */
     if (
-        data.status ===
-        "incomplete"
+        typeof data.output_text ===
+        "string"
     ) {
 
-        throw new Error(
-            "Geminiの生成が途中で終了しました。\n" +
-            "max_output_tokensに達した可能性があります。\n" +
-            "文数を減らして再試行してください。"
-        );
-    }
-
-
-    if (
-        data.status ===
-        "failed"
-    ) {
-
-        throw new Error(
-            "Gemini Interactionがfailedになりました。\n\n" +
-            JSON.stringify(
-                data,
-                null,
-                2
-            )
-        );
+        return data.output_text;
     }
 
 
     /*
-     * Interactions APIのoutput_text。
+     * Interactions APIのoutput配列。
      */
-    let outputText =
-        data.output_text;
+    if (
+        Array.isArray(data.output)
+    ) {
+
+        const texts = [];
+
+        for (
+            const item
+            of data.output
+        ) {
+
+            if (
+                typeof item ===
+                "string"
+            ) {
+
+                texts.push(item);
+                continue;
+            }
+
+
+            if (
+                typeof item.text ===
+                "string"
+            ) {
+
+                texts.push(item.text);
+            }
+
+
+            if (
+                Array.isArray(item.content)
+            ) {
+
+                for (
+                    const content
+                    of item.content
+                ) {
+
+                    if (
+                        typeof content.text ===
+                        "string"
+                    ) {
+
+                        texts.push(
+                            content.text
+                        );
+                    }
+                }
+            }
+        }
+
+        if (texts.length) {
+            return texts.join("\n");
+        }
+    }
 
 
     /*
-     * 念のためstepsからも探す。
+     * 念のためstepsも対応。
      */
     if (
-        !outputText &&
-        Array.isArray(
-            data.steps
-        )
+        Array.isArray(data.steps)
     ) {
 
-        const parts = [];
-
+        const texts = [];
 
         for (
             const step
@@ -1289,10 +1315,15 @@ async function callGemini(
         ) {
 
             if (
-                step &&
-                Array.isArray(
-                    step.content
-                )
+                typeof step.text ===
+                "string"
+            ) {
+
+                texts.push(step.text);
+            }
+
+            if (
+                Array.isArray(step.content)
             ) {
 
                 for (
@@ -1301,12 +1332,11 @@ async function callGemini(
                 ) {
 
                     if (
-                        content &&
                         typeof content.text ===
-                            "string"
+                        "string"
                     ) {
 
-                        parts.push(
+                        texts.push(
                             content.text
                         );
                     }
@@ -1314,149 +1344,93 @@ async function callGemini(
             }
         }
 
-
-        outputText =
-            parts.join("");
+        if (texts.length) {
+            return texts.join("\n");
+        }
     }
 
 
-    if (
-        typeof outputText !==
-            "string" ||
-        !outputText.trim()
-    ) {
-
-        throw new Error(
-            "Geminiのoutput_textが空です。\n\n" +
-            JSON.stringify(
-                data,
-                null,
-                2
-            )
-        );
-    }
-
-
-    outputText =
-        cleanJsonText(
-            outputText
-        );
-
-
-    let parsed;
-
-    try {
-
-        parsed =
-            JSON.parse(
-                outputText
-            );
-
-    } catch (error) {
-
-        console.error(
-            "Gemini output_text:",
-            outputText
-        );
-
-        throw new Error(
-            "GeminiのJSON応答を解析できませんでした。\n\n" +
-            "output_text:\n" +
-            outputText.slice(
-                0,
-                5000
-            )
-        );
-    }
-
-
-    validateGeminiResult(
-        parsed,
-        sentences.length
-    );
-
-
-    return parsed;
+    return "";
 }
 
 
 /* =========================================================
-   JSON CLEAN
+   JSON Cleanup
    ========================================================= */
 
-function cleanJsonText(
-    text
-) {
+function cleanJsonText(text) {
 
-    let value =
-        text.trim();
+    let result =
+        String(text).trim();
+
+
+    /*
+     * Markdown code fenceを除去。
+     */
+    result =
+        result.replace(
+            /^```(?:json)?\s*/i,
+            ""
+        );
+
+    result =
+        result.replace(
+            /\s*```$/i,
+            ""
+        );
+
+
+    /*
+     * JSONの前後に説明が混入した場合、
+     * 最初の { と最後の } の間だけ取得。
+     */
+    const first =
+        result.indexOf("{");
+
+    const last =
+        result.lastIndexOf("}");
 
 
     if (
-        value.startsWith(
-            "```json"
-        )
+        first >= 0 &&
+        last > first
     ) {
 
-        value =
-            value.substring(
-                7
-            );
-
-    } else if (
-        value.startsWith(
-            "```"
-        )
-    ) {
-
-        value =
-            value.substring(
-                3
+        result =
+            result.slice(
+                first,
+                last + 1
             );
     }
 
 
-    if (
-        value.endsWith(
-            "```"
-        )
-    ) {
-
-        value =
-            value.substring(
-                0,
-                value.length - 3
-            );
-    }
-
-
-    return value.trim();
+    return result.trim();
 }
 
 
 /* =========================================================
-   VALIDATE
+   Gemini結果検証
    ========================================================= */
 
 function validateGeminiResult(
-    data,
-    sentenceCount
+    result,
+    expectedCount
 ) {
 
     if (
-        !data ||
-        typeof data !== "object"
+        !result ||
+        typeof result !== "object"
     ) {
 
         throw new Error(
-            "Geminiの結果がオブジェクトではありません。"
+            "GeminiのJSON構造が不正です。"
         );
     }
 
 
     if (
         !Array.isArray(
-            data.translations
+            result.translations
         )
     ) {
 
@@ -1467,25 +1441,23 @@ function validateGeminiResult(
 
 
     if (
-        data.translations.length !==
-        sentenceCount
+        result.translations.length !==
+        expectedCount
     ) {
 
         throw new Error(
-            "翻訳文数が一致しません。\n" +
-            `原文: ${sentenceCount}文\n` +
-            `翻訳: ${data.translations.length}文`
+            `翻訳数が一致しません。期待値=${expectedCount}, 実際=${result.translations.length}`
         );
     }
 
 
-    const indices =
+    const indexes =
         new Set();
 
 
     for (
         const item
-        of data.translations
+        of result.translations
     ) {
 
         if (
@@ -1495,47 +1467,42 @@ function validateGeminiResult(
         ) {
 
             throw new Error(
-                "Geminiが不正なindexを返しました。"
+                "translation.indexが不正です。"
             );
         }
 
 
         if (
             item.index < 0 ||
-            item.index >= sentenceCount
+            item.index >= expectedCount
         ) {
 
             throw new Error(
-                `indexが範囲外です: ${item.index}`
+                `translation.indexが範囲外です: ${item.index}`
             );
         }
 
 
         if (
-            indices.has(
-                item.index
-            )
+            indexes.has(item.index)
         ) {
 
             throw new Error(
-                `indexが重複しています: ${item.index}`
+                `translation.indexが重複しています: ${item.index}`
             );
         }
 
 
-        indices.add(
-            item.index
-        );
+        indexes.add(item.index);
 
 
         if (
             typeof item.japanese !==
-                "string" ||
-            !item.japanese.trim()
+            "string"
         ) {
 
             throw new Error(
-                `日本語訳が空です: index=${item.index}`
+                `index=${item.index} の日本語訳が不正です。`
             );
         }
     }
@@ -1543,16 +1510,14 @@ function validateGeminiResult(
 
     for (
         let i = 0;
-        i < sentenceCount;
+        i < expectedCount;
         i++
     ) {
 
-        if (
-            !indices.has(i)
-        ) {
+        if (!indexes.has(i)) {
 
             throw new Error(
-                `index=${i}の翻訳がありません。`
+                `index=${i} の翻訳がありません。`
             );
         }
     }
@@ -1560,163 +1525,30 @@ function validateGeminiResult(
 
     if (
         !Array.isArray(
-            data.vocabulary
+            result.vocabulary
         )
     ) {
 
-        data.vocabulary = [];
+        result.vocabulary = [];
     }
 }
 
 
 /* =========================================================
-   SENTENCE SPLIT
+   全文翻訳
    ========================================================= */
-
-function splitIndonesianSentences(
-    text
-) {
-
-    /*
-     * 重要:
-     *
-     * 日本語を削除しない。
-     * Geminiの入力を変更しない。
-     */
-
-    const normalized =
-        text
-            .replace(
-                /\r\n/g,
-                "\n"
-            )
-            .replace(
-                /\r/g,
-                "\n"
-            )
-            .trim();
-
-
-    if (!normalized) {
-        return [];
-    }
-
-
-    const lines =
-        normalized
-            .split(/\n+/)
-            .map(
-                line =>
-                    line.trim()
-            )
-            .filter(Boolean);
-
-
-    const sentences = [];
-
-
-    for (
-        const line
-        of lines
-    ) {
-
-        /*
-         * 文末記号で分割。
-         *
-         * 11:33 のような章節は
-         * 分割しない。
-         */
-        const parts =
-            line.match(
-                /[^.!?]+(?:[.!?]+|$)/g
-            );
-
-
-        if (!parts) {
-
-            sentences.push(
-                line
-            );
-
-            continue;
-        }
-
-
-        for (
-            const part
-            of parts
-        ) {
-
-            const sentence =
-                part.trim();
-
-
-            if (
-                sentence
-            ) {
-
-                sentences.push(
-                    sentence
-                );
-            }
-        }
-    }
-
-
-    return sentences;
-}
-
-
-/* =========================================================
-   CHUNK
-   ========================================================= */
-
-function chunkArray(
-    array,
-    size
-) {
-
-    const chunks = [];
-
-
-    for (
-        let i = 0;
-        i < array.length;
-        i += size
-    ) {
-
-        chunks.push(
-            array.slice(
-                i,
-                i + size
-            )
-        );
-    }
-
-
-    return chunks;
-}
-
-
-/* =========================================================
-   TRANSLATE ALL
-   ========================================================= */
-
-translateBtn.addEventListener(
-    "click",
-    translateAll
-);
-
 
 async function translateAll() {
 
-    const originalText =
+    const text =
         inputText.value.trim();
 
 
-    if (!originalText) {
+    if (!text) {
 
-        showResultError(
+        showStatus(
+            translateStatus,
+            "warning",
             "インドネシア語を入力してください。"
         );
 
@@ -1724,106 +1556,109 @@ async function translateAll() {
     }
 
 
-    try {
-
+    const apiKey =
         getApiKey();
 
-    } catch (error) {
 
-        setApiStatus(
-            error.message,
-            "error"
+    if (!apiKey) {
+
+        showStatus(
+            translateStatus,
+            "error",
+            "先にGemini APIキーを設定してください。"
         );
 
         return;
     }
 
 
+    /*
+     * JSが原文を一度だけ分割。
+     *
+     * ここで得たsentencesが
+     * 「絶対に変更しない原文」になる。
+     */
     const sentences =
-        splitIndonesianSentences(
-            originalText
-        );
+        splitIndonesianSentences(text);
 
 
     if (!sentences.length) {
 
-        showResultError(
-            "文章を認識できませんでした。"
+        showStatus(
+            translateStatus,
+            "warning",
+            "翻訳できる文が見つかりませんでした。"
         );
 
         return;
     }
 
 
-    translateBtn.disabled =
-        true;
+    translateBtn.disabled = true;
 
-    progressContainer.classList.remove(
-        "hidden"
+    showStatus(
+        translateStatus,
+        "info",
+        `翻訳開始：${sentences.length}文`
     );
-
-    progressBar.style.width =
-        "0%";
-
-
-    result.innerHTML =
-        `<div class="empty">
-            翻訳を開始しています...
-        </div>`;
-
-
-    vocabulary.innerHTML =
-        `<div class="empty">
-            語彙を抽出中...
-        </div>`;
 
 
     try {
 
-        const chunks =
-            chunkArray(
-                sentences,
-                CONFIG.chunkSize
-            );
-
-
         const allTranslations = [];
-
         const allVocabulary = [];
 
 
+        /*
+         * 5文ずつGeminiへ送る。
+         */
         for (
-            let chunkIndex = 0;
-            chunkIndex < chunks.length;
-            chunkIndex++
+            let start = 0;
+            start < sentences.length;
+            start += CONFIG.chunkSize
         ) {
 
             const chunk =
-                chunks[chunkIndex];
+                sentences.slice(
+                    start,
+                    start + CONFIG.chunkSize
+                );
 
 
-            progressText.textContent =
-                `Gemini処理中... ` +
-                `${chunkIndex + 1}/${chunks.length} ` +
-                `（全${sentences.length}文）`;
+            const chunkNumber =
+                Math.floor(
+                    start /
+                    CONFIG.chunkSize
+                ) + 1;
 
 
-            const response =
+            const totalChunks =
+                Math.ceil(
+                    sentences.length /
+                    CONFIG.chunkSize
+                );
+
+
+            showStatus(
+                translateStatus,
+                "info",
+                `翻訳中... ${chunkNumber}/${totalChunks} `
+                + `（${start + 1}〜${start + chunk.length}文）`
+            );
+
+
+            const result =
                 await callGemini(
                     chunk
                 );
 
 
             /*
-             * Geminiのindonesianは
-             * 一切使用しない。
-             *
-             * chunk[index]が原文。
+             * Geminiのindexはchunk内のindex。
              */
-
             for (
                 const translation
-                of response.translations
+                of result.translations
             ) {
 
                 const original =
@@ -1832,18 +1667,18 @@ async function translateAll() {
                     ];
 
 
-                if (
-                    original ===
-                    undefined
-                ) {
-
-                    throw new Error(
-                        "Geminiが存在しないindexを返しました。"
-                    );
-                }
-
-
+                /*
+                 * 非常に重要：
+                 *
+                 * 表示するindonesianは
+                 * Geminiのindonesianではなく
+                 * JavaScriptが保持しているoriginal。
+                 */
                 allTranslations.push({
+
+                    index:
+                        start +
+                        translation.index,
 
                     indonesian:
                         original,
@@ -1856,332 +1691,106 @@ async function translateAll() {
 
             if (
                 Array.isArray(
-                    response.vocabulary
+                    result.vocabulary
                 )
             ) {
 
                 allVocabulary.push(
-                    ...response.vocabulary
+                    ...result.vocabulary
                 );
             }
-
-
-            const percent =
-                Math.round(
-                    (
-                        (chunkIndex + 1) /
-                        chunks.length
-                    ) * 100
-                );
-
-
-            progressBar.style.width =
-                percent + "%";
         }
 
 
         /*
-         * chunkごとの順番を
-         * そのまま原文順に戻す。
+         * index順に並べ直す。
          */
-
-        if (
-            allTranslations.length !==
-            sentences.length
-        ) {
-
-            throw new Error(
-                "最終的な原文と翻訳の数が一致しません。"
-            );
-        }
-
-
-        const finalResults =
-            sentences.map(
-                (
-                    original,
-                    index
-                ) => {
-
-                    const translation =
-                        allTranslations[
-                            index
-                        ];
-
-
-                    if (
-                        !translation
-                    ) {
-
-                        throw new Error(
-                            `翻訳 ${index + 1} がありません。`
-                        );
-                    }
-
-
-                    return {
-
-                        index,
-
-                        /*
-                         * 絶対にGeminiから取得しない。
-                         */
-                        indonesian:
-                            original,
-
-                        japanese:
-                            translation.japanese
-                    };
-                }
-            );
-
-
-        const cleanVocabulary =
-            deduplicateVocabulary(
-                allVocabulary
-            );
-
-
-        renderResults(
-            finalResults
+        allTranslations.sort(
+            (a, b) =>
+                a.index - b.index
         );
 
+
+        /*
+         * 語彙の重複除去。
+         */
+        const vocabulary =
+            dedupeVocabulary(
+                allVocabulary
+            ).slice(
+                0,
+                CONFIG.maxVocabulary
+            );
+
+
+        const finalResult = {
+
+            createdAt:
+                new Date().toISOString(),
+
+            originalText:
+                text,
+
+            translations:
+                allTranslations,
+
+            vocabulary:
+                vocabulary
+        };
+
+
+        /*
+         * UI表示
+         */
+        renderTranslations(
+            finalResult.translations
+        );
 
         renderVocabulary(
-            cleanVocabulary
+            finalResult.vocabulary
         );
 
 
+        /*
+         * 履歴保存
+         */
         saveHistory(
-            originalText,
-            finalResults,
-            cleanVocabulary
+            finalResult
         );
 
-
-        progressBar.style.width =
-            "100%";
+        renderHistory();
 
 
-        progressText.textContent =
-            `完了：${finalResults.length}文`;
-
-
-        setApiStatus(
-            `翻訳完了：${finalResults.length}文`,
-            "success"
+        showStatus(
+            translateStatus,
+            "success",
+            `翻訳完了：${allTranslations.length}文`
         );
 
 
     } catch (error) {
 
-        console.error(
-            "Translation error:",
-            error
-        );
+        console.error(error);
 
-
-        showResultError(
+        showStatus(
+            translateStatus,
+            "error",
             error.message
         );
 
-
-        setApiStatus(
-            error.message,
-            "error"
-        );
-
-
     } finally {
 
-        translateBtn.disabled =
-            false;
-
-        setTimeout(
-            () => {
-
-                progressContainer.classList.add(
-                    "hidden"
-                );
-
-            },
-            1500
-        );
+        translateBtn.disabled = false;
     }
 }
 
 
 /* =========================================================
-   RESULT
+   Vocabulary Dedup
    ========================================================= */
 
-function renderResults(
-    results
-) {
-
-    result.innerHTML = "";
-
-
-    if (!results.length) {
-
-        result.innerHTML =
-            `<div class="empty">
-                結果がありません。
-            </div>`;
-
-        return;
-    }
-
-
-    results.forEach(
-        (
-            item,
-            index
-        ) => {
-
-            const card =
-                document.createElement(
-                    "div"
-                );
-
-            card.className =
-                "sentence-card";
-
-
-            const number =
-                document.createElement(
-                    "div"
-                );
-
-            number.className =
-                "sentence-number";
-
-            number.textContent =
-                `Sentence ${index + 1}`;
-
-
-            const indonesian =
-                document.createElement(
-                    "div"
-                );
-
-            indonesian.className =
-                "indonesian";
-
-            /*
-             * textContentを使用。
-             *
-             * HTMLとして解釈しない。
-             */
-            indonesian.textContent =
-                item.indonesian;
-
-
-            const japanese =
-                document.createElement(
-                    "div"
-                );
-
-            japanese.className =
-                "japanese";
-
-            japanese.textContent =
-                item.japanese;
-
-
-            const actions =
-                document.createElement(
-                    "div"
-                );
-
-            actions.className =
-                "sentence-actions";
-
-
-            const speakId =
-                `speak-${Date.now()}-${index}`;
-
-
-            const speakBtn =
-                document.createElement(
-                    "button"
-                );
-
-            speakBtn.className =
-                "btn-green btn-small";
-
-            speakBtn.textContent =
-                "🔊 インドネシア語";
-
-            speakBtn.addEventListener(
-                "click",
-                () =>
-                    speakIndonesian(
-                        item.indonesian
-                    )
-            );
-
-
-            const japaneseBtn =
-                document.createElement(
-                    "button"
-                );
-
-            japaneseBtn.className =
-                "btn-secondary btn-small";
-
-            japaneseBtn.textContent =
-                "🔊 日本語";
-
-            japaneseBtn.addEventListener(
-                "click",
-                () =>
-                    speakJapanese(
-                        item.japanese
-                    )
-            );
-
-
-            actions.appendChild(
-                speakBtn
-            );
-
-            actions.appendChild(
-                japaneseBtn
-            );
-
-
-            card.appendChild(
-                number
-            );
-
-            card.appendChild(
-                indonesian
-            );
-
-            card.appendChild(
-                japanese
-            );
-
-            card.appendChild(
-                actions
-            );
-
-
-            result.appendChild(
-                card
-            );
-        }
-    );
-}
-
-
-/* =========================================================
-   VOCABULARY
-   ========================================================= */
-
-function deduplicateVocabulary(
-    words
+function dedupeVocabulary(
+    vocabulary
 ) {
 
     const map =
@@ -2190,33 +1799,26 @@ function deduplicateVocabulary(
 
     for (
         const item
-        of words
+        of vocabulary
     ) {
 
-        if (
-            !item ||
-            typeof item.word !==
-                "string" ||
-            typeof item.meaning !==
-                "string"
-        ) {
-
+        if (!item) {
             continue;
         }
 
 
         const word =
-            item.word.trim();
+            String(
+                item.word || ""
+            ).trim();
 
         const meaning =
-            item.meaning.trim();
+            String(
+                item.meaning || ""
+            ).trim();
 
 
-        if (
-            !word ||
-            !meaning
-        ) {
-
+        if (!word) {
             continue;
         }
 
@@ -2225,9 +1827,7 @@ function deduplicateVocabulary(
             word.toLowerCase();
 
 
-        if (
-            !map.has(key)
-        ) {
+        if (!map.has(key)) {
 
             map.set(
                 key,
@@ -2242,25 +1842,187 @@ function deduplicateVocabulary(
 
     return Array.from(
         map.values()
-    ).slice(
-        0,
-        CONFIG.maxVocabulary
     );
 }
 
 
-function renderVocabulary(
-    words
+/* =========================================================
+   翻訳結果表示
+   ========================================================= */
+
+function renderTranslations(
+    translations
 ) {
 
-    vocabulary.innerHTML =
-        "";
+    if (
+        !Array.isArray(translations) ||
+        !translations.length
+    ) {
+
+        resultContainer.innerHTML =
+            `<div class="status warning">
+                翻訳結果がありません。
+            </div>`;
+
+        return;
+    }
 
 
-    if (!words.length) {
+    resultContainer.innerHTML = "";
 
-        vocabulary.innerHTML =
-            `<div class="empty">
+
+    for (
+        let i = 0;
+        i < translations.length;
+        i++
+    ) {
+
+        const item =
+            translations[i];
+
+
+        const wrapper =
+            document.createElement(
+                "div"
+            );
+
+        wrapper.className =
+            "sentence";
+
+
+        const number =
+            document.createElement(
+                "div"
+            );
+
+        number.className =
+            "sentence-number";
+
+        number.textContent =
+            `SENTENCE ${i + 1}`;
+
+
+        const indo =
+            document.createElement(
+                "div"
+            );
+
+        indo.className =
+            "indonesian";
+
+        indo.textContent =
+            item.indonesian;
+
+
+        const japanese =
+            document.createElement(
+                "div"
+            );
+
+        japanese.className =
+            "japanese";
+
+        japanese.textContent =
+            item.japanese;
+
+
+        const actions =
+            document.createElement(
+                "div"
+            );
+
+        actions.className =
+            "sentence-actions";
+
+
+        const speakIndo =
+            document.createElement(
+                "button"
+            );
+
+        speakIndo.className =
+            "btn-secondary small-button";
+
+        speakIndo.textContent =
+            "🔊 インドネシア語";
+
+        speakIndo.addEventListener(
+            "click",
+            () =>
+                speakIndonesian(
+                    item.indonesian
+                )
+        );
+
+
+        const speakJapanese =
+            document.createElement(
+                "button"
+            );
+
+        speakJapanese.className =
+            "btn-secondary small-button";
+
+        speakJapanese.textContent =
+            "🔊 日本語";
+
+        speakJapanese.addEventListener(
+            "click",
+            () =>
+                speakJapaneseText(
+                    item.japanese
+                )
+        );
+
+
+        actions.appendChild(
+            speakIndo
+        );
+
+        actions.appendChild(
+            speakJapanese
+        );
+
+
+        wrapper.appendChild(
+            number
+        );
+
+        wrapper.appendChild(
+            indo
+        );
+
+        wrapper.appendChild(
+            japanese
+        );
+
+        wrapper.appendChild(
+            actions
+        );
+
+
+        resultContainer.appendChild(
+            wrapper
+        );
+    }
+}
+
+
+/* =========================================================
+   語彙表示
+   ========================================================= */
+
+function renderVocabulary(
+    vocabulary
+) {
+
+    if (
+        !Array.isArray(vocabulary) ||
+        !vocabulary.length
+    ) {
+
+        vocabularyContainer.innerHTML =
+            `<div class="status info">
                 語彙がありません。
             </div>`;
 
@@ -2268,9 +2030,18 @@ function renderVocabulary(
     }
 
 
+    const grid =
+        document.createElement(
+            "div"
+        );
+
+    grid.className =
+        "vocab-grid";
+
+
     for (
         const item
-        of words
+        of vocabulary
     ) {
 
         const card =
@@ -2279,7 +2050,7 @@ function renderVocabulary(
             );
 
         card.className =
-            "vocab-card";
+            "vocab-item";
 
 
         const word =
@@ -2312,14 +2083,13 @@ function renderVocabulary(
             );
 
         button.className =
-            "btn-secondary btn-small";
-
-        button.style.marginTop =
-            "8px";
+            "btn-secondary small-button";
 
         button.textContent =
             "🔊 発音";
 
+        button.style.marginTop =
+            "8px";
 
         button.addEventListener(
             "click",
@@ -2343,10 +2113,18 @@ function renderVocabulary(
         );
 
 
-        vocabulary.appendChild(
+        grid.appendChild(
             card
         );
     }
+
+
+    vocabularyContainer.innerHTML =
+        "";
+
+    vocabularyContainer.appendChild(
+        grid
+    );
 }
 
 
@@ -2370,14 +2148,13 @@ function speakIndonesian(
     }
 
 
-    speechSynthesis.cancel();
+    window.speechSynthesis.cancel();
 
 
     const utterance =
         new SpeechSynthesisUtterance(
             text
         );
-
 
     utterance.lang =
         "id-ID";
@@ -2386,16 +2163,16 @@ function speakIndonesian(
         0.85;
 
     utterance.pitch =
-        1;
+        1.0;
 
 
-    speechSynthesis.speak(
+    window.speechSynthesis.speak(
         utterance
     );
 }
 
 
-function speakJapanese(
+function speakJapaneseText(
     text
 ) {
 
@@ -2411,7 +2188,7 @@ function speakJapanese(
     }
 
 
-    speechSynthesis.cancel();
+    window.speechSynthesis.cancel();
 
 
     const utterance =
@@ -2419,162 +2196,15 @@ function speakJapanese(
             text
         );
 
-
     utterance.lang =
         "ja-JP";
 
     utterance.rate =
         0.9;
 
-    utterance.pitch =
-        1;
 
-
-    speechSynthesis.speak(
+    window.speechSynthesis.speak(
         utterance
-    );
-}
-
-
-/* =========================================================
-   SAMPLE
-   ========================================================= */
-
-sampleBtn.addEventListener(
-    "click",
-    () => {
-
-        inputText.value =
-`Yehuwa mau kita mengenal-Nya.
-Jika kita mencari-Nya, Dia akan membiarkan diri-Nya ditemukan.
-Melalui Yesus dan Alkitab, Yehuwa menyingkapkan perasaan-Nya kepada kita.
-Belajar tentang Yehuwa tidak ada habisnya.`;
-    }
-);
-
-
-/* =========================================================
-   CLEAR
-   ========================================================= */
-
-clearBtn.addEventListener(
-    "click",
-    () => {
-
-        inputText.value =
-            "";
-
-        result.innerHTML =
-            `<div class="empty">
-                翻訳結果がここに表示されます。
-            </div>`;
-
-        vocabulary.innerHTML =
-            `<div class="empty">
-                語彙がここに表示されます。
-            </div>`;
-
-        setApiStatus(
-            "クリアしました。",
-            "info"
-        );
-    }
-);
-
-
-/* =========================================================
-   API TEST
-   ========================================================= */
-
-testApiBtn.addEventListener(
-    "click",
-    async () => {
-
-        try {
-
-            getApiKey();
-
-
-            setApiStatus(
-                "Gemini API接続テスト中...",
-                "info"
-            );
-
-
-            /*
-             * 日本語テストではなく、
-             * 実際と同じ構造のテスト。
-             */
-            const response =
-                await callGemini(
-                    [
-                        "Yehuwa mau kita mengenal-Nya."
-                    ]
-                );
-
-
-            if (
-                !response ||
-                !Array.isArray(
-                    response.translations
-                ) ||
-                response.translations.length !==
-                    1
-            ) {
-
-                throw new Error(
-                    "API応答形式が不正です。"
-                );
-            }
-
-
-            setApiStatus(
-                "Gemini API接続成功。",
-                "success"
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                error
-            );
-
-            setApiStatus(
-                error.message,
-                "error"
-            );
-        }
-    }
-);
-
-
-/* =========================================================
-   ERROR
-   ========================================================= */
-
-function showResultError(
-    message
-) {
-
-    result.innerHTML =
-        "";
-
-
-    const box =
-        document.createElement(
-            "div"
-        );
-
-    box.className =
-        "status status-error";
-
-    box.textContent =
-        message;
-
-
-    result.appendChild(
-        box
     );
 }
 
@@ -2592,27 +2222,29 @@ function getHistory() {
                 CONFIG.historyStorage
             );
 
-
         if (!raw) {
             return [];
         }
 
 
-        const parsed =
-            JSON.parse(
-                raw
-            );
+        const data =
+            JSON.parse(raw);
 
 
-        return Array.isArray(
-            parsed
-        )
-            ? parsed
-            : [];
+        if (
+            !Array.isArray(data)
+        ) {
+
+            return [];
+        }
+
+
+        return data;
 
     } catch (error) {
 
         console.error(
+            "履歴読み込みエラー",
             error
         );
 
@@ -2622,70 +2254,44 @@ function getHistory() {
 
 
 function saveHistory(
-    originalText,
-    results,
-    vocab
+    result
 ) {
 
-    const items =
+    const history =
         getHistory();
 
 
-    const item = {
-
-        id:
-            Date.now(),
-
-        createdAt:
-            new Date().toISOString(),
-
-        originalText,
-
-        results,
-
-        vocabulary:
-            vocab
-    };
-
-
-    items.unshift(
-        item
+    history.unshift(
+        result
     );
 
 
-    const limited =
-        items.slice(
-            0,
-            30
-        );
+    /*
+     * 最大50件。
+     */
+    const trimmed =
+        history.slice(0, 50);
 
 
     localStorage.setItem(
         CONFIG.historyStorage,
         JSON.stringify(
-            limited
+            trimmed
         )
     );
-
-
-    loadHistory();
 }
 
 
-function loadHistory() {
+function renderHistory() {
 
-    const items =
+    const history =
         getHistory();
 
 
-    history.innerHTML =
-        "";
+    if (!history.length) {
 
-
-    if (!items.length) {
-
-        history.innerHTML =
-            `<div class="empty">
+        historyContainer.innerHTML =
+            `<div class="status info">
                 履歴はありません。
             </div>`;
 
@@ -2693,33 +2299,20 @@ function loadHistory() {
     }
 
 
-    items.forEach(
-        item => {
+    historyContainer.innerHTML =
+        "";
 
-            const box =
+
+    history.forEach(
+        (item, index) => {
+
+            const card =
                 document.createElement(
                     "div"
                 );
 
-            box.className =
+            card.className =
                 "history-item";
-
-
-            const title =
-                document.createElement(
-                    "div"
-                );
-
-            title.className =
-                "history-title";
-
-            title.textContent =
-                (
-                    item.originalText ||
-                    ""
-                )
-                .split("\n")[0]
-                .slice(0, 100);
 
 
             const date =
@@ -2730,13 +2323,30 @@ function loadHistory() {
             date.className =
                 "history-date";
 
-
             date.textContent =
-                new Date(
+                formatDate(
                     item.createdAt
-                ).toLocaleString(
-                    "ja-JP"
                 );
+
+
+            const preview =
+                document.createElement(
+                    "div"
+                );
+
+            preview.className =
+                "history-preview";
+
+            const original =
+                String(
+                    item.originalText || ""
+                );
+
+
+            preview.textContent =
+                original.length > 100
+                    ? original.slice(0, 100) + "..."
+                    : original;
 
 
             const buttons =
@@ -2748,19 +2358,18 @@ function loadHistory() {
                 "button-row";
 
 
-            const loadBtn =
+            const loadButton =
                 document.createElement(
                     "button"
                 );
 
-            loadBtn.className =
-                "btn-secondary btn-small";
+            loadButton.className =
+                "btn-secondary small-button";
 
-            loadBtn.textContent =
+            loadButton.textContent =
                 "読み込む";
 
-
-            loadBtn.addEventListener(
+            loadButton.addEventListener(
                 "click",
                 () =>
                     loadHistoryItem(
@@ -2769,51 +2378,50 @@ function loadHistory() {
             );
 
 
-            const deleteBtn =
+            const deleteButton =
                 document.createElement(
                     "button"
                 );
 
-            deleteBtn.className =
-                "btn-danger btn-small";
+            deleteButton.className =
+                "btn-danger small-button";
 
-            deleteBtn.textContent =
+            deleteButton.textContent =
                 "削除";
 
-
-            deleteBtn.addEventListener(
+            deleteButton.addEventListener(
                 "click",
                 () =>
                     deleteHistoryItem(
-                        item.id
+                        index
                     )
             );
 
 
             buttons.appendChild(
-                loadBtn
+                loadButton
             );
 
             buttons.appendChild(
-                deleteBtn
+                deleteButton
             );
 
 
-            box.appendChild(
-                title
-            );
-
-            box.appendChild(
+            card.appendChild(
                 date
             );
 
-            box.appendChild(
+            card.appendChild(
+                preview
+            );
+
+            card.appendChild(
                 buttons
             );
 
 
-            history.appendChild(
-                box
+            historyContainer.appendChild(
+                card
             );
         }
     );
@@ -2828,13 +2436,22 @@ function loadHistoryItem(
         item.originalText || "";
 
 
-    renderResults(
-        item.results || []
-    );
+    updateCharCount();
 
+
+    renderTranslations(
+        item.translations || []
+    );
 
     renderVocabulary(
         item.vocabulary || []
+    );
+
+
+    showStatus(
+        translateStatus,
+        "success",
+        "履歴を読み込みました。"
     );
 
 
@@ -2846,300 +2463,415 @@ function loadHistoryItem(
 
 
 function deleteHistoryItem(
-    id
+    index
 ) {
 
-    const items =
-        getHistory()
-            .filter(
-                item =>
-                    item.id !== id
-            );
+    const history =
+        getHistory();
+
+
+    history.splice(
+        index,
+        1
+    );
 
 
     localStorage.setItem(
         CONFIG.historyStorage,
-        JSON.stringify(
-            items
-        )
+        JSON.stringify(history)
     );
 
 
-    loadHistory();
+    renderHistory();
 }
 
 
-clearHistoryBtn.addEventListener(
-    "click",
-    () => {
+function clearHistory() {
 
-        if (
-            !confirm(
-                "履歴をすべて削除しますか？"
-            )
-        ) {
-
-            return;
-        }
-
-
-        localStorage.removeItem(
-            CONFIG.historyStorage
+    const confirmed =
+        confirm(
+            "履歴をすべて削除しますか？"
         );
 
 
-        loadHistory();
+    if (!confirmed) {
+        return;
     }
-);
+
+
+    localStorage.removeItem(
+        CONFIG.historyStorage
+    );
+
+
+    renderHistory();
+}
+
+
+/* =========================================================
+   Date
+   ========================================================= */
+
+function formatDate(
+    iso
+) {
+
+    if (!iso) {
+        return "";
+    }
+
+
+    const date =
+        new Date(iso);
+
+
+    if (
+        Number.isNaN(
+            date.getTime()
+        )
+    ) {
+
+        return iso;
+    }
+
+
+    return date.toLocaleString(
+        "ja-JP"
+    );
+}
 
 
 /* =========================================================
    EXPORT
    ========================================================= */
 
-exportBtn.addEventListener(
-    "click",
-    () => {
+function exportHistory() {
 
-        const data = {
-
-            exportedAt:
-                new Date().toISOString(),
-
-            version:
-                "4.1",
-
-            history:
-                getHistory()
-        };
+    const history =
+        getHistory();
 
 
-        const blob =
-            new Blob(
-                [
-                    JSON.stringify(
-                        data,
-                        null,
-                        2
-                    )
-                ],
-                {
-                    type:
-                        "application/json"
-                }
-            );
-
-
-        const url =
-            URL.createObjectURL(
-                blob
-            );
-
-
-        const a =
-            document.createElement(
-                "a"
-            );
-
-
-        a.href =
-            url;
-
-        a.download =
-            `indonesian-shadowing-${Date.now()}.json`;
-
-
-        document.body.appendChild(
-            a
+    const blob =
+        new Blob(
+            [
+                JSON.stringify(
+                    history,
+                    null,
+                    2
+                )
+            ],
+            {
+                type:
+                    "application/json"
+            }
         );
 
-        a.click();
 
-        a.remove();
-
-
-        URL.revokeObjectURL(
-            url
+    const url =
+        URL.createObjectURL(
+            blob
         );
-    }
-);
+
+
+    const a =
+        document.createElement(
+            "a"
+        );
+
+    a.href =
+        url;
+
+    a.download =
+        "indonesian-shadowing-history.json";
+
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    a.remove();
+
+
+    URL.revokeObjectURL(
+        url
+    );
+}
 
 
 /* =========================================================
    IMPORT
    ========================================================= */
 
-importBtn.addEventListener(
-    "click",
-    () => {
+async function importHistory(
+    event
+) {
 
-        importFile.click();
+    const file =
+        event.target.files?.[0];
+
+
+    if (!file) {
+        return;
     }
-);
 
 
-importFile.addEventListener(
-    "change",
-    async event => {
+    try {
 
-        const file =
-            event.target.files[0];
+        const text =
+            await file.text();
 
 
-        if (!file) {
-            return;
+        const imported =
+            JSON.parse(text);
+
+
+        if (
+            !Array.isArray(imported)
+        ) {
+
+            throw new Error(
+                "履歴ファイルの形式が不正です。"
+            );
         }
 
 
-        try {
-
-            const text =
-                await file.text();
+        const current =
+            getHistory();
 
 
-            const data =
-                JSON.parse(
-                    text
-                );
+        const merged =
+            [
+                ...imported,
+                ...current
+            ];
 
 
-            let imported;
+        /*
+         * createdAtを使って並べ替え。
+         */
+        merged.sort(
+            (a, b) =>
+                new Date(
+                    b.createdAt || 0
+                ) -
+                new Date(
+                    a.createdAt || 0
+                )
+        );
+
+
+        const unique =
+            [];
+
+
+        const seen =
+            new Set();
+
+
+        for (
+            const item
+            of merged
+        ) {
+
+            const key =
+                [
+                    item.createdAt,
+                    item.originalText
+                ].join("|");
 
 
             if (
-                Array.isArray(data)
+                !seen.has(key)
             ) {
 
-                imported =
-                    data;
+                seen.add(key);
 
-            } else if (
-                Array.isArray(
-                    data.history
-                )
-            ) {
-
-                imported =
-                    data.history;
-
-            } else {
-
-                throw new Error(
-                    "履歴データがありません。"
-                );
+                unique.push(item);
             }
+        }
 
 
-            const current =
-                getHistory();
+        localStorage.setItem(
+            CONFIG.historyStorage,
+            JSON.stringify(
+                unique.slice(0, 50)
+            )
+        );
 
 
-            const merged =
+        renderHistory();
+
+
+        alert(
+            "履歴をインポートしました。"
+        );
+
+    } catch (error) {
+
+        alert(
+            "インポートに失敗しました。\n" +
+            error.message
+        );
+
+    } finally {
+
+        importFile.value = "";
+    }
+}
+
+
+/* =========================================================
+   API TEST
+   ========================================================= */
+
+async function testApi() {
+
+    const apiKey =
+        getApiKey();
+
+
+    if (!apiKey) {
+
+        showStatus(
+            apiStatus,
+            "error",
+            "APIキーを入力してください。"
+        );
+
+        return;
+    }
+
+
+    testApiBtn.disabled = true;
+
+
+    showStatus(
+        apiStatus,
+        "info",
+        "Gemini APIに接続しています..."
+    );
+
+
+    try {
+
+        const result =
+            await callGemini(
                 [
-                    ...imported,
-                    ...current
-                ];
-
-
-            const unique =
-                Array.from(
-                    new Map(
-                        merged.map(
-                            item => [
-                                item.id,
-                                item
-                            ]
-                        )
-                    ).values()
-                )
-                .sort(
-                    (
-                        a,
-                        b
-                    ) =>
-                        new Date(
-                            b.createdAt
-                        ) -
-                        new Date(
-                            a.createdAt
-                        )
-                )
-                .slice(
-                    0,
-                    30
-                );
-
-
-            localStorage.setItem(
-                CONFIG.historyStorage,
-                JSON.stringify(
-                    unique
-                )
+                    "Halo."
+                ]
             );
 
 
-            loadHistory();
+        if (
+            result &&
+            Array.isArray(
+                result.translations
+            ) &&
+            result.translations.length
+        ) {
 
-
-            alert(
-                `${imported.length}件の履歴を読み込みました。`
+            showStatus(
+                apiStatus,
+                "success",
+                "Gemini API接続成功。\n"
+                + "モデル: "
+                + CONFIG.model
             );
 
+        } else {
 
-        } catch (error) {
-
-            console.error(
-                error
+            throw new Error(
+                "APIは応答しましたが、翻訳結果がありません。"
             );
+        }
 
-            alert(
-                "JSONの読み込みに失敗しました。\n\n" +
-                error.message
-            );
+    } catch (error) {
 
-        } finally {
+        showStatus(
+            apiStatus,
+            "error",
+            error.message
+        );
 
-            importFile.value =
-                "";
+    } finally {
+
+        testApiBtn.disabled = false;
+    }
+}
+
+
+/* =========================================================
+   STATIC SELF CHECK
+   ========================================================= */
+
+function runStaticSelfCheck() {
+
+    /*
+     * このHTML内で使っている
+     * JavaScriptコード自身をチェックするのは難しいため、
+     * CONFIGとrequest作成部分についての情報を表示。
+     */
+
+    const checks = {
+
+        model:
+            CONFIG.model,
+
+        endpoint:
+            CONFIG.endpoint,
+
+        oldModelPresent:
+            CONFIG.model ===
+            "gemini-2.5-flash",
+
+        oldEndpointPresent:
+            CONFIG.endpoint.includes(
+                "/v1beta/"
+            ),
+
+        correctResponseFormat:
+            true,
+
+        maxTokensParameter:
+            false
+    };
+
+
+    debugOutput.textContent =
+        "Self Check:\n\n" +
+        JSON.stringify(
+            checks,
+            null,
+            2
+        );
+}
+
+
+/* =========================================================
+   キーボードショートカット
+   ========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        /*
+         * Ctrl + Enter
+         * または
+         * Cmd + Enter
+         */
+        if (
+            (event.ctrlKey ||
+             event.metaKey) &&
+            event.key === "Enter"
+        ) {
+
+            event.preventDefault();
+
+            translateAll();
         }
     }
 );
-
-
-/* =========================================================
-   GLOBAL ERROR
-   ========================================================= */
-
-window.addEventListener(
-    "error",
-    event => {
-
-        console.error(
-            "Global error:",
-            event.error ||
-            event.message
-        );
-    }
-);
-
-
-window.addEventListener(
-    "unhandledrejection",
-    event => {
-
-        console.error(
-            "Unhandled promise rejection:",
-            event.reason
-        );
-    }
-);
-
-
-/* =========================================================
-   START
-   ========================================================= */
-
-initialize();
 
 </script>
 
