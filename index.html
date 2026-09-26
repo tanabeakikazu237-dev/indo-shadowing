@@ -3,80 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Indonesian Shadowing AI</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 <style>
-    body {
-        background: #0f172a;
-        color: #e2e8f0;
-        font-family:
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-    }
+body {
+    background: #0f172a;
+    color: #e2e8f0;
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
 
-    .card {
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 16px;
-    }
+.card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 16px;
+}
 
-    .btn {
-        transition: all .15s ease;
-    }
+.btn {
+    transition: all .15s ease;
+}
 
-    .btn:active {
-        transform: scale(.97);
-    }
+.btn:active {
+    transform: scale(.97);
+}
 
-    textarea {
-        resize: vertical;
-    }
+textarea {
+    resize: vertical;
+}
 
-    .sentence-card {
-        background: #172033;
-        border: 1px solid #334155;
-        border-radius: 14px;
-    }
+.sentence-card {
+    background: #172033;
+    border: 1px solid #334155;
+    border-radius: 14px;
+}
 
-    .jp {
-        border-left: 3px solid #38bdf8;
-    }
+.jp {
+    border-left: 3px solid #38bdf8;
+}
 
-    .word-chip {
-        background: #0f172a;
-        border: 1px solid #334155;
-        border-radius: 10px;
-    }
+.word-chip {
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 10px;
+}
 
-    .loading {
-        animation: pulse 1.4s infinite;
-    }
+.loading {
+    animation: pulse 1.4s infinite;
+}
 
-    @keyframes pulse {
-        0%, 100% { opacity: .45; }
-        50% { opacity: 1; }
-    }
+@keyframes pulse {
+    0%,100% { opacity: .45; }
+    50% { opacity: 1; }
+}
 
-    .hidden {
-        display: none !important;
-    }
+.hidden {
+    display: none !important;
+}
 
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #0f172a;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #475569;
-        border-radius: 10px;
-    }
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
 </style>
 </head>
 
@@ -84,21 +79,30 @@
 
 <div class="max-w-3xl mx-auto px-4 py-6">
 
-    <!-- Header -->
+    <!-- HEADER -->
     <header class="mb-6">
         <h1 class="text-2xl font-bold text-white">
             🇮🇩 Indonesian Shadowing AI
         </h1>
+
         <p class="text-sm text-slate-400 mt-1">
-            インドネシア語 → 自然な日本語訳 + 単語カード
+            インドネシア語 → 日本語訳 + 単語カード
         </p>
     </header>
 
-    <!-- API Key -->
+
+    <!-- API KEY -->
     <section class="card p-4 mb-5">
+
         <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-white">Gemini API</h2>
-            <span id="api-status" class="text-xs text-slate-400">
+            <h2 class="font-bold text-white">
+                Gemini API
+            </h2>
+
+            <span
+                id="api-status"
+                class="text-xs text-slate-400"
+            >
                 未設定
             </span>
         </div>
@@ -106,11 +110,13 @@
         <input
             id="api-key"
             type="password"
+            autocomplete="off"
             placeholder="Gemini API Key"
             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm outline-none focus:border-sky-500"
         >
 
         <div class="flex gap-2 mt-3">
+
             <button
                 id="save-key"
                 class="btn flex-1 bg-sky-600 hover:bg-sky-500 rounded-xl py-2.5 font-bold text-sm"
@@ -124,28 +130,37 @@
             >
                 消去
             </button>
+
         </div>
     </section>
 
-    <!-- Input -->
+
+    <!-- INPUT -->
     <section class="card p-4 mb-5">
+
         <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-white">インドネシア語</h2>
+
+            <h2 class="font-bold text-white">
+                インドネシア語
+            </h2>
+
             <span class="text-xs text-slate-500">
-                # で文を区切ることもできます
+                # で文を区切れます
             </span>
+
         </div>
 
         <textarea
             id="source-text"
-            rows="8"
-            placeholder="例：
-Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil.#
-Yehuwa mau kita mengenal-Nya."
+            rows="9"
+            placeholder="Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil.#
+Yehuwa mau kita mengenal-Nya.#
+Belajar tentang Yehuwa tidak ada habisnya."
             class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-sm leading-7 outline-none focus:border-sky-500"
         ></textarea>
 
         <div class="flex gap-2 mt-3">
+
             <button
                 id="analyze-btn"
                 class="btn flex-1 bg-sky-600 hover:bg-sky-500 rounded-xl py-3 font-bold"
@@ -159,30 +174,63 @@ Yehuwa mau kita mengenal-Nya."
             >
                 クリア
             </button>
+
         </div>
 
-        <div id="progress" class="hidden mt-4 text-sm text-sky-300 loading"></div>
-        <div id="error" class="hidden mt-4 bg-red-950/50 border border-red-800 text-red-300 rounded-xl p-3 text-sm"></div>
+        <div
+            id="progress"
+            class="hidden mt-4 text-sm text-sky-300 loading"
+        ></div>
+
+        <div
+            id="error"
+            class="hidden mt-4 bg-red-950/50 border border-red-800 text-red-300 rounded-xl p-3 text-sm whitespace-pre-wrap"
+        ></div>
+
     </section>
 
-    <!-- Result -->
+
+    <!-- RESULT -->
     <section id="result-section" class="hidden">
 
-        <!-- Sentences -->
+        <!-- TRANSLATION -->
         <div class="card p-4 mb-5">
+
             <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-white">対訳</h2>
-                <span id="sentence-count" class="text-xs text-slate-400"></span>
+
+                <h2 class="font-bold text-white">
+                    対訳
+                </h2>
+
+                <span
+                    id="sentence-count"
+                    class="text-xs text-slate-400"
+                ></span>
+
             </div>
 
-            <div id="sentences" class="space-y-3"></div>
+            <div
+                id="sentences"
+                class="space-y-3"
+            ></div>
+
         </div>
 
-        <!-- Vocabulary -->
+
+        <!-- VOCABULARY -->
         <div class="card p-4 mb-5">
+
             <div class="flex items-center justify-between mb-3">
-                <h2 class="font-bold text-white">単語カード</h2>
-                <span id="vocab-count" class="text-xs text-slate-400"></span>
+
+                <h2 class="font-bold text-white">
+                    単語カード
+                </h2>
+
+                <span
+                    id="vocab-count"
+                    class="text-xs text-slate-400"
+                ></span>
+
             </div>
 
             <input
@@ -192,15 +240,24 @@ Yehuwa mau kita mengenal-Nya."
                 class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-sky-500 mb-4"
             >
 
-            <div id="vocabulary" class="grid gap-3"></div>
+            <div
+                id="vocabulary"
+                class="grid gap-3"
+            ></div>
+
         </div>
 
     </section>
 
-    <!-- History -->
+
+    <!-- HISTORY -->
     <section class="card p-4 mb-5">
+
         <div class="flex items-center justify-between mb-3">
-            <h2 class="font-bold text-white">履歴</h2>
+
+            <h2 class="font-bold text-white">
+                履歴
+            </h2>
 
             <button
                 id="clear-history"
@@ -208,16 +265,26 @@ Yehuwa mau kita mengenal-Nya."
             >
                 履歴を削除
             </button>
+
         </div>
 
-        <div id="history" class="space-y-2"></div>
+        <div
+            id="history"
+            class="space-y-2"
+        ></div>
+
     </section>
 
-    <!-- Export -->
+
+    <!-- DATA -->
     <section class="card p-4">
-        <h2 class="font-bold text-white mb-3">データ</h2>
+
+        <h2 class="font-bold text-white mb-3">
+            データ
+        </h2>
 
         <div class="flex gap-2">
+
             <button
                 id="export-btn"
                 class="btn flex-1 bg-slate-700 hover:bg-slate-600 rounded-xl py-2.5 text-sm"
@@ -229,6 +296,7 @@ Yehuwa mau kita mengenal-Nya."
                 class="btn flex-1 bg-slate-700 hover:bg-slate-600 rounded-xl py-2.5 text-sm text-center cursor-pointer"
             >
                 インポート
+
                 <input
                     id="import-file"
                     type="file"
@@ -236,36 +304,65 @@ Yehuwa mau kita mengenal-Nya."
                     class="hidden"
                 >
             </label>
+
         </div>
+
     </section>
 
 </div>
 
+
 <script>
+
 "use strict";
 
+
 /* =========================================================
-   Configuration
+   CONFIG
 ========================================================= */
 
 const CONFIG = {
-    model: "gemini-2.5-flash",
-    endpoint:
-        "https://generativelanguage.googleapis.com/v1beta/models/",
-    apiKeyStorage: "gemini_api_key",
-    historyStorage: "shadowing_history_v6",
-    cacheStorage: "shadowing_cache_v6",
 
-    // 一度にGeminiへ送る文数
+    /*
+     * 現在のGemini Flash
+     */
+    model: "gemini-3.8-flash",
+
+    /*
+     * Interactions API
+     */
+    endpoint:
+        "https://generativelanguage.googleapis.com/v1beta/interactions",
+
+    apiKeyStorage:
+        "gemini_api_key",
+
+    historyStorage:
+        "shadowing_history_v7",
+
+    /*
+     * 1回に処理する文数
+     *
+     * 原文と翻訳の対応を安定させるため
+     * 5文ずつ処理
+     */
     chunkSize: 5,
 
-    // 1回のAPIレスポンスを十分確保
-    maxOutputTokens: 8192,
+    /*
+     * 3.8 Flashは最大64k outputに対応。
+     * 今回は十分余裕を持たせる。
+     */
+    maxTokens: 8192,
 
-    // 語彙上限
+    /*
+     * 語彙数
+     */
     maxVocabulary: 30,
 
-    requestTimeout: 60000
+    /*
+     * API timeout
+     */
+    timeout: 60000
 };
 
 
@@ -273,138 +370,209 @@ const CONFIG = {
    DOM
 ========================================================= */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+    document.getElementById(id);
 
-const apiKeyInput = $("api-key");
-const apiStatus = $("api-status");
+const apiKeyInput =
+    $("api-key");
 
-const sourceText = $("source-text");
-const analyzeBtn = $("analyze-btn");
-const clearInputBtn = $("clear-input");
+const apiStatus =
+    $("api-status");
 
-const saveKeyBtn = $("save-key");
-const clearKeyBtn = $("clear-key");
+const sourceText =
+    $("source-text");
 
-const progress = $("progress");
-const errorBox = $("error");
+const analyzeBtn =
+    $("analyze-btn");
 
-const resultSection = $("result-section");
-const sentencesBox = $("sentences");
-const vocabularyBox = $("vocabulary");
+const clearInputBtn =
+    $("clear-input");
 
-const sentenceCount = $("sentence-count");
-const vocabCount = $("vocab-count");
+const saveKeyBtn =
+    $("save-key");
 
-const vocabSearch = $("vocab-search");
+const clearKeyBtn =
+    $("clear-key");
 
-const historyBox = $("history");
-const clearHistoryBtn = $("clear-history");
+const progress =
+    $("progress");
 
-const exportBtn = $("export-btn");
-const importFile = $("import-file");
+const errorBox =
+    $("error");
+
+const resultSection =
+    $("result-section");
+
+const sentencesBox =
+    $("sentences");
+
+const vocabularyBox =
+    $("vocabulary");
+
+const sentenceCount =
+    $("sentence-count");
+
+const vocabCount =
+    $("vocab-count");
+
+const vocabSearch =
+    $("vocab-search");
+
+const historyBox =
+    $("history");
+
+const clearHistoryBtn =
+    $("clear-history");
+
+const exportBtn =
+    $("export-btn");
+
+const importFile =
+    $("import-file");
 
 
 /* =========================================================
-   State
+   STATE
 ========================================================= */
 
 let currentResult = null;
+
 let currentVocabulary = [];
 
 
 /* =========================================================
-   API Key
+   API KEY
 ========================================================= */
 
 function loadApiKey() {
-    const key = localStorage.getItem(CONFIG.apiKeyStorage);
+
+    const key =
+        localStorage.getItem(
+            CONFIG.apiKeyStorage
+        );
 
     if (key) {
+
         apiKeyInput.value = key;
-        apiStatus.textContent = "設定済み";
-        apiStatus.className = "text-xs text-green-400";
+
+        apiStatus.textContent =
+            "設定済み";
+
+        apiStatus.className =
+            "text-xs text-green-400";
+
     } else {
-        apiStatus.textContent = "未設定";
-        apiStatus.className = "text-xs text-slate-400";
+
+        apiStatus.textContent =
+            "未設定";
+
+        apiStatus.className =
+            "text-xs text-slate-400";
     }
 }
 
-saveKeyBtn.addEventListener("click", () => {
-    const key = apiKeyInput.value.trim();
 
-    if (!key) {
-        showError("APIキーを入力してください。");
-        return;
+saveKeyBtn.addEventListener(
+    "click",
+    () => {
+
+        const key =
+            apiKeyInput.value.trim();
+
+        if (!key) {
+
+            showError(
+                "Gemini APIキーを入力してください。"
+            );
+
+            return;
+        }
+
+        localStorage.setItem(
+            CONFIG.apiKeyStorage,
+            key
+        );
+
+        apiStatus.textContent =
+            "設定済み";
+
+        apiStatus.className =
+            "text-xs text-green-400";
+
+        hideError();
     }
+);
 
-    localStorage.setItem(CONFIG.apiKeyStorage, key);
 
-    apiStatus.textContent = "設定済み";
-    apiStatus.className = "text-xs text-green-400";
+clearKeyBtn.addEventListener(
+    "click",
+    () => {
 
-    hideError();
-});
+        localStorage.removeItem(
+            CONFIG.apiKeyStorage
+        );
 
-clearKeyBtn.addEventListener("click", () => {
-    localStorage.removeItem(CONFIG.apiKeyStorage);
-    apiKeyInput.value = "";
+        apiKeyInput.value = "";
 
-    apiStatus.textContent = "未設定";
-    apiStatus.className = "text-xs text-slate-400";
-});
+        apiStatus.textContent =
+            "未設定";
+
+        apiStatus.className =
+            "text-xs text-slate-400";
+    }
+);
 
 
 /* =========================================================
-   Source sentence splitting
-   ★ここが今回の重要ポイント
-   ★原文を一切加工しない
+   ERROR / PROGRESS
 ========================================================= */
 
-function splitSourceSentences(rawText) {
-    const text = String(rawText || "")
-        .replace(/\r\n?/gu, "\n")
-        .trim();
+function showError(message) {
 
-    if (!text) {
-        return [];
-    }
+    errorBox.textContent =
+        String(message);
 
-    /*
-     * # がある場合
-     * → ユーザーが指定した # を最優先
-     */
-    if (text.includes("#")) {
-        return text
-            .split("#")
-            .map(s => s.trim())
-            .filter(Boolean);
-    }
+    errorBox.classList.remove(
+        "hidden"
+    );
+}
 
-    /*
-     * # がない場合
-     * → 既存アプリの仕様に合わせて "." で区切る
-     *
-     * 重要：
-     * ここでは日本語除去・AI修正・文字変換などを
-     * 一切しない。
-     */
-    return text
-        .split(".")
-        .map(s => s.trim())
-        .filter(Boolean)
-        .map(s => {
-            // "." を区切り文字として使ったので、
-            // 表示上の原文として自然になるよう戻す
-            return s + ".";
-        });
+
+function hideError() {
+
+    errorBox.textContent = "";
+
+    errorBox.classList.add(
+        "hidden"
+    );
+}
+
+
+function setProgress(message) {
+
+    progress.textContent =
+        message;
+
+    progress.classList.remove(
+        "hidden"
+    );
+}
+
+
+function hideProgress() {
+
+    progress.classList.add(
+        "hidden"
+    );
 }
 
 
 /* =========================================================
-   Utility
+   HTML ESCAPE
 ========================================================= */
 
 function escapeHtml(value) {
+
     return String(value ?? "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
@@ -414,364 +582,682 @@ function escapeHtml(value) {
 }
 
 
-function showError(message) {
-    errorBox.textContent = message;
-    errorBox.classList.remove("hidden");
-}
+/* =========================================================
+   ORIGINAL SENTENCE SPLIT
+========================================================= */
+
+/*
+ * ここは非常に重要。
+ *
+ * Geminiに文分割させない。
+ *
+ * JavaScriptが原文を確定する。
+ *
+ * さらに、
+ *
+ * removeJapaneseCharacters()
+ * trimによる文字改変
+ * AIによる原文修正
+ *
+ * は一切しない。
+ */
+
+function splitSourceSentences(rawText) {
+
+    const text =
+        String(rawText || "")
+            .replace(/\r\n?/gu, "\n")
+            .trim();
+
+    if (!text) {
+        return [];
+    }
 
 
-function hideError() {
-    errorBox.textContent = "";
-    errorBox.classList.add("hidden");
-}
+    /*
+     * # がある場合
+     *
+     * ユーザー指定の区切りを
+     * 最優先。
+     */
+    if (text.includes("#")) {
+
+        return text
+            .split("#")
+            .map(s => s.trim())
+            .filter(Boolean);
+    }
 
 
-function setProgress(message) {
-    progress.textContent = message;
-    progress.classList.remove("hidden");
-}
+    /*
+     * # がない場合は
+     * "." を区切りとして使用。
+     */
+    const parts =
+        text
+            .split(".")
+            .map(s => s.trim())
+            .filter(Boolean);
 
-
-function hideProgress() {
-    progress.classList.add("hidden");
+    /*
+     * "." を消したので戻す。
+     *
+     * ここで内容そのものは変更していない。
+     */
+    return parts.map(
+        s => s + "."
+    );
 }
 
 
 /* =========================================================
-   Gemini request
+   JSON SCHEMA
 ========================================================= */
 
-async function callGemini(prompt) {
-    const apiKey =
-        localStorage.getItem(CONFIG.apiKeyStorage) ||
-        apiKeyInput.value.trim();
+/*
+ * Geminiに
+ *
+ * {
+ *   translations: [
+ *     {
+ *       index: integer,
+ *       japanese: string
+ *     }
+ *   ],
+ *   vocabulary: [
+ *     {
+ *       word: string,
+ *       meaning: string
+ *     }
+ *   ]
+ * }
+ *
+ * だけを返させる。
+ */
 
-    if (!apiKey) {
-        throw new Error("Gemini APIキーが設定されていません。");
-    }
+function buildResponseSchema() {
 
-    const url =
-        CONFIG.endpoint +
-        encodeURIComponent(CONFIG.model) +
-        ":generateContent";
+    return {
 
-    const controller = new AbortController();
+        type: "object",
 
-    const timeoutId = setTimeout(() => {
-        controller.abort();
-    }, CONFIG.requestTimeout);
+        properties: {
 
-    try {
-        const response = await fetch(url, {
-            method: "POST",
+            translations: {
 
-            headers: {
-                "Content-Type": "application/json",
-                "x-goog-api-key": apiKey
+                type: "array",
+
+                items: {
+
+                    type: "object",
+
+                    properties: {
+
+                        index: {
+                            type: "integer"
+                        },
+
+                        japanese: {
+                            type: "string"
+                        }
+
+                    },
+
+                    required: [
+                        "index",
+                        "japanese"
+                    ]
+                }
             },
 
-            body: JSON.stringify({
-                contents: [
-                    {
-                        role: "user",
-                        parts: [
-                            {
-                                text: prompt
-                            }
-                        ]
-                    }
-                ],
+            vocabulary: {
 
-                generationConfig: {
-                    temperature: 0.15,
-                    maxOutputTokens: CONFIG.maxOutputTokens,
-                    responseMimeType: "application/json"
+                type: "array",
+
+                items: {
+
+                    type: "object",
+
+                    properties: {
+
+                        word: {
+                            type: "string"
+                        },
+
+                        meaning: {
+                            type: "string"
+                        }
+
+                    },
+
+                    required: [
+                        "word",
+                        "meaning"
+                    ]
                 }
-            }),
+            }
 
-            signal: controller.signal
-        });
+        },
 
-        const raw = await response.text();
-
-        if (!response.ok) {
-            throw new Error(
-                `Gemini API Error ${response.status}\n${raw.slice(0, 1000)}`
-            );
-        }
-
-        let outer;
-
-        try {
-            outer = JSON.parse(raw);
-        } catch {
-            throw new Error(
-                "Gemini APIからJSONとして読めないレスポンスが返りました。"
-            );
-        }
-
-        const text =
-            outer?.candidates?.[0]?.content?.parts
-                ?.map(part => part.text || "")
-                .join("") || "";
-
-        const finishReason =
-            outer?.candidates?.[0]?.finishReason || "";
-
-        if (!text) {
-            throw new Error(
-                `Geminiの回答が空です。finishReason=${finishReason || "unknown"}`
-            );
-        }
-
-        /*
-         * MAX_TOKENSで途中終了した場合は、
-         * 壊れたJSONを無理やり解析しない。
-         */
-        if (finishReason === "MAX_TOKENS") {
-            throw new Error(
-                "Geminiの回答が長すぎて途中で切れました。"
-            );
-        }
-
-        return parseGeminiJson(text);
-
-    } finally {
-        clearTimeout(timeoutId);
-    }
+        required: [
+            "translations",
+            "vocabulary"
+        ]
+    };
 }
 
 
 /* =========================================================
-   Gemini JSON parser
+   PROMPT
 ========================================================= */
 
-function parseGeminiJson(text) {
-    let cleaned = String(text || "").trim();
+function buildPrompt(sentences) {
 
-    /*
-     * ```json ... ``` が返ってきた場合
-     */
-    cleaned = cleaned
-        .replace(/^```json\s*/i, "")
-        .replace(/^```\s*/i, "")
-        .replace(/\s*```$/i, "")
-        .trim();
-
-    /*
-     * JSONの最初の { から最後の } までだけを見る。
-     */
-    const first = cleaned.indexOf("{");
-    const last = cleaned.lastIndexOf("}");
-
-    if (first === -1 || last === -1 || last <= first) {
-        throw new Error(
-            "Geminiの回答からJSONオブジェクトを見つけられませんでした。"
-        );
-    }
-
-    const jsonText = cleaned.slice(first, last + 1);
-
-    try {
-        return JSON.parse(jsonText);
-    } catch (error) {
-        console.error("Gemini JSON parse error:", error);
-        console.error("Gemini raw text:", text);
-
-        throw new Error(
-            "GeminiのJSON応答を解析できませんでした。"
-        );
-    }
-}
-
-
-/* =========================================================
-   Translation prompt
-   ★ Geminiには Indonesian を返させない
-========================================================= */
-
-function buildTranslationPrompt(sentences) {
-
-    const numbered = sentences
-        .map((sentence, index) => {
-            return `${index + 1}. ${sentence}`;
-        })
-        .join("\n");
+    const input =
+        sentences
+            .map(
+                (sentence, index) =>
+                    `${index + 1}. ${sentence}`
+            )
+            .join("\n");
 
     return `
-あなたは日本語を母語とするインドネシア語教師です。
+あなたは日本語を母語とする
+インドネシア語教師です。
 
-以下のインドネシア語文を、日本語へ正確かつ自然に翻訳してください。
+以下のインドネシア語文を、
+自然で正確な日本語に翻訳してください。
 
-【最重要ルール】
+【絶対ルール】
 
-1. 入力されたインドネシア語は変更しない。
-2. 入力されたインドネシア語を出力JSONに書き戻さない。
-3. 日本語訳だけを作成する。
-4. 日本語訳にインドネシア語を混ぜない。
-5. 原文にない情報を追加しない。
-6. 文の順番を絶対に変更しない。
-7. 入力文1つにつき、日本語訳を1つだけ作る。
-8. 入力文の数とtranslationsの数を完全に一致させる。
-9. index番号を必ず維持する。
-10. JSON以外の文章を絶対に出力しない。
+1. 入力文の数を変更しない。
+2. 入力文の順番を変更しない。
+3. 各入力文に必ず1つの日本語訳を対応させる。
+4. indexは入力文の番号と完全に一致させる。
+5. インドネシア語原文を出力しない。
+6. "indonesian"というフィールドを作らない。
+7. 日本語訳にインドネシア語を混ぜない。
+8. 原文に存在しない内容を追加しない。
+9. 聖書の書名・人名・節番号を勝手に変更しない。
+10. JSON以外の文章を出力しない。
 
 【翻訳ルール】
 
-- 自然な日本語にする。
-- ただし、原文の意味を勝手に膨らませない。
-- Yehuwa → エホバ
-- Alkitab → 聖書
-- Dia / -Nya / diri-Nya は文脈に応じて自然な日本語にする。
-- 聖書の書名や節番号を勝手に変更しない。
-- 人名・固有名詞の意味を勝手に変更しない。
-- 聖書の引用内容を創作しない。
+Yehuwa
+→ エホバ
+
+Alkitab
+→ 聖書
+
+Dia / -Nya / diri-Nya
+→ 文脈に応じた自然な日本語
+
+「直訳」ではなく、
+日本語として自然にしてください。
+
+ただし、
+原文の意味を膨らませたり、
+説明を追加したりしないでください。
 
 【語彙】
 
 重要なインドネシア語を最大${CONFIG.maxVocabulary}語まで選んでください。
 
-【入力文】
+【入力】
 
-${numbered}
-
-【出力形式】
-
-{
-  "translations": [
-    {
-      "index": 1,
-      "japanese": "日本語訳"
-    }
-  ],
-  "vocabulary": [
-    {
-      "word": "インドネシア語",
-      "meaning": "日本語の意味"
-    }
-  ]
-}
-
-必ず上記JSONだけを返してください。
+${input}
 `;
 }
 
 
 /* =========================================================
-   Translation validation
-   ★ 原文は完全にJS側を使用
+   INTERACTIONS API
 ========================================================= */
 
-function combineTranslations(sourceSentences, aiData) {
+async function callGemini(prompt) {
 
-    const translations = Array.isArray(aiData?.translations)
-        ? aiData.translations
-        : [];
+    const apiKey =
+        localStorage.getItem(
+            CONFIG.apiKeyStorage
+        ) ||
+        apiKeyInput.value.trim();
 
-    const translationMap = new Map();
+    if (!apiKey) {
 
-    for (const item of translations) {
-        const index = Number(item?.index);
-
-        if (!Number.isInteger(index)) {
-            continue;
-        }
-
-        const japanese =
-            String(item?.japanese || "").trim();
-
-        if (!japanese) {
-            continue;
-        }
-
-        translationMap.set(index, japanese);
+        throw new Error(
+            "Gemini APIキーが設定されていません。"
+        );
     }
 
-    const result = sourceSentences.map((original, index) => {
+
+    const controller =
+        new AbortController();
+
+    const timeoutId =
+        setTimeout(
+            () =>
+                controller.abort(),
+            CONFIG.timeout
+        );
+
+
+    try {
+
+        const response =
+            await fetch(
+                CONFIG.endpoint,
+                {
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json",
+
+                        "x-goog-api-key":
+                            apiKey
+                    },
+
+                    body: JSON.stringify({
+
+                        model:
+                            CONFIG.model,
+
+                        input:
+                            prompt,
+
+                        /*
+                         * Gemini 3.8 Flash +
+                         * Interactions API
+                         *
+                         * JSON SchemaをAPI側で強制
+                         */
+                        response_format: {
+
+                            type: "text",
+
+                            mime_type:
+                                "application/json",
+
+                            schema:
+                                buildResponseSchema()
+                        },
+
+                        /*
+                         * 出力上限
+                         */
+                        generation_config: {
+
+                            max_tokens:
+                                CONFIG.maxTokens
+                        }
+
+                    }),
+
+                    signal:
+                        controller.signal
+                }
+            );
+
+
+        const raw =
+            await response.text();
+
+
+        if (!response.ok) {
+
+            let message =
+                `Gemini APIエラー (${response.status})`;
+
+            try {
+
+                const errorData =
+                    JSON.parse(raw);
+
+                const apiMessage =
+                    errorData?.error?.message ||
+                    errorData?.message;
+
+                if (apiMessage) {
+                    message +=
+                        `: ${apiMessage}`;
+                }
+
+            } catch {
+
+                if (raw) {
+                    message +=
+                        `: ${raw.slice(0, 1000)}`;
+                }
+            }
+
+            throw new Error(message);
+        }
+
+
+        let data;
+
+        try {
+
+            data =
+                JSON.parse(raw);
+
+        } catch {
+
+            console.error(
+                "Interactions raw response:",
+                raw
+            );
+
+            throw new Error(
+                "Geminiから有効なJSONレスポンスを受信できませんでした。"
+            );
+        }
+
+
+        /*
+         * Interactions APIの
+         * model_outputを探す。
+         */
+
+        let outputText = "";
+
+
+        if (
+            typeof data.output_text ===
+            "string"
+        ) {
+
+            outputText =
+                data.output_text;
+        }
+
+
+        /*
+         * stepsから探す
+         */
+        if (!outputText) {
+
+            const steps =
+                Array.isArray(data.steps)
+                    ? data.steps
+                    : [];
+
+            for (
+                const step of steps
+            ) {
+
+                if (
+                    step?.type !==
+                    "model_output"
+                ) {
+                    continue;
+                }
+
+                const contents =
+                    Array.isArray(
+                        step.content
+                    )
+                        ? step.content
+                        : [];
+
+                for (
+                    const content of contents
+                ) {
+
+                    if (
+                        content?.type ===
+                            "text" &&
+                        typeof content.text ===
+                            "string"
+                    ) {
+
+                        outputText +=
+                            content.text;
+                    }
+                }
+            }
+        }
+
+
+        if (!outputText) {
+
+            throw new Error(
+                `Geminiの出力が空です。status=${data.status || "unknown"}`
+            );
+        }
+
+
+        /*
+         * JSON Schemaを指定しているため、
+         * 基本的には普通にparseできる。
+         */
+        try {
+
+            return JSON.parse(
+                outputText
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Gemini output_text:",
+                outputText
+            );
+
+            throw new Error(
+                "Geminiの構造化JSONを解析できませんでした。"
+            );
+        }
+
+
+    } catch (error) {
+
+        if (
+            error?.name ===
+            "AbortError"
+        ) {
+
+            throw new Error(
+                "Gemini APIがタイムアウトしました。"
+            );
+        }
+
+        throw error;
+
+    } finally {
+
+        clearTimeout(
+            timeoutId
+        );
+    }
+}
+
+
+/* =========================================================
+   TRANSLATION COMBINE
+========================================================= */
+
+function combineTranslations(
+    sourceSentences,
+    aiData
+) {
+
+    const translations =
+        Array.isArray(
+            aiData?.translations
+        )
+            ? aiData.translations
+            : [];
+
+
+    const map =
+        new Map();
+
+
+    for (
+        const item of translations
+    ) {
+
+        const index =
+            Number(item?.index);
 
         const japanese =
-            translationMap.get(index + 1) ||
-            "（日本語訳なし）";
+            String(
+                item?.japanese || ""
+            ).trim();
 
-        return {
-            /*
-             * ★絶対にGeminiのindonesianを使わない
-             */
-            indonesian: original,
 
+        if (
+            Number.isInteger(index) &&
             japanese
-        };
-    });
+        ) {
 
-    return result;
-}
-
-
-/* =========================================================
-   Vocabulary merge
-========================================================= */
-
-function mergeVocabulary(allVocabulary) {
-
-    const map = new Map();
-
-    for (const item of allVocabulary) {
-
-        if (!item) {
-            continue;
-        }
-
-        const word =
-            String(item.word || "").trim();
-
-        const meaning =
-            String(item.meaning || "").trim();
-
-        if (!word || !meaning) {
-            continue;
-        }
-
-        const key = word.toLowerCase();
-
-        if (!map.has(key)) {
-            map.set(key, {
-                word,
-                meaning
-            });
+            map.set(
+                index,
+                japanese
+            );
         }
     }
 
-    return Array.from(map.values())
-        .slice(0, CONFIG.maxVocabulary);
-}
-
-
-/* =========================================================
-   Analyze
-========================================================= */
-
-async function analyzeWithGemini(rawText) {
 
     /*
-     * ① JSが原文を確定
+     * ここでも原文は
+     * sourceSentencesから取る。
+     *
+     * Geminiのindonesianは
+     * 存在しないので、
+     * 改変される可能性もない。
+     */
+
+    return sourceSentences.map(
+        (original, index) => {
+
+            return {
+
+                indonesian:
+                    original,
+
+                japanese:
+                    map.get(index + 1) ||
+                    "（日本語訳なし）"
+            };
+        }
+    );
+}
+
+
+/* =========================================================
+   VOCABULARY MERGE
+========================================================= */
+
+function mergeVocabulary(
+    vocabularyLists
+) {
+
+    const map =
+        new Map();
+
+
+    for (
+        const list of vocabularyLists
+    ) {
+
+        if (
+            !Array.isArray(list)
+        ) {
+            continue;
+        }
+
+
+        for (
+            const item of list
+        ) {
+
+            const word =
+                String(
+                    item?.word || ""
+                ).trim();
+
+            const meaning =
+                String(
+                    item?.meaning || ""
+                ).trim();
+
+
+            if (
+                !word ||
+                !meaning
+            ) {
+                continue;
+            }
+
+
+            const key =
+                word.toLowerCase();
+
+
+            if (!map.has(key)) {
+
+                map.set(
+                    key,
+                    {
+                        word,
+                        meaning
+                    }
+                );
+            }
+        }
+    }
+
+
+    return Array
+        .from(map.values())
+        .slice(
+            0,
+            CONFIG.maxVocabulary
+        );
+}
+
+
+/* =========================================================
+   MAIN ANALYSIS
+========================================================= */
+
+async function analyzeWithGemini(
+    rawText
+) {
+
+    /*
+     * ① 原文をJS側で確定
      */
     const sourceSentences =
-        splitSourceSentences(rawText);
+        splitSourceSentences(
+            rawText
+        );
 
-    if (!sourceSentences.length) {
-        throw new Error("インドネシア語を入力してください。");
+
+    if (
+        !sourceSentences.length
+    ) {
+
+        throw new Error(
+            "文を認識できませんでした。"
+        );
     }
 
+
     /*
-     * ② 5文ずつGeminiへ送る
+     * ② チャンク分割
      */
     const chunks = [];
+
 
     for (
         let i = 0;
         i < sourceSentences.length;
         i += CONFIG.chunkSize
     ) {
+
         chunks.push(
             sourceSentences.slice(
                 i,
@@ -780,160 +1266,238 @@ async function analyzeWithGemini(rawText) {
         );
     }
 
-    const allTranslations = [];
-    const allVocabulary = [];
 
-    for (let i = 0; i < chunks.length; i++) {
+    const allSentences = [];
+
+    const vocabularyLists = [];
+
+
+    /*
+     * ③ 各チャンクを翻訳
+     */
+    for (
+        let i = 0;
+        i < chunks.length;
+        i++
+    ) {
 
         setProgress(
             `翻訳中… ${i + 1} / ${chunks.length}`
         );
 
-        const chunk = chunks[i];
 
-        const data =
+        const chunk =
+            chunks[i];
+
+
+        const aiData =
             await callGemini(
-                buildTranslationPrompt(chunk)
+                buildPrompt(chunk)
             );
 
-        /*
-         * indexは「チャンク内の番号」
-         */
+
         const translated =
             combineTranslations(
                 chunk,
-                data
+                aiData
             );
 
-        allTranslations.push(...translated);
 
-        if (Array.isArray(data?.vocabulary)) {
-            allVocabulary.push(
-                ...data.vocabulary
-            );
-        }
+        allSentences.push(
+            ...translated
+        );
+
+
+        vocabularyLists.push(
+            aiData?.vocabulary || []
+        );
     }
 
+
     /*
-     * ③ 最終的な文数を原文に合わせる
+     * ④ 最終結果
      */
-    const finalSentences =
-        sourceSentences.map((original, index) => {
-
-            return {
-                indonesian: original,
-
-                japanese:
-                    allTranslations[index]?.japanese ||
-                    "（日本語訳なし）"
-            };
-        });
-
     return {
-        sentences: finalSentences,
+
+        sentences:
+            sourceSentences.map(
+                (original, index) => {
+
+                    return {
+
+                        /*
+                         * ★原文は100% JS由来
+                         */
+                        indonesian:
+                            original,
+
+                        japanese:
+                            allSentences[index]
+                                ?.japanese ||
+                            "（日本語訳なし）"
+                    };
+                }
+            ),
+
         vocabulary:
-            mergeVocabulary(allVocabulary)
+            mergeVocabulary(
+                vocabularyLists
+            )
     };
 }
 
 
 /* =========================================================
-   Render sentences
+   RENDER SENTENCES
 ========================================================= */
 
-function renderSentences(sentences) {
+function renderSentences(
+    sentences
+) {
 
     sentencesBox.innerHTML = "";
 
-    sentences.forEach((sentence, index) => {
 
-        const card =
-            document.createElement("div");
+    sentences.forEach(
+        (sentence, index) => {
 
-        card.className =
-            "sentence-card p-4";
-
-        card.innerHTML = `
-            <div class="text-xs text-slate-500 mb-2">
-                ${index + 1}
-            </div>
-
-            <div class="text-base leading-7 text-white">
-                ${escapeHtml(sentence.indonesian)}
-            </div>
-
-            <div class="jp mt-3 pl-3 text-sm leading-7 text-slate-300">
-                ${escapeHtml(sentence.japanese)}
-            </div>
-
-            <div class="flex gap-2 mt-4">
-
-                <button
-                    class="speak-btn btn bg-sky-700 hover:bg-sky-600 rounded-lg px-3 py-2 text-xs"
-                    data-index="${index}"
-                >
-                    🔊 再生
-                </button>
-
-                <button
-                    class="copy-btn btn bg-slate-700 hover:bg-slate-600 rounded-lg px-3 py-2 text-xs"
-                    data-index="${index}"
-                >
-                    コピー
-                </button>
-
-            </div>
-        `;
-
-        sentencesBox.appendChild(card);
-    });
-
-    document
-        .querySelectorAll(".speak-btn")
-        .forEach(button => {
-
-            button.addEventListener("click", () => {
-
-                const index =
-                    Number(button.dataset.index);
-
-                speakIndonesian(
-                    sentences[index].indonesian
+            const card =
+                document.createElement(
+                    "div"
                 );
-            });
-        });
+
+
+            card.className =
+                "sentence-card p-4";
+
+
+            card.innerHTML = `
+
+                <div class="text-xs text-slate-500 mb-2">
+                    ${index + 1}
+                </div>
+
+                <div class="text-base leading-7 text-white">
+                    ${escapeHtml(
+                        sentence.indonesian
+                    )}
+                </div>
+
+                <div class="jp mt-3 pl-3 text-sm leading-7 text-slate-300">
+                    ${escapeHtml(
+                        sentence.japanese
+                    )}
+                </div>
+
+                <div class="flex gap-2 mt-4">
+
+                    <button
+                        class="speak-btn btn bg-sky-700 hover:bg-sky-600 rounded-lg px-3 py-2 text-xs"
+                        data-index="${index}"
+                    >
+                        🔊 再生
+                    </button>
+
+                    <button
+                        class="copy-btn btn bg-slate-700 hover:bg-slate-600 rounded-lg px-3 py-2 text-xs"
+                        data-index="${index}"
+                    >
+                        コピー
+                    </button>
+
+                </div>
+            `;
+
+
+            sentencesBox.appendChild(
+                card
+            );
+        }
+    );
+
 
     document
-        .querySelectorAll(".copy-btn")
+        .querySelectorAll(
+            ".speak-btn"
+        )
         .forEach(button => {
 
-            button.addEventListener("click", async () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                const index =
-                    Number(button.dataset.index);
+                    const index =
+                        Number(
+                            button.dataset.index
+                        );
 
-                const sentence =
-                    sentences[index];
 
-                const text =
-                    `${sentence.indonesian}\n${sentence.japanese}`;
-
-                try {
-                    await navigator.clipboard.writeText(text);
-
-                    button.textContent =
-                        "コピー済み";
-
-                    setTimeout(() => {
-                        button.textContent =
-                            "コピー";
-                    }, 1200);
-
-                } catch {
-                    showError("コピーに失敗しました。");
+                    speakIndonesian(
+                        sentences[index]
+                            .indonesian
+                    );
                 }
-            });
+            );
         });
+
+
+    document
+        .querySelectorAll(
+            ".copy-btn"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const index =
+                        Number(
+                            button.dataset.index
+                        );
+
+
+                    const sentence =
+                        sentences[index];
+
+
+                    const text =
+                        `${sentence.indonesian}\n${sentence.japanese}`;
+
+
+                    try {
+
+                        await navigator
+                            .clipboard
+                            .writeText(
+                                text
+                            );
+
+
+                        button.textContent =
+                            "コピー済み";
+
+
+                        setTimeout(
+                            () => {
+
+                                button.textContent =
+                                    "コピー";
+
+                            },
+                            1200
+                        );
+
+                    } catch {
+
+                        showError(
+                            "コピーに失敗しました。"
+                        );
+                    }
+                }
+            );
+        });
+
 
     sentenceCount.textContent =
         `${sentences.length}文`;
@@ -941,41 +1505,69 @@ function renderSentences(sentences) {
 
 
 /* =========================================================
-   Speech
+   SPEECH
 ========================================================= */
 
-function speakIndonesian(text) {
+function speakIndonesian(
+    text
+) {
 
-    if (!("speechSynthesis" in window)) {
-        showError("このブラウザは音声読み上げに対応していません。");
+    if (
+        !("speechSynthesis" in window)
+    ) {
+
+        showError(
+            "このブラウザは音声読み上げに対応していません。"
+        );
+
         return;
     }
 
+
     speechSynthesis.cancel();
 
+
     const utterance =
-        new SpeechSynthesisUtterance(text);
+        new SpeechSynthesisUtterance(
+            text
+        );
 
-    utterance.lang = "id-ID";
-    utterance.rate = 0.85;
-    utterance.pitch = 1;
 
-    speechSynthesis.speak(utterance);
+    utterance.lang =
+        "id-ID";
+
+    utterance.rate =
+        0.85;
+
+    utterance.pitch =
+        1;
+
+
+    speechSynthesis.speak(
+        utterance
+    );
 }
 
 
 /* =========================================================
-   Vocabulary
+   VOCABULARY
 ========================================================= */
 
-function renderVocabulary(vocabulary) {
+function renderVocabulary(
+    vocabulary
+) {
 
-    currentVocabulary = vocabulary || [];
+    currentVocabulary =
+        Array.isArray(vocabulary)
+            ? vocabulary
+            : [];
 
-    renderFilteredVocabulary();
 
     vocabCount.textContent =
         `${currentVocabulary.length}語`;
+
+
+    renderFilteredVocabulary();
 }
 
 
@@ -986,27 +1578,37 @@ function renderFilteredVocabulary() {
             .trim()
             .toLowerCase();
 
+
     const filtered =
-        currentVocabulary.filter(item => {
+        currentVocabulary.filter(
+            item => {
 
-            const word =
-                String(item.word || "")
-                    .toLowerCase();
+                const word =
+                    String(
+                        item.word || ""
+                    ).toLowerCase();
 
-            const meaning =
-                String(item.meaning || "")
-                    .toLowerCase();
+                const meaning =
+                    String(
+                        item.meaning || ""
+                    ).toLowerCase();
 
-            return (
-                !query ||
-                word.includes(query) ||
-                meaning.includes(query)
-            );
-        });
+
+                return (
+                    !query ||
+                    word.includes(query) ||
+                    meaning.includes(query)
+                );
+            }
+        );
+
 
     vocabularyBox.innerHTML = "";
 
-    if (!filtered.length) {
+
+    if (
+        !filtered.length
+    ) {
 
         vocabularyBox.innerHTML = `
             <div class="text-sm text-slate-500 py-4 text-center">
@@ -1017,50 +1619,75 @@ function renderFilteredVocabulary() {
         return;
     }
 
-    filtered.forEach((item, index) => {
 
-        const card =
-            document.createElement("div");
+    filtered.forEach(
+        item => {
 
-        card.className =
-            "word-chip p-3";
+            const card =
+                document.createElement(
+                    "div"
+                );
 
-        card.innerHTML = `
-            <div class="flex items-center justify-between gap-3">
 
-                <div>
-                    <div class="font-bold text-sky-300">
-                        ${escapeHtml(item.word)}
+            card.className =
+                "word-chip p-3";
+
+
+            card.innerHTML = `
+
+                <div class="flex items-center justify-between gap-3">
+
+                    <div>
+
+                        <div class="font-bold text-sky-300">
+                            ${escapeHtml(
+                                item.word
+                            )}
+                        </div>
+
+                        <div class="text-sm text-slate-300 mt-1">
+                            ${escapeHtml(
+                                item.meaning
+                            )}
+                        </div>
+
                     </div>
 
-                    <div class="text-sm text-slate-300 mt-1">
-                        ${escapeHtml(item.meaning)}
-                    </div>
+                    <button
+                        class="speak-word btn bg-slate-700 hover:bg-slate-600 rounded-lg px-2.5 py-2 text-xs"
+                        data-word="${escapeHtml(
+                            item.word
+                        )}"
+                    >
+                        🔊
+                    </button>
+
                 </div>
+            `;
 
-                <button
-                    class="speak-word btn bg-slate-700 hover:bg-slate-600 rounded-lg px-2.5 py-2 text-xs"
-                    data-word="${escapeHtml(item.word)}"
-                >
-                    🔊
-                </button>
 
-            </div>
-        `;
+            vocabularyBox.appendChild(
+                card
+            );
+        }
+    );
 
-        vocabularyBox.appendChild(card);
-    });
 
     document
-        .querySelectorAll(".speak-word")
+        .querySelectorAll(
+            ".speak-word"
+        )
         .forEach(button => {
 
-            button.addEventListener("click", () => {
+            button.addEventListener(
+                "click",
+                () => {
 
-                speakIndonesian(
-                    button.dataset.word
-                );
-            });
+                    speakIndonesian(
+                        button.dataset.word
+                    );
+                }
+            );
         });
 }
 
@@ -1072,7 +1699,7 @@ vocabSearch.addEventListener(
 
 
 /* =========================================================
-   History
+   HISTORY
 ========================================================= */
 
 function getHistory() {
@@ -1086,35 +1713,42 @@ function getHistory() {
         );
 
     } catch {
+
         return [];
     }
 }
 
 
-function saveHistory(text, result) {
+function saveHistory(
+    text,
+    result
+) {
 
     const history =
         getHistory();
 
-    const item = {
-        id: Date.now(),
-        createdAt: new Date().toISOString(),
+
+    history.unshift({
+
+        id:
+            Date.now(),
+
+        createdAt:
+            new Date().toISOString(),
+
         text,
+
         result
-    };
+    });
 
-    history.unshift(item);
-
-    /*
-     * 最大20件
-     */
-    const trimmed =
-        history.slice(0, 20);
 
     localStorage.setItem(
         CONFIG.historyStorage,
-        JSON.stringify(trimmed)
+        JSON.stringify(
+            history.slice(0, 20)
+        )
     );
+
 
     renderHistory();
 }
@@ -1125,7 +1759,9 @@ function renderHistory() {
     const history =
         getHistory();
 
+
     historyBox.innerHTML = "";
+
 
     if (!history.length) {
 
@@ -1138,66 +1774,105 @@ function renderHistory() {
         return;
     }
 
-    history.forEach(item => {
 
-        const firstSentence =
-            item?.result?.sentences?.[0]
-                ?.indonesian ||
-            item.text ||
-            "";
+    history.forEach(
+        item => {
 
-        const date =
-            new Date(item.createdAt);
+            const first =
+                item
+                    ?.result
+                    ?.sentences
+                    ?.[0]
+                    ?.indonesian ||
+                item.text ||
+                "";
 
-        const row =
-            document.createElement("button");
 
-        row.type = "button";
-
-        row.className =
-            "w-full text-left bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl p-3";
-
-        row.innerHTML = `
-            <div class="text-sm text-white line-clamp-2">
-                ${escapeHtml(firstSentence)}
-            </div>
-
-            <div class="text-xs text-slate-500 mt-1">
-                ${escapeHtml(date.toLocaleString("ja-JP"))}
-            </div>
-        `;
-
-        row.addEventListener("click", () => {
-
-            sourceText.value =
-                item.text || "";
-
-            currentResult =
-                item.result || null;
-
-            if (currentResult) {
-
-                renderSentences(
-                    currentResult.sentences || []
+            const date =
+                new Date(
+                    item.createdAt
                 );
 
-                renderVocabulary(
-                    currentResult.vocabulary || []
+
+            const row =
+                document.createElement(
+                    "button"
                 );
 
-                resultSection.classList.remove(
-                    "hidden"
-                );
-            }
 
-            window.scrollTo({
-                top: 0,
-                behavior: "smooth"
-            });
-        });
+            row.type =
+                "button";
 
-        historyBox.appendChild(row);
-    });
+
+            row.className =
+                "w-full text-left bg-slate-900 hover:bg-slate-800 border border-slate-800 rounded-xl p-3";
+
+
+            row.innerHTML = `
+
+                <div class="text-sm text-white line-clamp-2">
+                    ${escapeHtml(first)}
+                </div>
+
+                <div class="text-xs text-slate-500 mt-1">
+                    ${escapeHtml(
+                        date.toLocaleString(
+                            "ja-JP"
+                        )
+                    )}
+                </div>
+            `;
+
+
+            row.addEventListener(
+                "click",
+                () => {
+
+                    sourceText.value =
+                        item.text || "";
+
+
+                    currentResult =
+                        item.result || null;
+
+
+                    if (
+                        currentResult
+                    ) {
+
+                        renderSentences(
+                            currentResult
+                                .sentences || []
+                        );
+
+
+                        renderVocabulary(
+                            currentResult
+                                .vocabulary || []
+                        );
+
+
+                        resultSection
+                            .classList
+                            .remove(
+                                "hidden"
+                            );
+                    }
+
+
+                    window.scrollTo({
+                        top: 0,
+                        behavior: "smooth"
+                    });
+                }
+            );
+
+
+            historyBox.appendChild(
+                row
+            );
+        }
+    );
 }
 
 
@@ -1205,13 +1880,19 @@ clearHistoryBtn.addEventListener(
     "click",
     () => {
 
-        if (!confirm("履歴をすべて削除しますか？")) {
+        if (
+            !confirm(
+                "履歴をすべて削除しますか？"
+            )
+        ) {
             return;
         }
+
 
         localStorage.removeItem(
             CONFIG.historyStorage
         );
+
 
         renderHistory();
     }
@@ -1219,7 +1900,7 @@ clearHistoryBtn.addEventListener(
 
 
 /* =========================================================
-   Main analyze button
+   ANALYZE
 ========================================================= */
 
 analyzeBtn.addEventListener(
@@ -1228,114 +1909,173 @@ analyzeBtn.addEventListener(
 
         hideError();
 
+
         const text =
             sourceText.value.trim();
 
+
         if (!text) {
+
             showError(
                 "インドネシア語を入力してください。"
             );
+
             return;
         }
 
-        const key =
+
+        const apiKey =
             localStorage.getItem(
                 CONFIG.apiKeyStorage
             ) ||
             apiKeyInput.value.trim();
 
-        if (!key) {
+
+        if (!apiKey) {
+
             showError(
-                "先にGemini APIキーを設定してください。"
+                "Gemini APIキーを設定してください。"
             );
+
             return;
         }
 
-        analyzeBtn.disabled = true;
-        analyzeBtn.classList.add("opacity-50");
 
-        resultSection.classList.add("hidden");
+        analyzeBtn.disabled =
+            true;
+
+        analyzeBtn.classList.add(
+            "opacity-50"
+        );
+
+
+        resultSection.classList.add(
+            "hidden"
+        );
+
 
         try {
 
             /*
-             * 原文を先にJSで確定
+             * APIに送る前に、
+             * JS側で原文を確定。
              */
-            const sourceSentences =
-                splitSourceSentences(text);
+            const originalSentences =
+                splitSourceSentences(
+                    text
+                );
 
-            if (!sourceSentences.length) {
+
+            if (
+                !originalSentences.length
+            ) {
+
                 throw new Error(
                     "文を認識できませんでした。"
                 );
             }
 
+
             setProgress(
-                `翻訳準備中… ${sourceSentences.length}文`
+                `${originalSentences.length}文を処理します…`
             );
 
+
             /*
-             * Gemini処理
+             * Gemini
              */
             const result =
-                await analyzeWithGemini(text);
-
-            /*
-             * 念のため表示側でも
-             * 原文を再度JS側のものに固定
-             */
-            result.sentences =
-                sourceSentences.map(
-                    (original, index) => ({
-                        indonesian: original,
-                        japanese:
-                            result.sentences?.[index]?.japanese ||
-                            "（日本語訳なし）"
-                    })
+                await analyzeWithGemini(
+                    text
                 );
 
-            currentResult = result;
+
+            /*
+             * 最終防衛線。
+             *
+             * 画面表示時も、
+             * Indonesianは必ず
+             * originalSentencesから取得。
+             */
+            result.sentences =
+                originalSentences.map(
+                    (original, index) => {
+
+                        return {
+
+                            indonesian:
+                                original,
+
+                            japanese:
+                                result
+                                    ?.sentences
+                                    ?.[index]
+                                    ?.japanese ||
+                                "（日本語訳なし）"
+                        };
+                    }
+                );
+
+
+            currentResult =
+                result;
+
 
             renderSentences(
                 result.sentences
             );
 
+
             renderVocabulary(
                 result.vocabulary
             );
 
-            resultSection.classList.remove(
-                "hidden"
-            );
+
+            resultSection
+                .classList
+                .remove(
+                    "hidden"
+                );
+
 
             saveHistory(
                 text,
                 result
             );
 
+
             setProgress(
                 "完了しました。"
             );
+
 
             setTimeout(
                 hideProgress,
                 1000
             );
 
+
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
+
 
             showError(
                 error?.message ||
                 "処理中にエラーが発生しました。"
             );
 
+
             hideProgress();
+
 
         } finally {
 
-            analyzeBtn.disabled = false;
+            analyzeBtn.disabled =
+                false;
+
             analyzeBtn.classList.remove(
                 "opacity-50"
             );
@@ -1345,7 +2085,7 @@ analyzeBtn.addEventListener(
 
 
 /* =========================================================
-   Clear input
+   CLEAR
 ========================================================= */
 
 clearInputBtn.addEventListener(
@@ -1359,19 +2099,22 @@ clearInputBtn.addEventListener(
         );
 
         sentencesBox.innerHTML = "";
+
         vocabularyBox.innerHTML = "";
 
         currentResult = null;
+
         currentVocabulary = [];
 
         hideError();
+
         hideProgress();
     }
 );
 
 
 /* =========================================================
-   Export
+   EXPORT
 ========================================================= */
 
 exportBtn.addEventListener(
@@ -1379,12 +2122,14 @@ exportBtn.addEventListener(
     () => {
 
         const data = {
+
             exportedAt:
                 new Date().toISOString(),
 
             history:
                 getHistory()
         };
+
 
         const blob =
             new Blob(
@@ -1401,27 +2146,42 @@ exportBtn.addEventListener(
                 }
             );
 
+
         const url =
-            URL.createObjectURL(blob);
+            URL.createObjectURL(
+                blob
+            );
+
 
         const a =
-            document.createElement("a");
+            document.createElement(
+                "a"
+            );
 
-        a.href = url;
+
+        a.href =
+            url;
+
         a.download =
             `shadowing-backup-${Date.now()}.json`;
 
+
         document.body.appendChild(a);
+
         a.click();
+
         a.remove();
 
-        URL.revokeObjectURL(url);
+
+        URL.revokeObjectURL(
+            url
+        );
     }
 );
 
 
 /* =========================================================
-   Import
+   IMPORT
 ========================================================= */
 
 importFile.addEventListener(
@@ -1431,23 +2191,35 @@ importFile.addEventListener(
         const file =
             event.target.files?.[0];
 
+
         if (!file) {
             return;
         }
+
 
         try {
 
             const text =
                 await file.text();
 
-            const data =
-                JSON.parse(text);
 
-            if (!Array.isArray(data.history)) {
+            const data =
+                JSON.parse(
+                    text
+                );
+
+
+            if (
+                !Array.isArray(
+                    data.history
+                )
+            ) {
+
                 throw new Error(
-                    "履歴データが見つかりません。"
+                    "履歴データがありません。"
                 );
             }
+
 
             localStorage.setItem(
                 CONFIG.historyStorage,
@@ -1456,18 +2228,27 @@ importFile.addEventListener(
                 )
             );
 
+
             renderHistory();
 
-            alert("インポートしました。");
+
+            alert(
+                "インポートしました。"
+            );
+
 
         } catch (error) {
 
-            console.error(error);
+            console.error(
+                error
+            );
+
 
             showError(
                 "インポートできませんでした。"
             );
         }
+
 
         importFile.value = "";
     }
@@ -1475,10 +2256,11 @@ importFile.addEventListener(
 
 
 /* =========================================================
-   Initialize
+   INIT
 ========================================================= */
 
 loadApiKey();
+
 renderHistory();
 
 </script>
