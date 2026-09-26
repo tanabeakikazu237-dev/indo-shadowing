@@ -75,15 +75,16 @@
 
         textarea {
             width: 100%;
-            height: 160px;
+            height: 260px; /* Expanded textarea height for easier editing */
             padding: 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: var(--font-size-id); /* Linked to font-size slider */
             resize: vertical;
             display: block;
+            line-height: 1.5;
         }
 
         .control-group {
@@ -217,7 +218,6 @@
             width: 100%;
         }
 
-        /* 曖昧検索エリア */
         .search-container {
             width: 100%;
             max-width: 340px;
@@ -455,63 +455,6 @@
             border: 1px solid #555;
             text-align: center;
         }
-
-        /* API Rate Limit Monitor Styles */
-        .limit-monitor {
-            background: #18181c;
-            border: 1px solid #33333d;
-            border-radius: 10px;
-            padding: 12px;
-            font-size: 0.8rem;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-        .monitor-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
-            color: #ddd;
-        }
-        .badge-safe {
-            background: #1b5e20;
-            color: #81c784;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-        }
-        .badge-warn {
-            background: #e65100;
-            color: #ffb74d;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-        }
-        .badge-danger {
-            background: #b71c1c;
-            color: #ef9a9a;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-        }
-        .monitor-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
-            background: #222228;
-            padding: 8px;
-            border-radius: 8px;
-        }
-        .monitor-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-        .m-label { color: var(--text-sub); font-size: 0.7rem; }
-        .m-value { color: #fff; font-weight: bold; font-size: 0.85rem; margin-top: 2px; }
-        .monitor-note { color: #aaa; font-size: 0.75rem; line-height: 1.3; }
     </style>
 </head>
 <body>
@@ -532,8 +475,8 @@
             </select>
         </div>
 
-        <label for="script-input">インドネシア語のテキストを入力または貼り付け</label>
-        <textarea id="script-input" placeholder="例: Saya ingin pergi ke toko untuk membeli buah-buahan segar. Di sana saya bertemu dengan teman lama." oninput="updateTokenEstimate()"></textarea>
+        <label for="script-input">インドネシア語のテキストを入力または貼り付け（#優先、次に.で文節区切り）</label>
+        <textarea id="script-input" placeholder="例: Halo# Selamat pagi. Apa kabar?" oninput="updateTokenEstimate()"></textarea>
         
         <div class="control-group">
             <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
@@ -817,23 +760,21 @@
     function updateTokenEstimate() {
         const text = document.getElementById('script-input')?.value.trim() || '';
         const tokenDisplay = document.getElementById('est-tokens');
-        const estStatus = document.getElementById('est-status');
-        const rpmBadge = document.getElementById('rpm-badge');
-        const rpdBadge = document.getElementById('rpd-badge');
+        const estStatus = document.getElementById('api-monitor-desc');
+        const rpmBadge = document.getElementById('rpm-count');
         const btn = document.getElementById('analyze-btn');
 
         const now = Date.now();
         rpmTimestamps = rpmTimestamps.filter(t => now - t < 60000);
         rpdTimestamps = rpdTimestamps.filter(t => now - t < 86400000);
 
-        if (rpmBadge) rpmBadge.textContent = `${rpmTimestamps.length} / 15`;
-        if (rpdBadge) rpdBadge.textContent = `${rpdTimestamps.length} / 1,500`;
+        if (rpmBadge) rpmBadge.textContent = `${rpmTimestamps.length} / 15 RPM`;
 
         if (!text) {
-            if (tokenDisplay) tokenDisplay.textContent = '0';
+            if (tokenDisplay) tokenDisplay.textContent = '0 Token';
             if (estStatus) {
-                estStatus.textContent = '未入力';
-                estStatus.style.color = '#aaa';
+                estStatus.textContent = 'テキストを入力すると消費予測が更新されます。';
+                estStatus.style.color = '#888';
             }
             if (btn && rpmTimestamps.length < 15) btn.disabled = false;
             return 0;
@@ -861,7 +802,7 @@
         const outputTokens = Math.ceil(wordCount * 12);
         const totalEstTokens = inputTokens + outputTokens + 250;
 
-        if (tokenDisplay) tokenDisplay.textContent = `~${totalEstTokens}`;
+        if (tokenDisplay) tokenDisplay.textContent = `~${totalEstTokens} Token`;
 
         if (rpmTimestamps.length >= 15) {
             if (estStatus) {
@@ -967,12 +908,13 @@
     }
 
     async function analyzeWithGemini(text, apiKey) {
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         
         const systemPrompt = `You are an expert Indonesian-Japanese language instructor.
 Given the input Indonesian text:
-1. Break down the text into logical sentences/clauses ("sentences") for shadowing practice, with natural Japanese translations.
-2. Extract ALL unique Indonesian words from the text EXCEPT pure numbers/digits (e.g. "123", "2024"). Every single word MUST have its exact Indonesian spelling ("word") and a concise, clear Japanese meaning ("meaning"). Do not skip any non-numeric words or leave meanings empty.`;
+1. STRICT SENTENCE SPLITTING RULE: You MUST split the text into logical sentences/clauses ("sentences") strictly prioritizing '#' as the primary separator. If '#' is present, split strictly at '#' boundaries. If '#' is absent, split by '.' (dots).
+2. For each resulting sentence, provide a natural Japanese translation ("japanese") and the corresponding Indonesian text segment ("indonesian").
+3. Extract ALL unique Indonesian words from the text EXCEPT pure numbers/digits (e.g. "123", "2024"). Every single word MUST have its exact Indonesian spelling ("word") and a concise, clear Japanese meaning ("meaning"). Do not skip any non-numeric words or leave meanings empty.`;
 
         const payload = {
             contents: [{ parts: [{ text: text }] }],
@@ -1110,6 +1052,12 @@ Given the input Indonesian text:
         });
     }
 
+    function cleanTextForSpeech(text) {
+        if (!text) return '';
+        // Remove trailing half-width numbers (e.g. "123", "1") or hash characters from speech reading
+        return text.replace(/#+/g, ' ').replace(/\s+\d+$/, '').trim();
+    }
+
     function onWordClick(event, lineIndex, wordIndex, clickedWord) {
         event.stopPropagation();
         if (!('speechSynthesis' in window)) return;
@@ -1135,8 +1083,9 @@ Given the input Indonesian text:
         const fullText = parsedData.sentences[lineIndex].indonesian;
         const wordsArray = fullText.split(/\s+/);
         const subText = wordsArray.slice(wordIndex).join(' ');
+        const cleanedSubText = cleanTextForSpeech(subText);
 
-        const utterance = new SpeechSynthesisUtterance(subText);
+        const utterance = new SpeechSynthesisUtterance(cleanedSubText);
         utterance.lang = 'id-ID';
         utterance.rate = parseFloat(document.getElementById('speed-range').value);
 
@@ -1165,7 +1114,8 @@ Given the input Indonesian text:
             }
         }
 
-        const utterance = new SpeechSynthesisUtterance(textToSpeech);
+        const cleanedSpeechText = cleanTextForSpeech(textToSpeech);
+        const utterance = new SpeechSynthesisUtterance(cleanedSpeechText);
         utterance.lang = 'id-ID';
         utterance.rate = parseFloat(document.getElementById('speed-range').value);
 
@@ -1308,7 +1258,6 @@ Given the input Indonesian text:
     function shuffleCards() {
         if (!parsedData.vocabulary || parsedData.vocabulary.length < 2) return;
 
-        // タップ回数（指定頻度）ごとにグループ化
         const groups = {};
         parsedData.vocabulary.forEach(item => {
             const key = cleanWordKey(item.word);
@@ -1317,13 +1266,11 @@ Given the input Indonesian text:
             groups[count].push(item);
         });
 
-        // タップ回数の多い順（降順）のグループキーを取得
         const sortedCounts = Object.keys(groups).map(Number).sort((a, b) => b - a);
         
         let newVocab = [];
         sortedCounts.forEach(count => {
             let groupArr = groups[count];
-            // 同一タップ回数のグループ内でのみランダムシャッフル
             for (let i = groupArr.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
                 [groupArr[i], groupArr[j]] = [groupArr[j], groupArr[i]];
