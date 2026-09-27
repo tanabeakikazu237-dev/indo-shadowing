@@ -553,7 +553,7 @@
                 </div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#007aff; font-size:0.8rem; text-decoration:none;">🔑 API Keyを無料取得</a>
-                    <button type="button" id="key-visibility-btn" style="background:none; border:none; color:#aaa; font-size:0.8rem; cursor:pointer;">表示/非表示</button>
+                    <button type="button" id="key-visibility-btn" style="background:none; border:none; color:#aaa; font-size:0.80rem; cursor:pointer;">表示/非表示</button>
                 </div>
 
                 <div style="border-top:1px solid #444; padding-top:10px; display:flex; flex-direction:column; gap:8px;">
@@ -612,10 +612,10 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
-            history: 'indo_shadowing_history_v17',
-            tapCounts: 'indo_shadowing_tapcounts_v8',
-            rpm: 'rpm_timestamps_v8',
-            cachePrefix: 'indo_shadowing_cache_v17_'
+            history: 'indo_shadowing_history_v21',
+            tapCounts: 'indo_shadowing_tapcounts_v11',
+            rpm: 'rpm_timestamps_v11',
+            cachePrefix: 'indo_shadowing_cache_v21_'
         };
 
         const CONFIG = {
@@ -623,7 +623,7 @@
             endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 17
+            cacheVersion: 21
         };
 
         let parsedData = { sentences: [], vocabulary: [] };
@@ -879,12 +879,17 @@
             updateTokenEstimate();
         }
 
+        /* 厳格な単語キー正規化および記号除外処理 */
         function cleanWordKey(str) {
             if (!str) return '';
-            return String(str).normalize('NFKC').toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:]/g, '').trim();
+            return String(str)
+                .normalize('NFKC')
+                .toLowerCase()
+                .replace(/[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]/g, '')
+                .trim();
         }
 
-        /* ＠を最優先、次にピリオド(.)で文節を抽出する高精度パーサー */
+        /* @優先、次にピリオド(.)で文節を抽出 */
         function preprocessIndonesianText(rawText) {
             if (!rawText) return [];
             
@@ -977,7 +982,7 @@
         function normalizeParsedData(data, preprocessedSegments) {
             const result = {
                 sentences: [],
-                vocabulary: Array.isArray(data?.vocabulary) ? data.vocabulary : []
+                vocabulary: []
             };
             const aiSentences = Array.isArray(data?.sentences) ? data.sentences : [];
 
@@ -986,37 +991,35 @@
                 japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
             }));
 
+            const rawVocab = Array.isArray(data?.vocabulary) ? data.vocabulary : [];
             const map = new Map();
-            result.vocabulary.forEach(v => {
-                const word = typeof v?.word === 'string' ? v.word.trim() : '';
-                const key = cleanWordKey(word);
-                if (key && !/^\d+$/u.test(key)) {
-                    map.set(key, { word, meaning: v?.meaning?.trim() || '（意味不明）' });
+            
+            rawVocab.forEach(v => {
+                const rawWord = typeof v?.word === 'string' ? v.word.trim() : '';
+                const cleanWord = rawWord.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '').trim();
+                const key = cleanWordKey(cleanWord);
+                const meaning = typeof v?.meaning === 'string' ? v.meaning.trim() : '';
+                
+                if (key && !/^\d+$/u.test(key) && meaning && meaning !== '（意味不明）' && meaning !== '（辞書登録なし）') {
+                    map.set(key, { word: cleanWord || rawWord, meaning });
                 }
             });
             result.vocabulary = [...map.values()];
             return result;
         }
 
-        /* 未登録の文脈単語に対しても、対応する対訳や推測に基づく意味を付与する改善抽出ロジック */
         function ensureAllWordsExtracted(preprocessedSegments, aiResultData) {
             parsedData = normalizeParsedData(aiResultData, preprocessedSegments);
             const existing = new Map(parsedData.vocabulary.map(v => [cleanWordKey(v.word), v]));
 
-            // 文節ごとに含まれる単語を精査
             parsedData.sentences.forEach(sentence => {
                 const words = sentence.indonesian.split(/\s+/u).map(w => w.trim()).filter(Boolean);
-                const jpTranslation = sentence.japanese || '';
-
-                words.forEach(word => {
-                    const key = cleanWordKey(word);
+                
+                words.forEach(rawToken => {
+                    const cleanToken = rawToken.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '').trim();
+                    const key = cleanWordKey(cleanToken);
                     if (key && !/^\d+$/u.test(key) && !existing.has(key)) {
-                        // 辞書にない文脈単語の場合、文全体の日本語訳や形態に基づいたスマートな意味を補完
-                        let inferredMeaning = '（文脈単語）';
-                        if (jpTranslation && jpTranslation !== '（日本語訳なし）') {
-                            inferredMeaning = '【文節訳】 ' + jpTranslation;
-                        }
-                        existing.set(key, { word, meaning: inferredMeaning });
+                        existing.set(key, { word: cleanToken || rawToken, meaning: '（辞書登録なし: AI単語リスト未収録）' });
                     }
                 });
             });
@@ -1087,11 +1090,10 @@
         async function analyzeWithGemini(segments, apiKey) {
             const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
             
-            const systemPrompt = 'You are a professional Indonesian-to-Japanese translator and linguistics expert specializing in accurate shadowing materials.\n' +
-                'You are given an array of Indonesian text segments. For each segment, provide its exact, natural Japanese translation (対訳).\n' +
-                'CRITICAL: You must return the "sentences" array with the exact same length and in the exact same order as the input array. Each item in the "sentences" array must correspond 1-to-1 to each input segment.\n' +
-                'Also extract all unique vocabulary words and their Japanese meanings into the "vocabulary" array.\n' +
-                'Return ONLY valid JSON matching the schema.';
+            const systemPrompt = 'You are a professional Indonesian-to-Japanese lexicographer.\n' +
+                'You will receive an array of Indonesian text segments (@ lines). For each segment, provide its exact, natural Japanese translation (japanese).\n' +
+                'CRITICAL FOR VOCABULARY: Extract EVERY unique Indonesian word appearing across all segments. Exclude punctuation marks, hyphens, and numbers from the words. Provide its precise, standalone dictionary meaning in Japanese (meaning) — e.g. "berpikir" -> "考える", "besar" -> "大きい", "rumah" -> "家". NEVER provide contextual sentence translations or phrase meanings for individual words. Every vocabulary item must have a proper dictionary definition.\n' +
+                'Return ONLY valid JSON matching the exact schema.';
 
             const payload = {
                 systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -1179,12 +1181,12 @@
 
                 const idText = document.createElement('div');
                 idText.className = 'id-text';
-                item.indonesian.split(/\s+/u).filter(Boolean).forEach((word, wIdx) => {
+                item.indonesian.split(/\s+/u).filter(Boolean).forEach((rawWord, wIdx) => {
                     if (wIdx > 0) idText.appendChild(document.createTextNode(' '));
                     const span = document.createElement('span');
                     span.className = 'word-token';
-                    span.textContent = word;
-                    span.addEventListener('click', event => onWordClick(event, index, wIdx, word));
+                    span.textContent = rawWord;
+                    span.addEventListener('click', event => onWordClick(event, index, wIdx, rawWord));
                     idText.appendChild(span);
                 });
 
@@ -1254,7 +1256,8 @@
             targetDiv?.classList.add('active');
             tokens[wordIndex]?.classList.add('highlighted');
 
-            const key = cleanWordKey(clickedWord);
+            const cleanToken = clickedWord.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '');
+            const key = cleanWordKey(cleanToken);
             if (key) {
                 wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
                 try { localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts)); } catch (_) {}
@@ -1326,7 +1329,7 @@
 
             const back = document.createElement('div');
             back.className = 'card-face card-back';
-            back.innerHTML = '<div style="font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;">裏：日本語の意味</div>' +
+            back.innerHTML = '<div style="font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;">裏：単語の基本意味</div>' +
                 '<div class="tap-count-badge" id="back-tap-badge"></div>' +
                 '<div class="card-meaning" id="back-card-meaning"></div>' +
                 '<div id="back-card-word-sub" style="font-size:0.9rem;color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;"></div>';
@@ -1366,7 +1369,7 @@
             $('card-counter').textContent = '単語 ' + (cardIndex + 1) + ' / ' + currentFilteredVocab.length;
             $('front-card-word').textContent = vocab.word;
             $('front-tap-badge').textContent = '📌 ' + count + '回';
-            $('back-card-meaning').textContent = vocab.meaning || '（日本語の意味なし）';
+            $('back-card-meaning').textContent = vocab.meaning || '（意味未登録）';
             $('back-tap-badge').textContent = '📌 ' + count + '回';
             $('back-card-word-sub').textContent = vocab.word;
             $('current-flashcard')?.classList.remove('flipped');
