@@ -76,7 +76,7 @@
 
         textarea {
             width: 100%;
-            height: 260px;
+            height: 220px;
             padding: 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
@@ -519,8 +519,8 @@
             </select>
         </div>
 
-        <label for="script-input">インドネシア語のテキストを入力または貼り付け（#優先、次に.で文節区切り）</label>
-        <textarea id="script-input" placeholder="例: Halo# Selamat pagi. Apa kabar?"></textarea>
+        <label for="script-input">インドネシア語のテキストを入力または貼り付け（#で始まる行やコメントを自動抽出します）</label>
+        <textarea id="script-input" placeholder="例: #Saat memikirkan hikmat Yehuwa..."></textarea>
         
         <div class="control-group">
             <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
@@ -632,18 +632,18 @@
 
     const STORAGE = {
         apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v3',
-        tapCounts: 'indo_shadowing_tapcounts_v3',
-        rpm: 'rpm_timestamps_v3',
-        cachePrefix: 'indo_shadowing_cache_v5_'
+        history: 'indo_shadowing_history_v4',
+        tapCounts: 'indo_shadowing_tapcounts_v4',
+        rpm: 'rpm_timestamps_v4',
+        cachePrefix: 'indo_shadowing_cache_v7_'
     };
 
     const CONFIG = {
-        model: 'gemini-2.5-flash',
+        model: 'gemini-3.5-flash-lite',
         endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
         maxRequestsPerMinute: 15,
         maxHistory: 5,
-        cacheVersion: 5
+        cacheVersion: 7
     };
 
     let parsedData = { sentences: [], vocabulary: [] };
@@ -653,6 +653,31 @@
     let searchDebounceTimer = null;
     let currentFilteredVocab = [];
     let rpmTimestamps = [];
+
+    // サンプル初期データをセット
+    const defaultText = `📌 設問 1
+* 質問: エホバの知恵やスケールの大きさについて考えると，どんな気持ちになりますか。
+* 日本語 (約25秒):
+  エホバの無限の知恵に比べると自分は本当にちっぽけだと感じます。ローマ11章33,34節にある通り、神の道を知り尽くすことはできませんが、その圧倒的な偉大さを知るからこそ、心から神を敬い頼りたくなる気持ちになります。
+* Indonesian (約25秒):
+  #Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil. Seperti di Roma 11:33, 34, jalan-jalan-Nya tidak terduga, tapi keagungan-Nya membuat kita semakin menghormati dan ingin mengandalkan-Nya sepenuhnya. 1
+📌 設問 2
+* 質問: 私たちはエホバについてよく知ることができます。どうしてそう言えますか。
+* 日本語 (約25秒):
+  エホバがご自分を知ることができるように配慮してくださっているからです。歴代第一28章9節のように、探し求めるなら神は見つけさせてくださいます。イエスや聖書を通して温かいお考えを啓示してくださっているからこそ知ることができます。
+* Indonesian (約25秒):
+  #Yehuwa mau kita mengenal-Nya. Seperti di 1 Tawarikh 28:9, jika kita mencari-Nya, Dia akan membiarkan diri-Nya ditemukan. Melalui Yesus dan Alkitab, Yehuwa menyingkapkan perasaan-Nya kepada kita. 2
+📌 設問 3
+* 質問: この記事ではどんなことを考えますか。
+* 日本語 (約25秒):
+  エホバを知ることに終わりはありません（ヨハネ17:3）。この記事では、長く仕えてきた人にとっても大切な「エホバをよく知るとはどういうことか」「なぜそれが大切か」「どうすればよく知ることができるか」の3点を学びます。
+* Indonesian (約25秒):
+  #Belajar tentang Yehuwa tidak ada habisnya (Yohanes 17:3). Artikel ini membahas tiga hal penting: apa artinya mengenal Yehuwa, mengapa itu penting, dan bagaimana kita bisa semakin mengenal-Nya. 3`;
+
+    const textareaEl = document.getElementById('script-input');
+    if (textareaEl && !textareaEl.value) {
+        textareaEl.value = defaultText;
+    }
 
     function $(id) {
         return document.getElementById(id);
@@ -861,33 +886,52 @@
             .trim();
     }
 
+    /* ご提示いただいた抽出ロジック（Indonesianブロックおよび#行の抽出・番号除去）を完全に組み込み */
     function preprocessIndonesianText(rawText) {
         if (!rawText) return [];
         
-        const separator = rawText.includes('#') ? '#' : '.';
-        const rawSegments = rawText.split(separator);
-        const cleanedSegments = [];
+        const lines = rawText.split('\n');
+        let isIndonesianLine = false;
+        let extracted = [];
 
-        rawSegments.forEach(seg => {
-            let scriptureMatch = seg.match(/\([^)]*\)/g) || [];
-            let cleaned = seg.replace(/\([^)]*\)/g, '___SCRIPTURE_PLACEHOLDER___');
-            cleaned = cleaned.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/gu, ' ');
-            cleaned = cleaned.replace(/\b\d+\b/g, ' ');
-            cleaned = cleaned.replace(/[^\w\s\-'\.,!\?()]/gu, ' ');
-
-            if (scriptureMatch.length > 0) {
-                let sIdx = 0;
-                cleaned = cleaned.replace(/___SCRIPTURE_PLACEHOLDER___/g, () => scriptureMatch[sIdx++] || '');
+        for (let line of lines) {
+            if (line.includes('Indonesian')) {
+                isIndonesianLine = true;
+                continue;
             }
-
-            cleaned = cleaned.replace(/\s+/g, ' ').trim();
-
-            if (cleaned) {
-                cleanedSegments.push(cleaned);
+            if (isIndonesianLine) {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('#')) {
+                    // 行末の末尾番号（例: " 1", "2", "12、13" など）を取り除く
+                    let content = trimmed.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '');
+                    content = content.replace(/^#\s*/, '').trim(); // 先頭の#を除去
+                    if (content) {
+                        extracted.push(content);
+                    }
+                    isIndonesianLine = false;
+                }
             }
-        });
+        }
 
-        return cleanedSegments;
+        // もし「Indonesian」マーカーが含まれない通常の箇条書きや文章だった場合のフォールバック抽出
+        if (extracted.length === 0) {
+            const regex = /#([^\n]+)/gm;
+            let match;
+            while ((match = regex.exec(rawText)) !== null) {
+                let content = match[1].trim();
+                content = content.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '').trim();
+                if (content) {
+                    extracted.push(content);
+                }
+            }
+        }
+
+        // それでも見つからない場合は通常の段落分割
+        if (extracted.length === 0) {
+            return rawText.split('.').map(s => s.trim()).filter(Boolean);
+        }
+
+        return extracted;
     }
 
     function updateSpeedVal(val) {
@@ -1157,7 +1201,7 @@
 
         const systemPrompt = `
 You are an expert Indonesian-Japanese language instructor.
-You will be provided with an array of pure Indonesian text segments.
+You will be provided with an array of pure Indonesian text segments extracted from study materials.
 Return ONLY valid JSON matching the supplied schema.
 
 Rules:
@@ -1845,7 +1889,6 @@ Rules:
         $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
         $('fontsize-range')?.addEventListener('input', e => updateFontSizeVal(e.target.value));
 
-        // Edit Modal Events
         $('edit-save-btn')?.addEventListener('click', saveEditedLine);
         $('edit-cancel-btn')?.addEventListener('click', closeEditLineModal);
 
