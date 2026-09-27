@@ -76,7 +76,7 @@
 
         textarea {
             width: 100%;
-            height: 220px;
+            height: 240px;
             padding: 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
@@ -505,22 +505,18 @@
 
     <header>
         <h1>🇮🇩 インドネシア語 AIシャドーイング</h1>
-        <button class="icon-btn" id="settings-open-btn" type="button">
-            ⚙️ 設定
-            <span id="api-badge" class="api-badge unset">未設定</span>
-        </button>
+        <div style="display:flex; gap:6px;">
+            <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;">📜 履歴(3件)</button>
+            <button class="icon-btn" id="settings-open-btn" type="button">
+                ⚙️ 設定
+                <span id="api-badge" class="api-badge unset">未設定</span>
+            </button>
+        </div>
     </header>
 
     <div class="card" id="setup-card">
-        <div id="history-section" style="display:none;">
-            <label for="history-select">📜 過去の入力履歴</label>
-            <select id="history-select" style="width:100%; padding:10px; background:#2c2c2c; border:1px solid #444; border-radius:8px; color:#fff;">
-                <option value="">-- 履歴を選択 --</option>
-            </select>
-        </div>
-
         <label for="script-input">インドネシア語のテキストを入力または貼り付け（#で始まる行やコメントを自動抽出します）</label>
-        <textarea id="script-input" placeholder="例: #Saat memikirkan hikmat Yehuwa..."></textarea>
+        <textarea id="script-input" placeholder="例: #Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."></textarea>
         
         <div class="control-group">
             <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
@@ -604,6 +600,20 @@
         </div>
     </div>
 
+    <!-- History Modal (Top 3 History items) -->
+    <div class="modal-overlay" id="history-modal">
+        <div class="modal-body">
+            <div class="modal-title">📜 過去の入力履歴（最大3件）</div>
+            <p style="font-size:0.8rem; color:#aaa; margin:0;">
+                直近で解析したテキストの履歴です。選択して復元できます。
+            </p>
+            <div id="history-items-container" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;">
+                <!-- Dynamic history buttons -->
+            </div>
+            <button class="btn btn-secondary" id="history-close-btn" type="button">閉じる</button>
+        </div>
+    </div>
+
     <!-- Edit Line Modal -->
     <div class="modal-overlay" id="edit-line-modal">
         <div class="modal-body">
@@ -632,18 +642,18 @@
 
     const STORAGE = {
         apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v4',
-        tapCounts: 'indo_shadowing_tapcounts_v4',
-        rpm: 'rpm_timestamps_v4',
-        cachePrefix: 'indo_shadowing_cache_v7_'
+        history: 'indo_shadowing_history_v5',
+        tapCounts: 'indo_shadowing_tapcounts_v5',
+        rpm: 'rpm_timestamps_v5',
+        cachePrefix: 'indo_shadowing_cache_v8_'
     };
 
     const CONFIG = {
         model: 'gemini-3.5-flash-lite',
         endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
         maxRequestsPerMinute: 15,
-        maxHistory: 5,
-        cacheVersion: 7
+        maxHistory: 3, // 保持する履歴を過去3件に制限
+        cacheVersion: 8
     };
 
     let parsedData = { sentences: [], vocabulary: [] };
@@ -653,31 +663,6 @@
     let searchDebounceTimer = null;
     let currentFilteredVocab = [];
     let rpmTimestamps = [];
-
-    // サンプル初期データをセット
-    const defaultText = `📌 設問 1
-* 質問: エホバの知恵やスケールの大きさについて考えると，どんな気持ちになりますか。
-* 日本語 (約25秒):
-  エホバの無限の知恵に比べると自分は本当にちっぽけだと感じます。ローマ11章33,34節にある通り、神の道を知り尽くすことはできませんが、その圧倒的な偉大さを知るからこそ、心から神を敬い頼りたくなる気持ちになります。
-* Indonesian (約25秒):
-  #Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil. Seperti di Roma 11:33, 34, jalan-jalan-Nya tidak terduga, tapi keagungan-Nya membuat kita semakin menghormati dan ingin mengandalkan-Nya sepenuhnya. 1
-📌 設問 2
-* 質問: 私たちはエホバについてよく知ることができます。どうしてそう言えますか。
-* 日本語 (約25秒):
-  エホバがご自分を知ることができるように配慮してくださっているからです。歴代第一28章9節のように、探し求めるなら神は見つけさせてくださいます。イエスや聖書を通して温かいお考えを啓示してくださっているからこそ知ることができます。
-* Indonesian (約25秒):
-  #Yehuwa mau kita mengenal-Nya. Seperti di 1 Tawarikh 28:9, jika kita mencari-Nya, Dia akan membiarkan diri-Nya ditemukan. Melalui Yesus dan Alkitab, Yehuwa menyingkapkan perasaan-Nya kepada kita. 2
-📌 設問 3
-* 質問: この記事ではどんなことを考えますか。
-* 日本語 (約25秒):
-  エホバを知ることに終わりはありません（ヨハネ17:3）。この記事では、長く仕えてきた人にとっても大切な「エホバをよく知るとはどういうことか」「なぜそれが大切か」「どうすればよく知ることができるか」の3点を学びます。
-* Indonesian (約25秒):
-  #Belajar tentang Yehuwa tidak ada habisnya (Yohanes 17:3). Artikel ini membahas tiga hal penting: apa artinya mengenal Yehuwa, mengapa itu penting, dan bagaimana kita bisa semakin mengenal-Nya. 3`;
-
-    const textareaEl = document.getElementById('script-input');
-    if (textareaEl && !textareaEl.value) {
-        textareaEl.value = defaultText;
-    }
 
     function $(id) {
         return document.getElementById(id);
@@ -772,39 +757,53 @@
 
     function updateHistoryUI() {
         const history = getHistory();
-        const section = $('history-section');
-        const select = $('history-select');
-        if (!section || !select) return;
+        const openBtn = $('history-modal-open-btn');
+        const container = $('history-items-container');
+
+        if (!openBtn || !container) return;
 
         if (!history.length) {
-            section.style.display = 'none';
+            openBtn.style.display = 'none';
             return;
         }
 
-        section.style.display = 'block';
-        select.innerHTML = '';
-        const first = document.createElement('option');
-        first.value = '';
-        first.textContent = '-- 過去のテキストを呼び出す --';
-        select.appendChild(first);
+        openBtn.style.display = 'flex';
+        openBtn.textContent = `📜 履歴(${history.length})`;
+        container.innerHTML = '';
 
         history.forEach((text, idx) => {
-            const opt = document.createElement('option');
-            opt.value = String(idx);
-            opt.textContent = `[${idx + 1}] ${text.replace(/\s+/g, ' ').slice(0, 30)}${text.length > 30 ? '...' : ''}`;
-            select.appendChild(opt);
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'backup-action-btn';
+            btn.style.width = '100%';
+            btn.style.justifyContent = 'flex-start';
+            btn.style.textAlign = 'left';
+            btn.style.padding = '10px';
+            btn.textContent = `[履歴 ${idx + 1}] ${text.replace(/\s+/g, ' ').slice(0, 32)}${text.length > 32 ? '...' : ''}`;
+            btn.addEventListener('click', () => {
+                loadHistoryText(text);
+                closeHistoryModal();
+            });
+            container.appendChild(btn);
         });
     }
 
-    function loadHistory(idx) {
-        if (idx === '') return;
-        const history = getHistory();
-        const text = history[Number(idx)];
+    function openHistoryModal() {
+        const modal = $('history-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeHistoryModal() {
+        const modal = $('history-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function loadHistoryText(text) {
         if (typeof text === 'string') {
             $('script-input').value = text;
             updateTokenEstimate();
+            showToast('過去の履歴テキストを読み込みました。');
         }
-        $('history-select').value = '';
     }
 
     function hashCode(str) {
@@ -886,7 +885,7 @@
             .trim();
     }
 
-    /* ご提示いただいた抽出ロジック（Indonesianブロックおよび#行の抽出・番号除去）を完全に組み込み */
+    /* ユーザーご提示のコードに基づく `#` 行および Indonesian ブロックからの正確な抽出ロジック */
     function preprocessIndonesianText(rawText) {
         if (!rawText) return [];
         
@@ -902,9 +901,8 @@
             if (isIndonesianLine) {
                 const trimmed = line.trim();
                 if (trimmed.startsWith('#')) {
-                    // 行末の末尾番号（例: " 1", "2", "12、13" など）を取り除く
                     let content = trimmed.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '');
-                    content = content.replace(/^#\s*/, '').trim(); // 先頭の#を除去
+                    content = content.replace(/^#\s*/, '').trim();
                     if (content) {
                         extracted.push(content);
                     }
@@ -913,7 +911,6 @@
             }
         }
 
-        // もし「Indonesian」マーカーが含まれない通常の箇条書きや文章だった場合のフォールバック抽出
         if (extracted.length === 0) {
             const regex = /#([^\n]+)/gm;
             let match;
@@ -926,7 +923,6 @@
             }
         }
 
-        // それでも見つからない場合は通常の段落分割
         if (extracted.length === 0) {
             return rawText.split('.').map(s => s.trim()).filter(Boolean);
         }
@@ -1876,6 +1872,10 @@ Rules:
         $('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
         $('export-btn')?.addEventListener('click', exportAppData);
         $('import-file-input')?.addEventListener('change', importAppData);
+
+        $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
+        $('history-close-btn')?.addEventListener('click', closeHistoryModal);
+
         $('analyze-btn')?.addEventListener('click', startApp);
         $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
         $('tab-word')?.addEventListener('click', () => switchMode('word'));
@@ -1883,7 +1883,7 @@ Rules:
         $('pause-speech-btn')?.addEventListener('click', pauseSpeech);
         $('resume-speech-btn')?.addEventListener('click', resumeSpeech);
         $('stop-speech-btn')?.addEventListener('click', stopSpeech);
-        $('history-select')?.addEventListener('change', e => loadHistory(e.target.value));
+
         $('script-input')?.addEventListener('input', updateTokenEstimate);
         $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
         $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
@@ -1895,6 +1895,9 @@ Rules:
         $('settings-modal')?.addEventListener('click', e => {
             if (e.target === $('settings-modal')) closeSettings();
         });
+        $('history-modal')?.addEventListener('click', e => {
+            if (e.target === $('history-modal')) closeHistoryModal();
+        });
         $('edit-line-modal')?.addEventListener('click', e => {
             if (e.target === $('edit-line-modal')) closeEditLineModal();
         });
@@ -1902,6 +1905,7 @@ Rules:
         document.addEventListener('keydown', e => {
             if (e.key === 'Escape') {
                 closeSettings();
+                closeHistoryModal();
                 closeEditLineModal();
             }
         });
@@ -1933,7 +1937,6 @@ Rules:
     window.updateSpeedVal = updateSpeedVal;
     window.updateFontSizeVal = updateFontSizeVal;
     window.updateTokenEstimate = updateTokenEstimate;
-    window.loadHistory = loadHistory;
     window.pauseSpeech = pauseSpeech;
     window.resumeSpeech = resumeSpeech;
     window.stopSpeech = stopSpeech;
