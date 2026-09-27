@@ -8,11 +8,11 @@
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            --bg-color: #121212;
+            --bg-color: #000000;
+            --app-bg: #121212;
             --card-bg: #1e1e1e;
             --card-sub-bg: #2c2c2c;
             --accent-color: #007aff;
-            --accent-hover: #0056b3;
             --text-main: #f0f0f0;
             --text-sub: #aaaaaa;
             --font-size-id: 1.1rem;
@@ -22,13 +22,27 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-color);
-            color: var(--text-main);
             margin: 0;
-            padding: 12px;
+            padding: 0;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        #app-container {
+            background-color: var(--app-bg);
+            width: 100%;
+            max-width: 768px;
             height: 100vh;
             height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            padding: 12px;
+            color: var(--text-main);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
 
         header {
@@ -37,10 +51,11 @@
             justify-content: space-between;
             margin-bottom: 12px;
             flex-shrink: 0;
+            min-height: 40px;
         }
 
         h1 {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             margin: 0;
             color: #fff;
             display: flex;
@@ -58,32 +73,37 @@
             cursor: pointer;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 4px;
+            font-weight: 600;
         }
+        .icon-btn:active { background: #444; }
 
         .card {
             background: var(--card-bg);
             padding: 16px;
             border-radius: 14px;
-            margin-bottom: 12px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            flex: 1;
+            overflow-y: auto;
         }
 
         label { font-size: 0.85rem; color: var(--text-sub); display: block; width: 100%; }
 
         textarea {
             width: 100%;
-            height: 240px;
+            flex: 1;
+            min-height: 140px;
             padding: 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
             color: #fff;
             font-size: var(--font-size-id);
-            resize: vertical;
+            resize: none;
             display: block;
             line-height: 1.5;
         }
@@ -96,6 +116,7 @@
             padding: 10px 14px;
             border-radius: 8px;
             width: 100%;
+            flex-shrink: 0;
         }
 
         .control-group span { font-size: 0.85rem; color: #ddd; }
@@ -112,7 +133,7 @@
             font-weight: bold;
             width: 100%;
             text-align: center;
-            transition: background 0.2s;
+            flex-shrink: 0;
         }
         .btn:active { opacity: 0.8; }
         .btn:disabled { opacity: 0.55; cursor: not-allowed; }
@@ -133,14 +154,7 @@
             align-items: center;
             justify-content: center;
             gap: 6px;
-            transition: background 0.2s, border-color 0.2s;
-            margin: 0;
-            line-height: normal;
             text-decoration: none;
-        }
-        .backup-action-btn:hover {
-            background-color: #4a4a4d;
-            border-color: #666;
         }
 
         .api-badge {
@@ -148,6 +162,7 @@
             padding: 4px 8px;
             border-radius: 4px;
             display: inline-block;
+            margin-left: 8px;
         }
         .api-badge.set { background: #1b5e20; color: #81c784; }
         .api-badge.unset { background: #b71c1c; color: #ef9a9a; }
@@ -176,10 +191,7 @@
             font-weight: bold;
             cursor: pointer;
         }
-        .tab-btn.active {
-            background: var(--accent-color);
-            color: #fff;
-        }
+        .tab-btn.active { background: var(--accent-color); color: #fff; }
 
         .content-area {
             flex: 1;
@@ -198,7 +210,6 @@
             border-radius: 10px;
             background: #252528;
             border-left: 4px solid transparent;
-            transition: background 0.15s, border-left 0.15s;
             position: relative;
         }
         .line-item.active {
@@ -221,7 +232,6 @@
             margin: 1px 2px;
             border-radius: 4px;
             cursor: pointer;
-            transition: background 0.1s;
         }
         .word-token:hover { background: rgba(0, 122, 255, 0.3); }
         .word-token.highlighted { background: #ff9500; color: #000; }
@@ -248,7 +258,6 @@
             font-size: 0.75rem;
             cursor: pointer;
         }
-        .edit-row-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
         .flashcard-wrapper {
             display: flex;
@@ -262,7 +271,7 @@
 
         .search-container {
             width: 100%;
-            max-width: 340px;
+            max-width: 380px;
             position: relative;
             margin-bottom: 4px;
         }
@@ -276,10 +285,6 @@
             color: #fff;
             font-size: 0.9rem;
             outline: none;
-            transition: border-color 0.2s;
-        }
-        .search-input-box:focus {
-            border-color: var(--accent-color);
         }
 
         .search-results-list {
@@ -305,16 +310,19 @@
             justify-content: space-between;
             align-items: center;
             font-size: 0.85rem;
+            background: transparent;
+            color: #fff;
+            border: 0;
+            width: 100%;
+            text-align: left;
         }
-        .search-result-item:hover {
-            background: #2a2a35;
-        }
+        .search-result-item:hover { background: #2a2a35; }
 
         .perspective-box {
             perspective: 1000px;
             width: 100%;
-            max-width: 340px;
-            height: 210px;
+            max-width: 380px;
+            height: 240px;
         }
 
         .flashcard {
@@ -325,10 +333,7 @@
             transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1);
             cursor: pointer;
         }
-
-        .flashcard.flipped {
-            transform: rotateY(180deg);
-        }
+        .flashcard.flipped { transform: rotateY(180deg); }
 
         .card-face {
             position: absolute;
@@ -346,23 +351,10 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
         }
 
-        .card-front {
-            background: linear-gradient(145deg, #232526, #414345);
-            color: #fff;
-        }
+        .card-front { background: linear-gradient(145deg, #232526, #414345); color: #fff; }
+        .card-back { background: linear-gradient(145deg, #0d324d, #7f5a83); color: #fff; transform: rotateY(180deg); }
 
-        .card-back {
-            background: linear-gradient(145deg, #0d324d, #7f5a83);
-            color: #fff;
-            transform: rotateY(180deg);
-        }
-
-        .card-word {
-            font-size: 1.6rem;
-            font-weight: bold;
-            margin-bottom: 8px;
-        }
-
+        .card-word { font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; word-break: break-word; }
         .tap-count-badge {
             position: absolute;
             top: 12px;
@@ -374,26 +366,15 @@
             color: #ffcc00;
             border: 1px solid rgba(255, 204, 0, 0.3);
         }
-
-        .card-hint {
-            font-size: 0.75rem;
-            color: #aaa;
-            position: absolute;
-            bottom: 12px;
-        }
-
-        .card-meaning {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #ffd700;
-        }
+        .card-hint { font-size: 0.75rem; color: #aaa; position: absolute; bottom: 12px; }
+        .card-meaning { font-size: 1.4rem; font-weight: 600; color: #ffd700; word-break: break-word; }
 
         .card-controls {
             display: flex;
             align-items: center;
             gap: 12px;
             width: 100%;
-            max-width: 340px;
+            max-width: 380px;
             justify-content: space-between;
             margin-top: 4px;
         }
@@ -409,9 +390,6 @@
             flex: 1;
             text-align: center;
         }
-        .ctrl-btn:active {
-            background: var(--accent-color);
-        }
 
         .audio-controls-bar {
             display: flex;
@@ -422,6 +400,7 @@
             border-radius: 10px;
             margin-bottom: 10px;
             gap: 6px;
+            flex-shrink: 0;
         }
         .audio-btn {
             background: #333;
@@ -434,7 +413,6 @@
             flex: 1;
             text-align: center;
         }
-        .audio-btn:active { background: var(--accent-color); }
 
         .modal-overlay {
             display: none;
@@ -446,7 +424,6 @@
             justify-content: center;
             padding: 20px;
         }
-
         .modal-body {
             background: var(--card-bg);
             padding: 20px;
@@ -458,9 +435,7 @@
             gap: 14px;
             border: 1px solid #444;
         }
-
-        .modal-title { font-size: 1.1rem; font-weight: bold; margin: 0; }
-
+        .modal-title { font-size: 1.1rem; font-weight: bold; margin: 0; color: #fff;}
         input[type="password"], input[type="text"] {
             width: 100%;
             padding: 10px;
@@ -503,1446 +478,984 @@
 </head>
 <body>
 
-    <header>
-        <h1>🇮🇩 インドネシア語 AIシャドーイング</h1>
-        <div style="display:flex; gap:6px;">
-            <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;">📜 履歴(3件)</button>
-            <button class="icon-btn" id="settings-open-btn" type="button">
-                ⚙️ 設定
-                <span id="api-badge" class="api-badge unset">未設定</span>
+    <div id="app-container">
+        <header id="main-header">
+            <div id="header-left" style="display: flex; align-items: center;">
+                <h1 id="app-title">🇮🇩 AIシャドーイング</h1>
+                <button class="icon-btn" id="header-back-btn" type="button" style="display:none;">◀ 戻る</button>
+            </div>
+            <div id="header-right" style="display:flex; gap:6px; align-items: center;">
+                <button class="icon-btn" id="fontsize-toggle-btn" type="button" title="文字サイズ変更">
+                    Aa <span id="fontsize-label" style="font-size:0.7rem; color:#aaa; margin-left:2px;">標準</span>
+                </button>
+                <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;" title="履歴">📜</button>
+                <button class="icon-btn" id="settings-open-btn" type="button" title="設定">
+                    ⚙️
+                    <span id="api-badge" class="api-badge unset" style="display:none;">未</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="card" id="setup-card">
+            <label for="script-input">インドネシア語のテキストを入力または貼り付け（@優先、次に.で文節抽出）</label>
+            <textarea id="script-input" placeholder="例: @Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."></textarea>
+            
+            <div class="control-group">
+                <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
+                <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
+                <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
+                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">📊 APIリクエスト・ローカルモニター</span>
+                    <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ 快適</span>
+                </div>
+                <div style="font-size:0.8rem; color:#ddd; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
+                    <div>推定消費: <strong id="est-tokens" style="color:#007aff;">0 Token</strong></div>
+                    <div>直近1分: <strong id="rpm-count" style="color:#ffcc00;">0 / 15 /分</strong></div>
+                </div>
+                <div id="api-monitor-desc" style="font-size:0.75rem; color:#888;">入力文字数から概算した値です。</div>
+            </div>
+
+            <button class="btn" id="analyze-btn" type="button">
+                ✨ Gemini AI で解析して開始
             </button>
         </div>
-    </header>
 
-    <div class="card" id="setup-card">
-        <label for="script-input">インドネシア語のテキストを入力または貼り付け（#で始まる行やコメントを自動抽出します）</label>
-        <textarea id="script-input" placeholder="例: #Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."></textarea>
-        
-        <div class="control-group">
-            <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
-            <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0">
-        </div>
-
-        <div class="control-group">
-            <span>文字サイズ: <strong id="fontsize-val">標準</strong></span>
-            <input type="range" id="fontsize-range" min="0.8" max="1.6" step="0.1" value="1.1">
-        </div>
-
-        <!-- API Monitor Box -->
-        <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
-            <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">📊 APIリクエスト・ローカルモニター</span>
-                <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ 快適</span>
-            </div>
-            <div style="font-size:0.8rem; color:#ddd; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
-                <div>推定消費: <strong id="est-tokens" style="color:#007aff;">0 Token</strong></div>
-                <div>直近1分: <strong id="rpm-count" style="color:#ffcc00;">0 / 15 /分</strong></div>
-            </div>
-            <div id="api-monitor-desc" style="font-size:0.75rem; color:#888;">入力文字数から概算した値です。実際のGemini課金・割当量とは一致しません。</div>
-        </div>
-
-        <button class="btn" id="analyze-btn" type="button">
-            ✨ Gemini AI で解析して開始
-        </button>
-    </div>
-
-    <div id="player-area">
-        <div class="tab-container">
-            <button class="tab-btn active" id="tab-sentence" type="button">📖 文章・対訳</button>
-            <button class="tab-btn" id="tab-word" type="button">🎴 単語フラッシュカード</button>
-        </div>
-
-        <!-- Audio Player Control Bar -->
-        <div class="audio-controls-bar" id="audio-bar" style="display:none;">
-            <button class="audio-btn" id="pause-speech-btn" type="button">⏸️ 一時停止</button>
-            <button class="audio-btn" id="resume-speech-btn" type="button">▶️ 再開</button>
-            <button class="audio-btn" id="stop-speech-btn" type="button">⏹️ 停止</button>
-            <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; background:#222; padding:4px 8px; border-radius:6px; border:1px solid #444; flex-shrink:0;">
-                <span>⚡ <strong id="speed-val-player" style="color:#007aff;">1.0</strong>x</span>
-                <input type="range" id="speed-range-player" min="0.5" max="1.2" step="0.1" value="1.0" style="width:65px; margin:0;">
-            </div>
-        </div>
-
-        <div class="content-area" id="content-area"></div>
-        <button class="btn btn-secondary" id="back-to-setup-btn" type="button">テキスト修正に戻る</button>
-    </div>
-
-    <!-- Settings Modal -->
-    <div class="modal-overlay" id="settings-modal">
-        <div class="modal-body">
-            <div class="modal-title">🔑 設定 & バックアップ</div>
-            <p style="font-size:0.8rem; color:#aaa; margin:0;">
-                APIキーや学習履歴はこのブラウザのlocalStorageに保存されます。APIキーは外部バックアップJSONには書き出しません。
-            </p>
-            <div>
-                <label for="api-key-input">Gemini API Key</label>
-                <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
-            </div>
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#007aff; font-size:0.8rem; text-decoration:none;">🔑 API Keyを無料取得</a>
-                <button type="button" id="key-visibility-btn" style="background:none; border:none; color:#aaa; font-size:0.8rem; cursor:pointer;">表示/非表示</button>
+        <div id="player-area">
+            <div class="tab-container">
+                <button class="tab-btn active" id="tab-sentence" type="button">📖 文章・対訳</button>
+                <button class="tab-btn" id="tab-word" type="button">🎴 単語フラッシュカード</button>
             </div>
 
-            <div style="border-top:1px solid #444; padding-top:10px; display:flex; flex-direction:column; gap:8px;">
-                <label style="font-size:0.8rem; font-weight:bold; color:#ddd;">🔄 マルチデバイス・データ移行</label>
-                <div style="display:flex; gap:8px;">
-                    <button class="backup-action-btn" id="export-btn" type="button">📤 データ書出し</button>
-                    <label class="backup-action-btn">
-                        📥 データ取込 <input type="file" id="import-file-input" accept=".json" style="display:none;">
-                    </label>
+            <div class="audio-controls-bar" id="audio-bar" style="display:none;">
+                <button class="audio-btn" id="pause-speech-btn" type="button">⏸️ 一時停止</button>
+                <button class="audio-btn" id="resume-speech-btn" type="button">▶️ 再開</button>
+                <button class="audio-btn" id="stop-speech-btn" type="button">⏹️ 停止</button>
+                <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; background:#222; padding:4px 8px; border-radius:6px; border:1px solid #444; flex-shrink:0;">
+                    <span>⚡ <strong id="speed-val-player" style="color:#007aff;">1.0</strong>x</span>
+                    <input type="range" id="speed-range-player" min="0.5" max="1.2" step="0.1" value="1.0" style="width:50px; margin:0;">
                 </div>
             </div>
 
-            <div style="display:flex; gap:8px; margin-top:8px;">
-                <button class="btn btn-secondary" id="settings-cancel-btn" type="button" style="flex:1;">キャンセル</button>
-                <button class="btn" id="settings-save-btn" type="button" style="flex:1;">保存</button>
+            <div class="content-area" id="content-area"></div>
+        </div>
+
+        <div class="modal-overlay" id="settings-modal">
+            <div class="modal-body">
+                <div class="modal-title">🔑 設定 & バックアップ</div>
+                <p style="font-size:0.8rem; color:#aaa; margin:0;">
+                    APIキーや学習履歴はこのブラウザに保存されます。
+                </p>
+                <div>
+                    <label for="api-key-input">Gemini API Key</label>
+                    <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
+                </div>
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#007aff; font-size:0.8rem; text-decoration:none;">🔑 API Keyを無料取得</a>
+                    <button type="button" id="key-visibility-btn" style="background:none; border:none; color:#aaa; font-size:0.8rem; cursor:pointer;">表示/非表示</button>
+                </div>
+
+                <div style="border-top:1px solid #444; padding-top:10px; display:flex; flex-direction:column; gap:8px;">
+                    <label style="font-size:0.8rem; font-weight:bold; color:#ddd;">🔄 マルチデバイス・データ移行</label>
+                    <div style="display:flex; gap:8px;">
+                        <button class="backup-action-btn" id="export-btn" type="button">📤 データ書出し</button>
+                        <label class="backup-action-btn">
+                            📥 データ取込 <input type="file" id="import-file-input" accept=".json" style="display:none;">
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button class="btn btn-secondary" id="settings-cancel-btn" type="button" style="flex:1;">キャンセル</button>
+                    <button class="btn" id="settings-save-btn" type="button" style="flex:1;">保存</button>
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- History Modal (Top 3 History items) -->
-    <div class="modal-overlay" id="history-modal">
-        <div class="modal-body">
-            <div class="modal-title">📜 過去の入力履歴（最大3件）</div>
-            <p style="font-size:0.8rem; color:#aaa; margin:0;">
-                直近で解析したテキストの履歴です。選択して復元できます。
-            </p>
-            <div id="history-items-container" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto;">
-                <!-- Dynamic history buttons -->
-            </div>
-            <button class="btn btn-secondary" id="history-close-btn" type="button">閉じる</button>
-        </div>
-    </div>
-
-    <!-- Edit Line Modal -->
-    <div class="modal-overlay" id="edit-line-modal">
-        <div class="modal-body">
-            <div class="modal-title">✏️ 文節の編集</div>
-            <input type="hidden" id="edit-line-index">
-            <div>
-                <label for="edit-indonesian-input">インドネシア語テキスト</label>
-                <input type="text" id="edit-indonesian-input" autocomplete="off">
-            </div>
-            <div>
-                <label for="edit-japanese-input">日本語訳</label>
-                <input type="text" id="edit-japanese-input" autocomplete="off">
-            </div>
-            <div style="display:flex; gap:8px; margin-top:8px;">
-                <button class="btn btn-secondary" id="edit-cancel-btn" type="button" style="flex:1;">キャンセル</button>
-                <button class="btn" id="edit-save-btn" type="button" style="flex:1;">保存</button>
+        <div class="modal-overlay" id="history-modal">
+            <div class="modal-body">
+                <div class="modal-title">📜 解析済み履歴（最大3件）</div>
+                <p style="font-size:0.8rem; color:#aaa; margin:0;">
+                    APIを消費せず、すぐに続きから学習を再開できます。
+                </p>
+                <div id="history-items-container" style="display:flex; flex-direction:column; gap:8px; max-height:250px; overflow-y:auto;"></div>
+                <button class="btn btn-secondary" id="history-close-btn" type="button">閉じる</button>
             </div>
         </div>
+
+        <div class="modal-overlay" id="edit-line-modal">
+            <div class="modal-body">
+                <div class="modal-title">✏️ 文節の編集</div>
+                <input type="hidden" id="edit-line-index">
+                <div>
+                    <label for="edit-indonesian-input">インドネシア語テキスト</label>
+                    <input type="text" id="edit-indonesian-input" autocomplete="off">
+                </div>
+                <div>
+                    <label for="edit-japanese-input">日本語訳</label>
+                    <input type="text" id="edit-japanese-input" autocomplete="off">
+                </div>
+                <div style="display:flex; gap:8px; margin-top:8px;">
+                    <button class="btn btn-secondary" id="edit-cancel-btn" type="button" style="flex:1;">キャンセル</button>
+                    <button class="btn" id="edit-save-btn" type="button" style="flex:1;">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="toast"></div>
     </div>
 
-    <div id="toast"></div>
+    <script>
+    (() => {
+        'use strict';
 
-<script>
-(() => {
-    'use strict';
-
-    const STORAGE = {
-        apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v5',
-        tapCounts: 'indo_shadowing_tapcounts_v5',
-        rpm: 'rpm_timestamps_v5',
-        cachePrefix: 'indo_shadowing_cache_v8_'
-    };
-
-    const CONFIG = {
-        model: 'gemini-3.5-flash-lite',
-        endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
-        maxRequestsPerMinute: 15,
-        maxHistory: 3, // 保持する履歴を過去3件に制限
-        cacheVersion: 8
-    };
-
-    let parsedData = { sentences: [], vocabulary: [] };
-    let wordTapCounts = {};
-    let currentMode = 'sentence';
-    let cardIndex = 0;
-    let searchDebounceTimer = null;
-    let currentFilteredVocab = [];
-    let rpmTimestamps = [];
-
-    function $(id) {
-        return document.getElementById(id);
-    }
-
-    function safeJsonParse(value, fallback) {
-        try {
-            return JSON.parse(value);
-        } catch (_) {
-            return fallback;
-        }
-    }
-
-    function getApiKey() {
-        try {
-            return localStorage.getItem(STORAGE.apiKey) || '';
-        } catch (_) {
-            return '';
-        }
-    }
-
-    function checkApiKeyStatus() {
-        const badge = $('api-badge');
-        if (!badge) return;
-        const key = getApiKey();
-        badge.textContent = key ? '設定済み' : '未設定';
-        badge.className = key ? 'api-badge set' : 'api-badge unset';
-    }
-
-    function openSettings() {
-        const input = $('api-key-input');
-        if (input) input.value = getApiKey();
-        const modal = $('settings-modal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeSettings() {
-        const modal = $('settings-modal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    function saveApiKey() {
-        const input = $('api-key-input');
-        const key = input ? input.value.trim() : '';
-        try {
-            if (key) localStorage.setItem(STORAGE.apiKey, key);
-            else localStorage.removeItem(STORAGE.apiKey);
-        } catch (e) {
-            showToast('APIキーの保存に失敗しました: ' + e.message);
-            return;
-        }
-        checkApiKeyStatus();
-        closeSettings();
-        showToast(key ? 'APIキーを保存しました。' : 'APIキーを削除しました。');
-    }
-
-    function toggleKeyVisibility() {
-        const input = $('api-key-input');
-        if (input) input.type = input.type === 'password' ? 'text' : 'password';
-    }
-
-    function showToast(msg) {
-        const toast = $('toast');
-        if (!toast) return;
-        toast.textContent = String(msg || '');
-        toast.style.display = 'block';
-        clearTimeout(showToast._timer);
-        showToast._timer = setTimeout(() => {
-            toast.style.display = 'none';
-        }, 4500);
-    }
-
-    function getHistory() {
-        try {
-            const h = localStorage.getItem(STORAGE.history);
-            const parsed = h ? JSON.parse(h) : [];
-            return Array.isArray(parsed) ? parsed.filter(v => typeof v === 'string') : [];
-        } catch (_) {
-            return [];
-        }
-    }
-
-    function saveToHistory(text) {
-        if (!text) return;
-        let history = getHistory().filter(item => item !== text);
-        history.unshift(text);
-        history = history.slice(0, CONFIG.maxHistory);
-        try {
-            localStorage.setItem(STORAGE.history, JSON.stringify(history));
-        } catch (_) {}
-    }
-
-    function updateHistoryUI() {
-        const history = getHistory();
-        const openBtn = $('history-modal-open-btn');
-        const container = $('history-items-container');
-
-        if (!openBtn || !container) return;
-
-        if (!history.length) {
-            openBtn.style.display = 'none';
-            return;
-        }
-
-        openBtn.style.display = 'flex';
-        openBtn.textContent = `📜 履歴(${history.length})`;
-        container.innerHTML = '';
-
-        history.forEach((text, idx) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'backup-action-btn';
-            btn.style.width = '100%';
-            btn.style.justifyContent = 'flex-start';
-            btn.style.textAlign = 'left';
-            btn.style.padding = '10px';
-            btn.textContent = `[履歴 ${idx + 1}] ${text.replace(/\s+/g, ' ').slice(0, 32)}${text.length > 32 ? '...' : ''}`;
-            btn.addEventListener('click', () => {
-                loadHistoryText(text);
-                closeHistoryModal();
-            });
-            container.appendChild(btn);
-        });
-    }
-
-    function openHistoryModal() {
-        const modal = $('history-modal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeHistoryModal() {
-        const modal = $('history-modal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    function loadHistoryText(text) {
-        if (typeof text === 'string') {
-            $('script-input').value = text;
-            updateTokenEstimate();
-            showToast('過去の履歴テキストを読み込みました。');
-        }
-    }
-
-    function hashCode(str) {
-        let hash = 5381;
-        for (let i = 0; i < str.length; i++) {
-            hash = ((hash << 5) - hash) ^ str.charCodeAt(i);
-            hash |= 0;
-        }
-        return Math.abs(hash >>> 0).toString(36);
-    }
-
-    function cacheKeyFor(text) {
-        return STORAGE.cachePrefix + hashCode(text);
-    }
-
-    function getCachedResult(text) {
-        try {
-            const raw = localStorage.getItem(cacheKeyFor(text));
-            if (!raw) return null;
-            const obj = JSON.parse(raw);
-            if (!obj || obj.version !== CONFIG.cacheVersion || !obj.data) return null;
-            return normalizeParsedData(obj.data);
-        } catch (_) {
-            return null;
-        }
-    }
-
-    function setCachedResult(text, data) {
-        try {
-            localStorage.setItem(cacheKeyFor(text), JSON.stringify({
-                version: CONFIG.cacheVersion,
-                data
-            }));
-        } catch (_) {}
-    }
-
-    function loadPersistentState() {
-        try {
-            const storedRpm = safeJsonParse(localStorage.getItem(STORAGE.rpm), []);
-            rpmTimestamps = Array.isArray(storedRpm) ? storedRpm.filter(Number.isFinite) : [];
-
-            const storedCounts = safeJsonParse(localStorage.getItem(STORAGE.tapCounts), {});
-            wordTapCounts = storedCounts && typeof storedCounts === 'object' ? storedCounts : {};
-        } catch (_) {
-            rpmTimestamps = [];
-            wordTapCounts = {};
-        }
-        pruneRpm();
-    }
-
-    function pruneRpm() {
-        const now = Date.now();
-        rpmTimestamps = rpmTimestamps.filter(t => Number.isFinite(t) && now - t >= 0 && now - t < 60000);
-        try {
-            localStorage.setItem(STORAGE.rpm, JSON.stringify(rpmTimestamps));
-        } catch (_) {}
-    }
-
-    function canMakeApiCall() {
-        pruneRpm();
-        return rpmTimestamps.length < CONFIG.maxRequestsPerMinute;
-    }
-
-    function recordApiCall() {
-        pruneRpm();
-        rpmTimestamps.push(Date.now());
-        try {
-            localStorage.setItem(STORAGE.rpm, JSON.stringify(rpmTimestamps));
-        } catch (_) {}
-        updateTokenEstimate();
-    }
-
-    function cleanWordKey(str) {
-        if (!str) return '';
-        return String(str)
-            .normalize('NFKC')
-            .toLowerCase()
-            .replace(/[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:]/g, '')
-            .trim();
-    }
-
-    /* ユーザーご提示のコードに基づく `#` 行および Indonesian ブロックからの正確な抽出ロジック */
-    function preprocessIndonesianText(rawText) {
-        if (!rawText) return [];
-        
-        const lines = rawText.split('\n');
-        let isIndonesianLine = false;
-        let extracted = [];
-
-        for (let line of lines) {
-            if (line.includes('Indonesian')) {
-                isIndonesianLine = true;
-                continue;
-            }
-            if (isIndonesianLine) {
-                const trimmed = line.trim();
-                if (trimmed.startsWith('#')) {
-                    let content = trimmed.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '');
-                    content = content.replace(/^#\s*/, '').trim();
-                    if (content) {
-                        extracted.push(content);
-                    }
-                    isIndonesianLine = false;
-                }
-            }
-        }
-
-        if (extracted.length === 0) {
-            const regex = /#([^\n]+)/gm;
-            let match;
-            while ((match = regex.exec(rawText)) !== null) {
-                let content = match[1].trim();
-                content = content.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '').trim();
-                if (content) {
-                    extracted.push(content);
-                }
-            }
-        }
-
-        if (extracted.length === 0) {
-            return rawText.split('.').map(s => s.trim()).filter(Boolean);
-        }
-
-        return extracted;
-    }
-
-    function updateSpeedVal(val) {
-        const n = Number.parseFloat(val);
-        if (!Number.isFinite(n)) return;
-        const numVal = n.toFixed(1);
-
-        const el1 = $('speed-val');
-        const el2 = $('speed-val-player');
-        if (el1) el1.textContent = numVal;
-        if (el2) el2.textContent = numVal;
-
-        const range1 = $('speed-range');
-        const range2 = $('speed-range-player');
-        if (range1 && range1.value !== String(val)) range1.value = String(val);
-        if (range2 && range2.value !== String(val)) range2.value = String(val);
-    }
-
-    function updateFontSizeVal(val) {
-        const numVal = Number.parseFloat(val);
-        if (!Number.isFinite(numVal)) return;
-
-        let label = '標準';
-        if (numVal <= 0.9) label = '小';
-        else if (numVal >= 1.3 && numVal < 1.5) label = '大';
-        else if (numVal >= 1.5) label = '特大';
-
-        const labelEl = $('fontsize-val');
-        if (labelEl) labelEl.textContent = label;
-
-        document.documentElement.style.setProperty('--font-size-id', numVal + 'rem');
-        document.documentElement.style.setProperty('--font-size-jp', (numVal * 0.8) + 'rem');
-
-        const textarea = $('script-input');
-        if (textarea) textarea.style.fontSize = numVal + 'rem';
-    }
-
-    function estimateTokens(text) {
-        if (!text) return 0;
-        const chars = [...text].length;
-        const words = text.split(/\s+/u).filter(Boolean).length;
-        return Math.ceil(chars * 1.2) + Math.ceil(words * 12) + 250;
-    }
-
-    function updateTokenEstimate() {
-        const text = $('script-input')?.value.trim() || '';
-        const tokenDisplay = $('est-tokens');
-        const estStatus = $('api-monitor-desc');
-        const rpmBadge = $('rpm-count');
-        const rateBadge = $('rate-badge');
-        const btn = $('analyze-btn');
-
-        pruneRpm();
-
-        if (rpmBadge) rpmBadge.textContent = `${rpmTimestamps.length} / ${CONFIG.maxRequestsPerMinute} /分`;
-
-        const cached = text ? !!getCachedResult(text) : false;
-
-        if (!text) {
-            if (tokenDisplay) tokenDisplay.textContent = '0 Token';
-            if (estStatus) {
-                estStatus.textContent = '入力文字数から概算値を表示します。実際のToken使用量ではありません。';
-                estStatus.style.color = '#888';
-            }
-            if (rateBadge) {
-                rateBadge.textContent = '✅ 実行可能';
-                rateBadge.style.background = '#1b5e20';
-                rateBadge.style.color = '#81c784';
-            }
-            if (btn) btn.disabled = false;
-            return 0;
-        }
-
-        if (cached) {
-            if (tokenDisplay) tokenDisplay.textContent = '0 (キャッシュ)';
-            if (estStatus) {
-                estStatus.textContent = '⚡ キャッシュ利用（APIリクエスト 0）';
-                estStatus.style.color = '#81c784';
-            }
-            if (rateBadge) {
-                rateBadge.textContent = '⚡ キャッシュ';
-                rateBadge.style.background = '#1b5e20';
-                rateBadge.style.color = '#81c784';
-            }
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '✨ キャッシュから開始';
-            }
-            return 0;
-        }
-
-        const total = estimateTokens(text);
-        if (tokenDisplay) tokenDisplay.textContent = `~${total} Token`;
-
-        if (!canMakeApiCall()) {
-            if (estStatus) {
-                estStatus.textContent = `🚫 このアプリの安全側レート制御（${CONFIG.maxRequestsPerMinute}回/分）に達しました。`;
-                estStatus.style.color = '#ef9a9a';
-            }
-            if (rateBadge) {
-                rateBadge.textContent = '⏳ 待機';
-                rateBadge.style.background = '#7f1d1d';
-                rateBadge.style.color = '#fecaca';
-            }
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '⏳ 1分間の安全制限中';
-            }
-        } else {
-            if (estStatus) {
-                estStatus.textContent = '✅ API実行可能（Token値は概算）';
-                estStatus.style.color = '#81c784';
-            }
-            if (rateBadge) {
-                rateBadge.textContent = '✅ 実行可能';
-                rateBadge.style.background = '#1b5e20';
-                rateBadge.style.color = '#81c784';
-            }
-            if (btn) {
-                btn.disabled = false;
-                btn.innerHTML = '✨ Gemini AI で解析して開始';
-            }
-        }
-
-        return total;
-    }
-
-    function normalizeParsedData(data, preprocessedSegments) {
-        const result = {
-            sentences: [],
-            vocabulary: Array.isArray(data?.vocabulary) ? data.vocabulary : []
+        const STORAGE = {
+            apiKey: 'gemini_api_key',
+            history: 'indo_shadowing_history_v17',
+            tapCounts: 'indo_shadowing_tapcounts_v8',
+            rpm: 'rpm_timestamps_v8',
+            cachePrefix: 'indo_shadowing_cache_v17_'
         };
 
-        const aiSentences = Array.isArray(data?.sentences) ? data.sentences : [];
+        const CONFIG = {
+            model: 'gemini-3.5-flash-lite',
+            endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
+            maxRequestsPerMinute: 15,
+            maxHistory: 3,
+            cacheVersion: 17
+        };
 
-        result.sentences = preprocessedSegments.map((indonesianText, idx) => {
-            return {
-                indonesian: indonesianText,
-                japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
-            };
-        });
+        let parsedData = { sentences: [], vocabulary: [] };
+        let wordTapCounts = {};
+        let currentMode = 'sentence';
+        let cardIndex = 0;
+        let searchDebounceTimer = null;
+        let currentFilteredVocab = [];
+        let rpmTimestamps = [];
 
-        const map = new Map();
-        result.vocabulary.forEach(v => {
-            const word = typeof v?.word === 'string' ? v.word.trim() : '';
-            const key = cleanWordKey(word);
-            if (key && !/^\d+$/u.test(key)) {
-                map.set(key, {
-                    word,
-                    meaning: typeof v?.meaning === 'string' && v.meaning.trim()
-                        ? v.meaning.trim()
-                        : '（意味不明）'
-                });
-            }
-        });
-        result.vocabulary = [...map.values()];
-        return result;
-    }
+        const fontSizes = [
+            { label: '小', id: 0.9, jp: 0.75 },
+            { label: '標準', id: 1.1, jp: 0.9 },
+            { label: '大', id: 1.3, jp: 1.05 },
+            { label: '特大', id: 1.5, jp: 1.2 }
+        ];
+        let currentFontSizeIndex = 1;
 
-    function extractWordsLocally(preprocessedSegments) {
-        const wordsSet = new Set();
-        preprocessedSegments.forEach(seg => {
-            seg.replace(/[\(\)]/g, ' ')
-               .split(/\s+/u)
-               .map(w => w.trim())
-               .filter(Boolean)
-               .forEach(w => wordsSet.add(w));
-        });
-        return [...wordsSet];
-    }
+        function $(id) { return document.getElementById(id); }
 
-    function ensureAllWordsExtracted(preprocessedSegments) {
-        parsedData = normalizeParsedData(parsedData, preprocessedSegments);
-        const existing = new Map(
-            parsedData.vocabulary.map(v => [cleanWordKey(v.word), v])
-        );
-
-        extractWordsLocally(preprocessedSegments).forEach(word => {
-            const key = cleanWordKey(word);
-            if (key && !/^\d+$/u.test(key) && !existing.has(key)) {
-                existing.set(key, {
-                    word,
-                    meaning: '（文脈単語・AI未取得）'
-                });
-            }
-        });
-
-        parsedData.vocabulary = [...existing.values()];
-    }
-
-    async function startApp() {
-        const rawText = $('script-input')?.value.trim() || '';
-        if (!rawText) {
-            showToast('インドネシア語のテキストを入力してください。');
-            return;
+        function safeJsonParse(value, fallback) {
+            try { return JSON.parse(value); } catch (_) { return fallback; }
         }
 
-        const apiKey = getApiKey();
-        if (!apiKey) {
-            showToast('APIキーが設定されていません。右上の「設定」から入力してください。');
-            openSettings();
-            return;
+        function getApiKey() {
+            try { return localStorage.getItem(STORAGE.apiKey) || ''; } catch (_) { return ''; }
         }
 
-        const preprocessedSegments = preprocessIndonesianText(rawText);
-        if (!preprocessedSegments.length) {
-            showToast('有効なインドネシア語の文節が見つかりませんでした。');
-            return;
-        }
-
-        const btn = $('analyze-btn');
-        if (btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="loading-spinner"></span> AI解析中...';
-        }
-
-        saveToHistory(rawText);
-        updateHistoryUI();
-
-        try {
-            let cached = getCachedResult(rawText);
-
-            if (cached) {
-                parsedData = normalizeParsedData(cached, preprocessedSegments);
-                showToast('⚡ キャッシュから復元しました（APIリクエスト 0）');
+        function checkApiKeyStatus() {
+            const badge = $('api-badge');
+            if (!badge) return;
+            const key = getApiKey();
+            if(key) {
+                badge.textContent = '済';
+                badge.className = 'api-badge set';
+                badge.style.display = 'inline-block';
             } else {
-                if (!canMakeApiCall()) {
-                    throw new Error('このアプリの安全側レート制限（15回/分）に達しています。少し待ってから再試行してください。');
-                }
+                badge.textContent = '未設定';
+                badge.className = 'api-badge unset';
+                badge.style.display = 'inline-block';
+            }
+        }
 
-                const aiResult = await analyzeWithGemini(preprocessedSegments, apiKey);
-                recordApiCall();
+        function switchView(view) {
+            if (view === 'setup') {
+                $('app-title').style.display = 'flex';
+                $('header-back-btn').style.display = 'none';
+                $('history-modal-open-btn').style.display = getHistory().length > 0 ? 'flex' : 'none';
+                $('settings-open-btn').style.display = 'flex';
+                $('setup-card').style.display = 'flex';
+                $('player-area').style.display = 'none';
+                updateTokenEstimate();
+                updateHistoryUI();
+            } else if (view === 'player') {
+                $('app-title').style.display = 'none';
+                $('header-back-btn').style.display = 'flex';
+                $('history-modal-open-btn').style.display = 'none';
+                $('settings-open-btn').style.display = 'none';
+                $('setup-card').style.display = 'none';
+                $('player-area').style.display = 'flex';
+            }
+        }
 
-                parsedData = normalizeParsedData(aiResult, preprocessedSegments);
-                ensureAllWordsExtracted(preprocessedSegments);
-                setCachedResult(rawText, parsedData);
+        function openSettings() {
+            const input = $('api-key-input');
+            if (input) input.value = getApiKey();
+            const modal = $('settings-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeSettings() {
+            const modal = $('settings-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function saveApiKey() {
+            const input = $('api-key-input');
+            const key = input ? input.value.trim() : '';
+            try {
+                if (key) localStorage.setItem(STORAGE.apiKey, key);
+                else localStorage.removeItem(STORAGE.apiKey);
+            } catch (e) {
+                showToast('APIキーの保存に失敗しました: ' + e.message);
+                return;
+            }
+            checkApiKeyStatus();
+            closeSettings();
+            showToast(key ? 'APIキーを保存しました。' : 'APIキーを削除しました。');
+        }
+
+        function toggleKeyVisibility() {
+            const input = $('api-key-input');
+            if (input) input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function showToast(msg) {
+            const toast = $('toast');
+            if (!toast) return;
+            toast.textContent = String(msg || '');
+            toast.style.display = 'block';
+            clearTimeout(showToast._timer);
+            showToast._timer = setTimeout(() => { toast.style.display = 'none'; }, 4500);
+        }
+
+        function cycleFontSize() {
+            currentFontSizeIndex = (currentFontSizeIndex + 1) % fontSizes.length;
+            applyFontSize();
+        }
+
+        function applyFontSize() {
+            const config = fontSizes[currentFontSizeIndex];
+            $('fontsize-label').textContent = config.label;
+            document.documentElement.style.setProperty('--font-size-id', config.id + 'rem');
+            document.documentElement.style.setProperty('--font-size-jp', config.jp + 'rem');
+            const textarea = $('script-input');
+            if (textarea) textarea.style.fontSize = config.id + 'rem';
+        }
+
+        function getHistory() {
+            try {
+                const h = localStorage.getItem(STORAGE.history);
+                const parsed = h ? JSON.parse(h) : [];
+                return Array.isArray(parsed) ? parsed.filter(item => item && item.text && item.data) : [];
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function saveToHistory(rawText, pData) {
+            if (!rawText || !pData) return;
+            let history = getHistory().filter(item => item.text !== rawText);
+            history.unshift({ text: rawText, data: pData, timestamp: Date.now() });
+            history = history.slice(0, CONFIG.maxHistory);
+            try { localStorage.setItem(STORAGE.history, JSON.stringify(history)); } catch (_) {}
+        }
+
+        function updateHistoryUI() {
+            const history = getHistory();
+            const openBtn = $('history-modal-open-btn');
+            const container = $('history-items-container');
+            if (!openBtn || !container) return;
+
+            if (!history.length) {
+                if ($('setup-card').style.display !== 'none') openBtn.style.display = 'none';
+                return;
             }
 
-            ensureAllWordsExtracted(preprocessedSegments);
+            if ($('setup-card').style.display !== 'none') openBtn.style.display = 'flex';
+            container.textContent = '';
+            history.forEach((item) => {
+                const dateStr = new Date(item.timestamp).toLocaleString('ja-JP', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                const previewText = item.text.replace(/\s+/g, ' ').slice(0, 30) + (item.text.length > 30 ? '...' : '');
 
-            if (!parsedData.sentences.length) {
-                throw new Error('有効な文節が解析結果にありませんでした。');
-            }
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'backup-action-btn';
+                btn.style.width = '100%';
+                btn.style.flexDirection = 'column';
+                btn.style.alignItems = 'flex-start';
+                btn.style.textAlign = 'left';
+                btn.style.padding = '10px';
+                btn.innerHTML = '\n' +
+                    '                    <div style="font-size: 0.75rem; color: #aaa; margin-bottom: 4px;">' + dateStr + '</div>\n' +
+                    '                    <div style="font-size: 0.9rem;">' + previewText + '</div>\n' +
+                    '                ';
+                btn.addEventListener('click', () => {
+                    loadHistoryData(item);
+                    closeHistoryModal();
+                });
+                container.appendChild(btn);
+            });
+        }
 
+        function openHistoryModal() {
+            const modal = $('history-modal');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function closeHistoryModal() {
+            const modal = $('history-modal');
+            if (modal) modal.style.display = 'none';
+        }
+
+        function loadHistoryData(historyItem) {
+            $('script-input').value = historyItem.text;
+            parsedData = historyItem.data;
             sortVocabulary();
             currentMode = 'sentence';
             cardIndex = 0;
             updateTabUI();
             stopSpeech();
             renderSentenceList();
-
-            const audioBar = $('audio-bar');
-            if (audioBar) audioBar.style.display = 'flex';
-
-            $('setup-card').style.display = 'none';
-            $('player-area').style.display = 'flex';
-        } catch (err) {
-            console.error(err);
-            showToast(err?.message || '解析中に予期しないエラーが発生しました。');
-        } finally {
-            updateTokenEstimate();
+            $('audio-bar').style.display = 'flex';
+            switchView('player');
+            showToast('履歴から解析済みデータを復元しました。');
         }
-    }
 
-    async function analyzeWithGemini(segments, apiKey) {
-        const apiUrl = `${CONFIG.endpoint}${CONFIG.model}:generateContent`;
-
-        const systemPrompt = `
-You are an expert Indonesian-Japanese language instructor.
-You will be provided with an array of pure Indonesian text segments extracted from study materials.
-Return ONLY valid JSON matching the supplied schema.
-
-Rules:
-1. For each segment provided in the list, return its exact corresponding natural Japanese translation in the "sentences" array (maintaining the exact index order).
-2. Extract ALL unique Indonesian words appearing in the segments, providing a concise Japanese meaning in the "vocabulary" array. Do not include pure numbers.
-`.trim();
-
-        const payload = {
-            systemInstruction: {
-                parts: [{ text: systemPrompt }]
-            },
-            contents: [{
-                role: 'user',
-                parts: [{ text: JSON.stringify(segments) }]
-            }],
-            generationConfig: {
-                responseMimeType: 'application/json',
-                responseSchema: {
-                    type: 'OBJECT',
-                    properties: {
-                        sentences: {
-                            type: 'ARRAY',
-                            items: {
-                                type: 'OBJECT',
-                                properties: {
-                                    japanese: { type: 'STRING' }
-                                },
-                                required: ['japanese']
-                            }
-                        },
-                        vocabulary: {
-                            type: 'ARRAY',
-                            items: {
-                                type: 'OBJECT',
-                                properties: {
-                                    word: { type: 'STRING' },
-                                    meaning: { type: 'STRING' }
-                                },
-                                required: ['word', 'meaning']
-                            }
-                        }
-                    },
-                    required: ['sentences', 'vocabulary']
-                },
-                temperature: 0.2,
-                maxOutputTokens: 8192
+        function hashCode(str) {
+            let hash = 5381;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) ^ str.charCodeAt(i);
+                hash |= 0;
             }
-        };
-
-        let res;
-        try {
-            res = await fetch(apiUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-goog-api-key': apiKey
-                },
-                body: JSON.stringify(payload)
-            });
-        } catch (networkErr) {
-            throw new Error('ネットワーク接続エラーです。インターネット接続やCORS設定を確認してください。');
+            return Math.abs(hash >>> 0).toString(36);
         }
 
-        const data = await res.json().catch(() => ({}));
+        function cacheKeyFor(text) { return STORAGE.cachePrefix + hashCode(text); }
 
-        if (!res.ok) {
-            const status = res.status;
-            const apiMessage = data?.error?.message || '';
-            throw new Error(`Gemini APIエラー（HTTP ${status}）: ${apiMessage || '詳細不明'}`);
-        }
-
-        const jsonText = data?.candidates?.[0]?.content?.parts
-            ?.filter(p => typeof p?.text === 'string')
-            ?.map(p => p.text)
-            ?.join('') || '';
-
-        if (!jsonText) {
-            throw new Error('AIから有効なJSONが返りませんでした。');
-        }
-
-        let parsed;
-        try {
-            parsed = JSON.parse(jsonText);
-        } catch (_) {
-            const cleaned = jsonText
-                .replace(/^```json\s*/i, '')
-                .replace(/^```\s*/i, '')
-                .replace(/\s*```$/i, '')
-                .trim();
-            parsed = JSON.parse(cleaned);
-        }
-
-        return parsed;
-    }
-
-    function sortVocabulary() {
-        if (!parsedData?.vocabulary) return;
-        parsedData.vocabulary.sort((a, b) => {
-            const ca = wordTapCounts[cleanWordKey(a.word)] || 0;
-            const cb = wordTapCounts[cleanWordKey(b.word)] || 0;
-            if (cb !== ca) return cb - ca;
-            return String(a.word).localeCompare(String(b.word), 'id', { sensitivity: 'base' });
-        });
-    }
-
-    function updateTabUI() {
-        $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');
-        $('tab-word')?.classList.toggle('active', currentMode === 'word');
-    }
-
-    function switchMode(mode) {
-        currentMode = mode;
-        stopSpeech();
-
-        const audioBar = $('audio-bar');
-        if (audioBar) audioBar.style.display = mode === 'sentence' ? 'flex' : 'none';
-
-        updateTabUI();
-
-        if (mode === 'sentence') {
-            renderSentenceList();
-        } else {
-            sortVocabulary();
-            cardIndex = 0;
-            renderFlashcard();
-        }
-    }
-
-    function renderSentenceList() {
-        const container = $('content-area');
-        if (!container) return;
-        container.textContent = '';
-
-        parsedData.sentences.forEach((item, index) => {
-            const div = document.createElement('div');
-            div.className = 'line-item';
-            div.id = `line-${index}`;
-
-            const editBtn = document.createElement('button');
-            editBtn.type = 'button';
-            editBtn.className = 'edit-row-btn';
-            editBtn.textContent = '✏️ 編集';
-            editBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                openEditLineModal(index);
-            });
-
-            const idText = document.createElement('div');
-            idText.className = 'id-text';
-            idText.id = `text-container-${index}`;
-
-            const words = item.indonesian.split(/\s+/u).filter(Boolean);
-            words.forEach((word, wIdx) => {
-                if (wIdx > 0) idText.appendChild(document.createTextNode(' '));
-                const span = document.createElement('span');
-                span.className = 'word-token';
-                span.textContent = word;
-                span.addEventListener('click', event => {
-                    onWordClick(event, index, wIdx, word);
-                });
-                idText.appendChild(span);
-            });
-
-            const jpText = document.createElement('div');
-            jpText.className = 'jp-text';
-            jpText.textContent = `💬 ${item.japanese || '（日本語訳なし）'}`;
-
-            div.append(editBtn, idText, jpText);
-
-            div.addEventListener('click', event => {
-                if (event.target instanceof Element && event.target.closest('.word-token, .edit-row-btn')) return;
-                playText(item.indonesian, index);
-            });
-
-            container.appendChild(div);
-        });
-    }
-
-    function openEditLineModal(index) {
-        const item = parsedData.sentences[index];
-        if (!item) return;
-
-        $('edit-line-index').value = String(index);
-        $('edit-indonesian-input').value = item.indonesian;
-        $('edit-japanese-input').value = item.japanese;
-
-        const modal = $('edit-line-modal');
-        if (modal) modal.style.display = 'flex';
-    }
-
-    function closeEditLineModal() {
-        const modal = $('edit-line-modal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    function saveEditedLine() {
-        const idx = Number.parseInt($('edit-line-index').value, 10);
-        const newIndonesian = $('edit-indonesian-input').value.trim();
-        const newJapanese = $('edit-japanese-input').value.trim();
-
-        if (isNaN(idx) || !parsedData.sentences[idx]) return;
-        if (!newIndonesian) {
-            showToast('インドネシア語テキストは空にできません。');
-            return;
-        }
-
-        parsedData.sentences[idx].indonesian = newIndonesian;
-        parsedData.sentences[idx].japanese = newJapanese;
-
-        const segments = parsedData.sentences.map(s => s.indonesian);
-        ensureAllWordsExtracted(segments);
-
-        closeEditLineModal();
-        renderSentenceList();
-        showToast('文節を更新しました。');
-    }
-
-    function cleanTextForSpeech(text) {
-        if (!text) return '';
-        return String(text)
-            .replace(/\b\d+\b/gu, '')
-            .replace(/\s+/u, ' ')
-            .trim();
-    }
-
-    function getSpeechRate() {
-        const value = Number.parseFloat($('speed-range')?.value || '1');
-        return Number.isFinite(value) ? Math.min(1.2, Math.max(0.5, value)) : 1;
-    }
-
-    function speak(text, onEnd) {
-        if (!('speechSynthesis' in window)) {
-            showToast('このブラウザは音声読み上げに対応していません。');
-            if (typeof onEnd === 'function') onEnd();
-            return;
-        }
-
-        const cleaned = cleanTextForSpeech(text);
-        if (!cleaned) {
-            if (typeof onEnd === 'function') onEnd();
-            return;
-        }
-
-        window.speechSynthesis.cancel();
-
-        const utterance = new SpeechSynthesisUtterance(cleaned);
-        utterance.lang = 'id-ID';
-        utterance.rate = getSpeechRate();
-        utterance.pitch = 1;
-        utterance.volume = 1;
-
-        if (typeof onEnd === 'function') utterance.addEventListener('end', onEnd, { once: true });
-        utterance.addEventListener('error', () => {
-            if (typeof onEnd === 'function') onEnd();
-        }, { once: true });
-
-        window.speechSynthesis.speak(utterance);
-    }
-
-    function onWordClick(event, lineIndex, wordIndex, clickedWord) {
-        event.stopPropagation();
-        if (!parsedData.sentences[lineIndex]) return;
-
-        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
-
-        const targetDiv = $(`line-${lineIndex}`);
-        const tokens = targetDiv?.querySelectorAll('.word-token') || [];
-        targetDiv?.classList.add('active');
-        tokens[wordIndex]?.classList.add('highlighted');
-
-        const key = cleanWordKey(clickedWord);
-        if (key && !/^\d+$/u.test(key)) {
-            wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
+        function getCachedResult(text) {
             try {
-                localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts));
+                const raw = localStorage.getItem(cacheKeyFor(text));
+                if (!raw) return null;
+                const obj = JSON.parse(raw);
+                if (!obj || obj.version !== CONFIG.cacheVersion || !obj.data) return null;
+                return obj.data;
+            } catch (_) { return null; }
+        }
+
+        function setCachedResult(text, data) {
+            try {
+                localStorage.setItem(cacheKeyFor(text), JSON.stringify({ version: CONFIG.cacheVersion, data }));
             } catch (_) {}
         }
 
-        const words = parsedData.sentences[lineIndex].indonesian.split(/\s+/u);
-        const subText = words.slice(wordIndex).join(' ');
+        function loadPersistentState() {
+            try {
+                const storedRpm = safeJsonParse(localStorage.getItem(STORAGE.rpm), []);
+                rpmTimestamps = Array.isArray(storedRpm) ? storedRpm.filter(Number.isFinite) : [];
+                const storedCounts = safeJsonParse(localStorage.getItem(STORAGE.tapCounts), {});
+                wordTapCounts = storedCounts && typeof storedCounts === 'object' ? storedCounts : {};
+            } catch (_) {
+                rpmTimestamps = [];
+                wordTapCounts = {};
+            }
+            pruneRpm();
+        }
 
-        speak(subText, () => {
-            tokens[wordIndex]?.classList.remove('highlighted');
-        });
-    }
+        function pruneRpm() {
+            const now = Date.now();
+            rpmTimestamps = rpmTimestamps.filter(t => Number.isFinite(t) && now - t >= 0 && now - t < 60000);
+            try { localStorage.setItem(STORAGE.rpm, JSON.stringify(rpmTimestamps)); } catch (_) {}
+        }
 
-    function playText(textToSpeech, index) {
-        if (index !== undefined) {
+        function canMakeApiCall() {
+            pruneRpm();
+            return rpmTimestamps.length < CONFIG.maxRequestsPerMinute;
+        }
+
+        function recordApiCall() {
+            pruneRpm();
+            rpmTimestamps.push(Date.now());
+            try { localStorage.setItem(STORAGE.rpm, JSON.stringify(rpmTimestamps)); } catch (_) {}
+            updateTokenEstimate();
+        }
+
+        function cleanWordKey(str) {
+            if (!str) return '';
+            return String(str).normalize('NFKC').toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:]/g, '').trim();
+        }
+
+        /* ＠を最優先、次にピリオド(.)で文節を抽出する高精度パーサー */
+        function preprocessIndonesianText(rawText) {
+            if (!rawText) return [];
+            
+            const atMatches = rawText.match(/@.*/g);
+            let extracted = [];
+
+            if (atMatches && atMatches.length > 0) {
+                for (let line of atMatches) {
+                    let content = line.replace(/^@\s*/, '').trim();
+                    content = content.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '').trim();
+                    if (content) {
+                        extracted.push(content);
+                    }
+                }
+            }
+
+            if (extracted.length === 0) {
+                const sentences = rawText.split('.');
+                for (let s of sentences) {
+                    let content = s.trim();
+                    if (content) {
+                        extracted.push(content);
+                    }
+                }
+            }
+
+            return extracted;
+        }
+
+        function updateSpeedVal(val) {
+            const n = Number.parseFloat(val);
+            if (!Number.isFinite(n)) return;
+            const numVal = n.toFixed(1);
+            if ($('speed-val')) $('speed-val').textContent = numVal;
+            if ($('speed-val-player')) $('speed-val-player').textContent = numVal;
+            if ($('speed-range') && $('speed-range').value !== String(val)) $('speed-range').value = String(val);
+            if ($('speed-range-player') && $('speed-range-player').value !== String(val)) $('speed-range-player').value = String(val);
+        }
+
+        function estimateTokens(text) {
+            if (!text) return 0;
+            const chars = [...text].length;
+            const words = text.split(/\s+/u).filter(Boolean).length;
+            return Math.ceil(chars * 1.2) + Math.ceil(words * 12) + 250;
+        }
+
+        function updateTokenEstimate() {
+            const text = $('script-input')?.value.trim() || '';
+            const tokenDisplay = $('est-tokens');
+            const estStatus = $('api-monitor-desc');
+            const rpmBadge = $('rpm-count');
+            const rateBadge = $('rate-badge');
+            const btn = $('analyze-btn');
+
+            pruneRpm();
+            if (rpmBadge) rpmBadge.textContent = rpmTimestamps.length + ' / ' + CONFIG.maxRequestsPerMinute + ' /分';
+            const cached = text ? !!getCachedResult(text) : false;
+
+            if (!text) {
+                if (tokenDisplay) tokenDisplay.textContent = '0 Token';
+                if (estStatus) estStatus.textContent = '入力文字数から概算値を表示します。';
+                if (rateBadge) { rateBadge.textContent = '✅ 実行可能'; rateBadge.style.background = '#1b5e20'; }
+                if (btn) btn.disabled = false;
+                return 0;
+            }
+
+            if (cached) {
+                if (tokenDisplay) tokenDisplay.textContent = '0 (キャッシュ)';
+                if (estStatus) estStatus.textContent = '⚡ キャッシュ利用（APIリクエスト 0）';
+                if (rateBadge) { rateBadge.textContent = '⚡ キャッシュ'; rateBadge.style.background = '#1b5e20'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '✨ キャッシュから開始'; }
+                return 0;
+            }
+
+            const total = estimateTokens(text);
+            if (tokenDisplay) tokenDisplay.textContent = '~' + total + ' Token';
+
+            if (!canMakeApiCall()) {
+                if (estStatus) estStatus.textContent = '🚫 レート制限に達しました。';
+                if (rateBadge) { rateBadge.textContent = '⏳ 待機'; rateBadge.style.background = '#7f1d1d'; }
+                if (btn) { btn.disabled = true; btn.innerHTML = '⏳ 1分間の制限中'; }
+            } else {
+                if (estStatus) estStatus.textContent = '✅ API実行可能';
+                if (rateBadge) { rateBadge.textContent = '✅ 実行可能'; rateBadge.style.background = '#1b5e20'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '✨ Gemini AI で解析して開始'; }
+            }
+            return total;
+        }
+
+        function normalizeParsedData(data, preprocessedSegments) {
+            const result = {
+                sentences: [],
+                vocabulary: Array.isArray(data?.vocabulary) ? data.vocabulary : []
+            };
+            const aiSentences = Array.isArray(data?.sentences) ? data.sentences : [];
+
+            result.sentences = preprocessedSegments.map((indonesianText, idx) => ({
+                indonesian: indonesianText,
+                japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
+            }));
+
+            const map = new Map();
+            result.vocabulary.forEach(v => {
+                const word = typeof v?.word === 'string' ? v.word.trim() : '';
+                const key = cleanWordKey(word);
+                if (key && !/^\d+$/u.test(key)) {
+                    map.set(key, { word, meaning: v?.meaning?.trim() || '（意味不明）' });
+                }
+            });
+            result.vocabulary = [...map.values()];
+            return result;
+        }
+
+        /* 未登録の文脈単語に対しても、対応する対訳や推測に基づく意味を付与する改善抽出ロジック */
+        function ensureAllWordsExtracted(preprocessedSegments, aiResultData) {
+            parsedData = normalizeParsedData(aiResultData, preprocessedSegments);
+            const existing = new Map(parsedData.vocabulary.map(v => [cleanWordKey(v.word), v]));
+
+            // 文節ごとに含まれる単語を精査
+            parsedData.sentences.forEach(sentence => {
+                const words = sentence.indonesian.split(/\s+/u).map(w => w.trim()).filter(Boolean);
+                const jpTranslation = sentence.japanese || '';
+
+                words.forEach(word => {
+                    const key = cleanWordKey(word);
+                    if (key && !/^\d+$/u.test(key) && !existing.has(key)) {
+                        // 辞書にない文脈単語の場合、文全体の日本語訳や形態に基づいたスマートな意味を補完
+                        let inferredMeaning = '（文脈単語）';
+                        if (jpTranslation && jpTranslation !== '（日本語訳なし）') {
+                            inferredMeaning = '【文節訳】 ' + jpTranslation;
+                        }
+                        existing.set(key, { word, meaning: inferredMeaning });
+                    }
+                });
+            });
+
+            parsedData.vocabulary = [...existing.values()];
+        }
+
+        async function startApp() {
+            const rawText = $('script-input')?.value.trim() || '';
+            if (!rawText) {
+                showToast('インドネシア語のテキストを入力してください。');
+                return;
+            }
+
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showToast('APIキーが設定されていません。');
+                openSettings();
+                return;
+            }
+
+            const preprocessedSegments = preprocessIndonesianText(rawText);
+            if (!preprocessedSegments.length) {
+                showToast('有効なインドネシア語の文節が見つかりませんでした。');
+                return;
+            }
+
+            const btn = $('analyze-btn');
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading-spinner"></span> AI解析中...';
+            }
+
+            try {
+                let cached = getCachedResult(rawText);
+                if (cached) {
+                    ensureAllWordsExtracted(preprocessedSegments, cached);
+                    showToast('⚡ キャッシュから復元しました（APIリクエスト 0）');
+                } else {
+                    if (!canMakeApiCall()) throw new Error('レート制限に達しています。');
+                    const aiResult = await analyzeWithGemini(preprocessedSegments, apiKey);
+                    recordApiCall();
+                    ensureAllWordsExtracted(preprocessedSegments, aiResult);
+                    setCachedResult(rawText, parsedData);
+                }
+
+                saveToHistory(rawText, parsedData);
+                sortVocabulary();
+                currentMode = 'sentence';
+                cardIndex = 0;
+                updateTabUI();
+                stopSpeech();
+                renderSentenceList();
+                $('audio-bar').style.display = 'flex';
+                switchView('player');
+            } catch (err) {
+                console.error(err);
+                showToast(err?.message || '解析中にエラーが発生しました。');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '✨ Gemini AI で解析して開始';
+                }
+            } finally {
+                updateTokenEstimate();
+            }
+        }
+
+        async function analyzeWithGemini(segments, apiKey) {
+            const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
+            
+            const systemPrompt = 'You are a professional Indonesian-to-Japanese translator and linguistics expert specializing in accurate shadowing materials.\n' +
+                'You are given an array of Indonesian text segments. For each segment, provide its exact, natural Japanese translation (対訳).\n' +
+                'CRITICAL: You must return the "sentences" array with the exact same length and in the exact same order as the input array. Each item in the "sentences" array must correspond 1-to-1 to each input segment.\n' +
+                'Also extract all unique vocabulary words and their Japanese meanings into the "vocabulary" array.\n' +
+                'Return ONLY valid JSON matching the schema.';
+
+            const payload = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: [{ role: 'user', parts: [{ text: JSON.stringify(segments) }] }],
+                generationConfig: {
+                    responseMimeType: 'application/json',
+                    responseSchema: {
+                        type: 'OBJECT',
+                        properties: {
+                            sentences: { 
+                                type: 'ARRAY', 
+                                items: { 
+                                    type: 'OBJECT', 
+                                    properties: { japanese: { type: 'STRING' } }, 
+                                    required: ['japanese'] 
+                                } 
+                            },
+                            vocabulary: { 
+                                type: 'ARRAY', 
+                                items: { 
+                                    type: 'OBJECT', 
+                                    properties: { word: { type: 'STRING' }, meaning: { type: 'STRING' } }, 
+                                    required: ['word', 'meaning'] 
+                                } 
+                            }
+                        },
+                        required: ['sentences', 'vocabulary']
+                    },
+                    temperature: 0.1
+                }
+            };
+
+            const res = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error('Gemini APIエラー: ' + (data?.error?.message || res.status));
+
+            const jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+            return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
+        }
+
+        function sortVocabulary() {
+            if (!parsedData?.vocabulary) return;
+            parsedData.vocabulary.sort((a, b) => {
+                const ca = wordTapCounts[cleanWordKey(a.word)] || 0;
+                const cb = wordTapCounts[cleanWordKey(b.word)] || 0;
+                if (cb !== ca) return cb - ca;
+                return String(a.word).localeCompare(String(b.word), 'id', { sensitivity: 'base' });
+            });
+        }
+
+        function updateTabUI() {
+            $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');
+            $('tab-word')?.classList.toggle('active', currentMode === 'word');
+        }
+
+        function switchMode(mode) {
+            currentMode = mode;
+            stopSpeech();
+            $('audio-bar').style.display = mode === 'sentence' ? 'flex' : 'none';
+            updateTabUI();
+            if (mode === 'sentence') renderSentenceList();
+            else { sortVocabulary(); cardIndex = 0; renderFlashcard(); }
+        }
+
+        function renderSentenceList() {
+            const container = $('content-area');
+            if (!container) return;
+            container.textContent = '';
+
+            parsedData.sentences.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'line-item';
+                div.id = 'line-' + index;
+
+                const editBtn = document.createElement('button');
+                editBtn.type = 'button';
+                editBtn.className = 'edit-row-btn';
+                editBtn.textContent = '✏️ 編集';
+                editBtn.addEventListener('click', (e) => { e.stopPropagation(); openEditLineModal(index); });
+
+                const idText = document.createElement('div');
+                idText.className = 'id-text';
+                item.indonesian.split(/\s+/u).filter(Boolean).forEach((word, wIdx) => {
+                    if (wIdx > 0) idText.appendChild(document.createTextNode(' '));
+                    const span = document.createElement('span');
+                    span.className = 'word-token';
+                    span.textContent = word;
+                    span.addEventListener('click', event => onWordClick(event, index, wIdx, word));
+                    idText.appendChild(span);
+                });
+
+                const jpText = document.createElement('div');
+                jpText.className = 'jp-text';
+                jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
+
+                div.append(editBtn, idText, jpText);
+                div.addEventListener('click', event => {
+                    if (event.target.closest('.word-token, .edit-row-btn')) return;
+                    playText(item.indonesian, index);
+                });
+                container.appendChild(div);
+            });
+        }
+
+        function openEditLineModal(index) {
+            const item = parsedData.sentences[index];
+            if (!item) return;
+            $('edit-line-index').value = String(index);
+            $('edit-indonesian-input').value = item.indonesian;
+            $('edit-japanese-input').value = item.japanese;
+            $('edit-line-modal').style.display = 'flex';
+        }
+
+        function closeEditLineModal() { $('edit-line-modal').style.display = 'none'; }
+
+        function saveEditedLine() {
+            const idx = Number.parseInt($('edit-line-index').value, 10);
+            const newIndonesian = $('edit-indonesian-input').value.trim();
+            const newJapanese = $('edit-japanese-input').value.trim();
+            if (isNaN(idx) || !parsedData.sentences[idx]) return;
+            if (!newIndonesian) { showToast('テキストは空にできません。'); return; }
+
+            parsedData.sentences[idx].indonesian = newIndonesian;
+            parsedData.sentences[idx].japanese = newJapanese;
+            ensureAllWordsExtracted(parsedData.sentences.map(s => s.indonesian), parsedData);
+            setCachedResult($('script-input').value, parsedData);
+            saveToHistory($('script-input').value, parsedData);
+            closeEditLineModal();
+            renderSentenceList();
+            showToast('文節を更新しました。');
+        }
+
+        function getSpeechRate() {
+            const value = Number.parseFloat($('speed-range')?.value || '1');
+            return Number.isFinite(value) ? Math.min(1.2, Math.max(0.5, value)) : 1;
+        }
+
+        function speak(text, onEnd) {
+            if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text.replace(/\b\d+\b/gu, '').trim());
+            utterance.lang = 'id-ID';
+            utterance.rate = getSpeechRate();
+            if (onEnd) utterance.addEventListener('end', onEnd, { once: true });
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function onWordClick(event, lineIndex, wordIndex, clickedWord) {
+            event.stopPropagation();
             document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
 
-            const targetDiv = $(`line-${index}`);
-            if (targetDiv) {
-                targetDiv.classList.add('active');
-                targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            const targetDiv = $('line-' + lineIndex);
+            const tokens = targetDiv?.querySelectorAll('.word-token') || [];
+            targetDiv?.classList.add('active');
+            tokens[wordIndex]?.classList.add('highlighted');
+
+            const key = cleanWordKey(clickedWord);
+            if (key) {
+                wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
+                try { localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts)); } catch (_) {}
             }
-        }
-        speak(textToSpeech);
-    }
-
-    function pauseSpeech() {
-        if ('speechSynthesis' in window && window.speechSynthesis.speaking) {
-            window.speechSynthesis.pause();
-        }
-    }
-
-    function resumeSpeech() {
-        if ('speechSynthesis' in window && window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-        }
-    }
-
-    function stopSpeech() {
-        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
-        document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
-        document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
-    }
-
-    function renderFlashcard() {
-        const container = $('content-area');
-        if (!container) return;
-        container.textContent = '';
-
-        currentFilteredVocab = Array.isArray(parsedData.vocabulary) ? parsedData.vocabulary : [];
-
-        if (!currentFilteredVocab.length) {
-            const empty = document.createElement('div');
-            empty.style.cssText = 'text-align:center;color:#888;padding:30px;';
-            empty.textContent = '抽出された単語がありません。';
-            container.appendChild(empty);
-            return;
+            speak(parsedData.sentences[lineIndex].indonesian.split(/\s+/u).slice(wordIndex).join(' '), () => {
+                tokens[wordIndex]?.classList.remove('highlighted');
+            });
         }
 
-        if (cardIndex >= currentFilteredVocab.length) cardIndex = 0;
-
-        const wrapper = document.createElement('div');
-        wrapper.className = 'flashcard-wrapper';
-
-        const searchContainer = document.createElement('div');
-        searchContainer.className = 'search-container';
-
-        const searchInput = document.createElement('input');
-        searchInput.type = 'text';
-        searchInput.id = 'word-search-input';
-        searchInput.className = 'search-input-box';
-        searchInput.placeholder = '🔍 単語・意味で曖昧検索...';
-        searchInput.autocomplete = 'off';
-        searchInput.addEventListener('input', e => handleSearchInput(e.target.value));
-
-        const results = document.createElement('div');
-        results.id = 'search-results-list';
-        results.className = 'search-results-list';
-
-        searchContainer.append(searchInput, results);
-
-        const counter = document.createElement('div');
-        counter.id = 'card-counter';
-        counter.style.cssText = 'font-size:0.85rem;color:#aaa;';
-
-        const perspective = document.createElement('div');
-        perspective.className = 'perspective-box';
-
-        const flashcard = document.createElement('div');
-        flashcard.className = 'flashcard';
-        flashcard.id = 'current-flashcard';
-        flashcard.addEventListener('click', flipCard);
-
-        const front = document.createElement('div');
-        front.className = 'card-face card-front';
-
-        const frontLabel = document.createElement('div');
-        frontLabel.style.cssText = 'font-size:0.8rem;color:#888;position:absolute;top:12px;left:12px;';
-        frontLabel.textContent = '表：インドネシア語';
-
-        const frontBadge = document.createElement('div');
-        frontBadge.className = 'tap-count-badge';
-        frontBadge.id = 'front-tap-badge';
-
-        const frontWord = document.createElement('div');
-        frontWord.className = 'card-word';
-        frontWord.id = 'front-card-word';
-
-        const speakBtn = document.createElement('button');
-        speakBtn.type = 'button';
-        speakBtn.style.cssText = 'font-size:1.2rem;cursor:pointer;background:none;border:0;color:#fff;';
-        speakBtn.textContent = '🔊';
-        speakBtn.title = '発音';
-        speakBtn.addEventListener('click', e => {
-            e.stopPropagation();
-            playCurrentCardSpeech();
-        });
-
-        const hint = document.createElement('div');
-        hint.className = 'card-hint';
-        hint.textContent = '👆 タップして意味を表示 & 音声再生';
-
-        front.append(frontLabel, frontBadge, frontWord, speakBtn, hint);
-
-        const back = document.createElement('div');
-        back.className = 'card-face card-back';
-
-        const backLabel = document.createElement('div');
-        backLabel.style.cssText = 'font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;';
-        backLabel.textContent = '裏：日本語の意味';
-
-        const backBadge = document.createElement('div');
-        backBadge.className = 'tap-count-badge';
-        backBadge.id = 'back-tap-badge';
-
-        const backMeaning = document.createElement('div');
-        backMeaning.className = 'card-meaning';
-        backMeaning.id = 'back-card-meaning';
-
-        const backWord = document.createElement('div');
-        backWord.id = 'back-card-word-sub';
-        backWord.style.cssText = 'font-size:0.9rem;color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;';
-
-        back.append(backLabel, backBadge, backMeaning, backWord);
-        flashcard.append(front, back);
-        perspective.appendChild(flashcard);
-
-        const controls = document.createElement('div');
-        controls.className = 'card-controls';
-
-        const prev = document.createElement('button');
-        prev.className = 'ctrl-btn';
-        prev.type = 'button';
-        prev.textContent = '◀ 前へ';
-        prev.addEventListener('click', prevCard);
-
-        const shuffle = document.createElement('button');
-        shuffle.className = 'ctrl-btn';
-        shuffle.type = 'button';
-        shuffle.title = 'タップ回数の多い単語を優先';
-        shuffle.textContent = '🔀 苦手優先シャッフル';
-        shuffle.addEventListener('click', shuffleCards);
-
-        const next = document.createElement('button');
-        next.className = 'ctrl-btn';
-        next.type = 'button';
-        next.textContent = '次へ ▶';
-        next.addEventListener('click', nextCard);
-
-        controls.append(prev, shuffle, next);
-        wrapper.append(searchContainer, counter, perspective, controls);
-        container.appendChild(wrapper);
-
-        updateCardDisplay();
-    }
-
-    function updateCardDisplay() {
-        if (!currentFilteredVocab?.length) return;
-
-        if (cardIndex < 0) cardIndex = currentFilteredVocab.length - 1;
-        if (cardIndex >= currentFilteredVocab.length) cardIndex = 0;
-
-        const vocab = currentFilteredVocab[cardIndex];
-        const key = cleanWordKey(vocab.word);
-        const count = wordTapCounts[key] || 0;
-        const meaning = vocab.meaning?.trim() || '（日本語の意味なし）';
-
-        if ($('card-counter')) $('card-counter').textContent = `単語 ${cardIndex + 1} / ${currentFilteredVocab.length}`;
-        if ($('front-card-word')) $('front-card-word').textContent = vocab.word;
-        if ($('front-tap-badge')) $('front-tap-badge').textContent = `📌 指定: ${count}回`;
-        if ($('back-card-meaning')) $('back-card-meaning').textContent = meaning;
-        if ($('back-tap-badge')) $('back-tap-badge').textContent = `📌 指定: ${count}回`;
-        if ($('back-card-word-sub')) $('back-card-word-sub').textContent = vocab.word;
-
-        $('current-flashcard')?.classList.remove('flipped');
-    }
-
-    function playCurrentCardSpeech() {
-        const vocab = currentFilteredVocab?.[cardIndex];
-        if (vocab?.word) playText(vocab.word);
-    }
-
-    function flipCard() {
-        const card = $('current-flashcard');
-        if (!card) return;
-        card.classList.toggle('flipped');
-        playCurrentCardSpeech();
-    }
-
-    function prevCard() {
-        if (!currentFilteredVocab?.length) return;
-        cardIndex = (cardIndex - 1 + currentFilteredVocab.length) % currentFilteredVocab.length;
-        updateCardDisplay();
-    }
-
-    function nextCard() {
-        if (!currentFilteredVocab?.length) return;
-        cardIndex = (cardIndex + 1) % currentFilteredVocab.length;
-        updateCardDisplay();
-    }
-
-    function shuffleCards() {
-        if (!parsedData.vocabulary || parsedData.vocabulary.length < 2) return;
-
-        const groups = new Map();
-        parsedData.vocabulary.forEach(item => {
-            const count = wordTapCounts[cleanWordKey(item.word)] || 0;
-            if (!groups.has(count)) groups.set(count, []);
-            groups.get(count).push(item);
-        });
-
-        const counts = [...groups.keys()].sort((a, b) => b - a);
-        const result = [];
-
-        counts.forEach(count => {
-            const arr = [...groups.get(count)];
-            for (let i = arr.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [arr[i], arr[j]] = [arr[j], arr[i]];
+        function playText(text, index) {
+            if (index !== undefined) {
+                document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+                const targetDiv = $('line-' + index);
+                if (targetDiv) { targetDiv.classList.add('active'); targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
             }
-            result.push(...arr);
-        });
+            speak(text);
+        }
 
-        parsedData.vocabulary = result;
-        currentFilteredVocab = result;
-        cardIndex = 0;
-        showToast('🎯 苦手優先スマートシャッフルを適用しました！');
-        updateCardDisplay();
-    }
+        function pauseSpeech() { if (window.speechSynthesis.speaking) window.speechSynthesis.pause(); }
+        function resumeSpeech() { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); }
+        function stopSpeech() { window.speechSynthesis.cancel(); }
 
-    function handleSearchInput(query) {
-        clearTimeout(searchDebounceTimer);
-        searchDebounceTimer = setTimeout(() => executeSearchFilter(String(query || '').trim()), 120);
-    }
+        function renderFlashcard() {
+            const container = $('content-area');
+            if (!container) return;
+            container.textContent = '';
+            currentFilteredVocab = parsedData.vocabulary || [];
 
-    function executeSearchFilter(query) {
-        const results = $('search-results-list');
-        if (!results) return;
+            if (!currentFilteredVocab.length) {
+                container.innerHTML = '<div style="text-align:center;color:#888;padding:30px;">抽出された単語がありません。</div>';
+                return;
+            }
 
-        if (!query) {
-            results.style.display = 'none';
-            results.textContent = '';
-            currentFilteredVocab = parsedData.vocabulary;
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flashcard-wrapper';
+
+            const searchContainer = document.createElement('div');
+            searchContainer.className = 'search-container';
+            const searchInput = document.createElement('input');
+            searchInput.type = 'text';
+            searchInput.className = 'search-input-box';
+            searchInput.placeholder = '🔍 単語・意味で検索...';
+            searchInput.addEventListener('input', e => handleSearchInput(e.target.value));
+
+            const results = document.createElement('div');
+            results.id = 'search-results-list';
+            results.className = 'search-results-list';
+            searchContainer.append(searchInput, results);
+
+            const counter = document.createElement('div');
+            counter.id = 'card-counter';
+            counter.style.cssText = 'font-size:0.85rem;color:#aaa;';
+
+            const perspective = document.createElement('div');
+            perspective.className = 'perspective-box';
+
+            const flashcard = document.createElement('div');
+            flashcard.className = 'flashcard';
+            flashcard.id = 'current-flashcard';
+            flashcard.addEventListener('click', () => { flashcard.classList.toggle('flipped'); playCurrentCardSpeech(); });
+
+            const front = document.createElement('div');
+            front.className = 'card-face card-front';
+            front.innerHTML = '<div style="font-size:0.8rem;color:#888;position:absolute;top:12px;left:12px;">表：インドネシア語</div>' +
+                '<div class="tap-count-badge" id="front-tap-badge"></div>' +
+                '<div class="card-word" id="front-card-word"></div>' +
+                '<button type="button" style="font-size:1.2rem;cursor:pointer;background:none;border:0;color:#fff;" onclick="event.stopPropagation(); playCurrentCardSpeech();">🔊</button>' +
+                '<div class="card-hint">👆 タップして意味を表示</div>';
+
+            const back = document.createElement('div');
+            back.className = 'card-face card-back';
+            back.innerHTML = '<div style="font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;">裏：日本語の意味</div>' +
+                '<div class="tap-count-badge" id="back-tap-badge"></div>' +
+                '<div class="card-meaning" id="back-card-meaning"></div>' +
+                '<div id="back-card-word-sub" style="font-size:0.9rem;color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;"></div>';
+
+            flashcard.append(front, back);
+            perspective.appendChild(flashcard);
+
+            const controls = document.createElement('div');
+            controls.className = 'card-controls';
+            controls.innerHTML = '<button class="ctrl-btn" type="button" onclick="prevCard()">◀ 前へ</button>' +
+                '<button class="ctrl-btn" type="button" onclick="shuffleCards()">🔀 シャッフル</button>' +
+                '<button class="ctrl-btn" type="button" onclick="nextCard()">次へ ▶</button>';
+
+            wrapper.append(searchContainer, counter, perspective, controls);
+            container.appendChild(wrapper);
+            updateCardDisplay();
+        }
+
+        window.prevCard = () => { cardIndex = (cardIndex - 1 + currentFilteredVocab.length) % currentFilteredVocab.length; updateCardDisplay(); };
+        window.nextCard = () => { cardIndex = (cardIndex + 1) % currentFilteredVocab.length; updateCardDisplay(); };
+        window.shuffleCards = () => {
+            currentFilteredVocab.sort(() => Math.random() - 0.5);
             cardIndex = 0;
             updateCardDisplay();
-            return;
-        }
-
-        const q = query.toLocaleLowerCase();
-        const matches = parsedData.vocabulary.filter(v =>
-            String(v.word).toLocaleLowerCase().includes(q) ||
-            String(v.meaning || '').toLocaleLowerCase().includes(q)
-        );
-
-        results.textContent = '';
-
-        if (!matches.length) {
-            const empty = document.createElement('div');
-            empty.style.cssText = 'padding:10px;color:#888;font-size:0.85rem;';
-            empty.textContent = '該当する単語が見つかりません';
-            results.appendChild(empty);
-            results.style.display = 'block';
-            return;
-        }
-
-        matches.forEach(item => {
-            const origIndex = parsedData.vocabulary.indexOf(item);
-            const key = cleanWordKey(item.word);
-            const count = wordTapCounts[key] || 0;
-
-            const row = document.createElement('button');
-            row.type = 'button';
-            row.className = 'search-result-item';
-            row.style.width = '100%';
-            row.style.background = 'transparent';
-            row.style.color = '#fff';
-            row.style.border = '0';
-            row.style.textAlign = 'left';
-
-            const left = document.createElement('span');
-            const strong = document.createElement('strong');
-            strong.textContent = item.word;
-            left.appendChild(strong);
-            left.appendChild(document.createTextNode(` - ${item.meaning}`));
-
-            const right = document.createElement('span');
-            right.style.cssText = 'color:#ffcc00;font-size:0.75rem;';
-            right.textContent = `📌 ${count}回`;
-
-            row.append(left, right);
-            row.addEventListener('click', () => selectSearchWord(origIndex));
-            results.appendChild(row);
-        });
-
-        results.style.display = 'block';
-    }
-
-    function selectSearchWord(origIndex) {
-        currentFilteredVocab = parsedData.vocabulary;
-        cardIndex = Number(origIndex);
-        const results = $('search-results-list');
-        if (results) results.style.display = 'none';
-        const input = $('word-search-input');
-        if (input) input.value = '';
-        updateCardDisplay();
-    }
-
-    function backToSetup() {
-        stopSpeech();
-        $('player-area').style.display = 'none';
-        $('setup-card').style.display = 'flex';
-        updateHistoryUI();
-        updateTokenEstimate();
-    }
-
-    function exportAppData() {
-        try {
-            const data = {
-                history: getHistory(),
-                tapCounts: wordTapCounts,
-                version: 2,
-                exportedAt: new Date().toISOString()
-            };
-
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `indonesian_shadowing_backup_${new Date().toISOString().slice(0,10)}.json`;
-            document.body.appendChild(a);
-            a.click();
-            a.remove();
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-
-            showToast('データを書き出しました（APIキーは含まれていません）。');
-        } catch (e) {
-            showToast('データの書き出しに失敗しました: ' + e.message);
-        }
-    }
-
-    function importAppData(event) {
-        const file = event?.target?.files?.[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            try {
-                const json = JSON.parse(e.target.result);
-
-                if (Array.isArray(json.history)) {
-                    localStorage.setItem(STORAGE.history, JSON.stringify(
-                        json.history.filter(v => typeof v === 'string').slice(0, CONFIG.maxHistory)
-                    ));
-                }
-
-                if (json.tapCounts && typeof json.tapCounts === 'object') {
-                    wordTapCounts = json.tapCounts;
-                    localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts));
-                }
-
-                updateHistoryUI();
-                showToast('バックアップデータを復元しました。APIキーは設定画面から別途入力してください。');
-                closeSettings();
-            } catch (err) {
-                showToast('バックアップファイルの読み込みに失敗しました（JSON形式が無効です）。');
-            }
+            showToast('シャッフルしました！');
         };
-        reader.onerror = () => showToast('バックアップファイルを読み込めませんでした。');
-        reader.readAsText(file);
-        event.target.value = '';
-    }
 
-    function bindStaticEvents() {
-        $('settings-open-btn')?.addEventListener('click', openSettings);
-        $('settings-cancel-btn')?.addEventListener('click', closeSettings);
-        $('settings-save-btn')?.addEventListener('click', saveApiKey);
-        $('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
-        $('export-btn')?.addEventListener('click', exportAppData);
-        $('import-file-input')?.addEventListener('change', importAppData);
+        window.playCurrentCardSpeech = () => {
+            const vocab = currentFilteredVocab?.[cardIndex];
+            if (vocab?.word) playText(vocab.word);
+        };
 
-        $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
-        $('history-close-btn')?.addEventListener('click', closeHistoryModal);
+        function updateCardDisplay() {
+            if (!currentFilteredVocab?.length) return;
+            const vocab = currentFilteredVocab[cardIndex];
+            const count = wordTapCounts[cleanWordKey(vocab.word)] || 0;
+            $('card-counter').textContent = '単語 ' + (cardIndex + 1) + ' / ' + currentFilteredVocab.length;
+            $('front-card-word').textContent = vocab.word;
+            $('front-tap-badge').textContent = '📌 ' + count + '回';
+            $('back-card-meaning').textContent = vocab.meaning || '（日本語の意味なし）';
+            $('back-tap-badge').textContent = '📌 ' + count + '回';
+            $('back-card-word-sub').textContent = vocab.word;
+            $('current-flashcard')?.classList.remove('flipped');
+        }
 
-        $('analyze-btn')?.addEventListener('click', startApp);
-        $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
-        $('tab-word')?.addEventListener('click', () => switchMode('word'));
-        $('back-to-setup-btn')?.addEventListener('click', backToSetup);
-        $('pause-speech-btn')?.addEventListener('click', pauseSpeech);
-        $('resume-speech-btn')?.addEventListener('click', resumeSpeech);
-        $('stop-speech-btn')?.addEventListener('click', stopSpeech);
+        function handleSearchInput(query) {
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                const q = query.toLowerCase().trim();
+                const results = $('search-results-list');
+                if (!q) { results.style.display = 'none'; currentFilteredVocab = parsedData.vocabulary; updateCardDisplay(); return; }
+                const matches = parsedData.vocabulary.filter(v => v.word.toLowerCase().includes(q) || (v.meaning && v.meaning.toLowerCase().includes(q)));
+                results.textContent = '';
+                if (!matches.length) { results.innerHTML = '<div style="padding:10px;color:#888;font-size:0.85rem;">該当なし</div>'; results.style.display = 'block'; return; }
+                matches.forEach(item => {
+                    const row = document.createElement('button');
+                    row.className = 'search-result-item';
+                    row.innerHTML = '<span><strong>' + item.word + '</strong> - ' + item.meaning + '</span>';
+                    row.addEventListener('click', () => {
+                        cardIndex = parsedData.vocabulary.indexOf(item);
+                        results.style.display = 'none';
+                        updateCardDisplay();
+                    });
+                    results.appendChild(row);
+                });
+                results.style.display = 'block';
+            }, 120);
+        }
 
-        $('script-input')?.addEventListener('input', updateTokenEstimate);
-        $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
-        $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
-        $('fontsize-range')?.addEventListener('input', e => updateFontSizeVal(e.target.value));
+        function exportAppData() {
+            try {
+                const data = { history: getHistory(), tapCounts: wordTapCounts };
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'backup.json';
+                a.click();
+                showToast('書き出し完了しました。');
+            } catch (e) { showToast('失敗しました。'); }
+        }
 
-        $('edit-save-btn')?.addEventListener('click', saveEditedLine);
-        $('edit-cancel-btn')?.addEventListener('click', closeEditLineModal);
+        function importAppData(e) {
+            const file = e.target.files?.[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const json = JSON.parse(evt.target.result);
+                    if (json.history) localStorage.setItem(STORAGE.history, JSON.stringify(json.history));
+                    if (json.tapCounts) { wordTapCounts = json.tapCounts; localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts)); }
+                    updateHistoryUI();
+                    closeSettings();
+                    showToast('インポート成功しました。');
+                } catch (_) { showToast('ファイル形式が不正です。'); }
+            };
+            reader.readAsText(file);
+        }
 
-        $('settings-modal')?.addEventListener('click', e => {
-            if (e.target === $('settings-modal')) closeSettings();
-        });
-        $('history-modal')?.addEventListener('click', e => {
-            if (e.target === $('history-modal')) closeHistoryModal();
-        });
-        $('edit-line-modal')?.addEventListener('click', e => {
-            if (e.target === $('edit-line-modal')) closeEditLineModal();
-        });
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') {
-                closeSettings();
-                closeHistoryModal();
-                closeEditLineModal();
-            }
-        });
-    }
-
-    window.addEventListener('load', () => {
-        loadPersistentState();
-        bindStaticEvents();
-        checkApiKeyStatus();
-        updateHistoryUI();
-        updateFontSizeVal($('fontsize-range')?.value || '1.1');
-        updateSpeedVal($('speed-range')?.value || '1.0');
-        updateTokenEstimate();
-
-        setInterval(() => {
-            pruneRpm();
+        window.addEventListener('load', () => {
+            loadPersistentState();
+            checkApiKeyStatus();
+            updateHistoryUI();
+            applyFontSize();
+            updateSpeedVal(1.0);
             updateTokenEstimate();
-        }, 5000);
-    });
 
-    window.openSettings = openSettings;
-    window.closeSettings = closeSettings;
-    window.saveApiKey = saveApiKey;
-    window.toggleKeyVisibility = toggleKeyVisibility;
-    window.exportAppData = exportAppData;
-    window.importAppData = importAppData;
-    window.startApp = startApp;
-    window.switchMode = switchMode;
-    window.updateSpeedVal = updateSpeedVal;
-    window.updateFontSizeVal = updateFontSizeVal;
-    window.updateTokenEstimate = updateTokenEstimate;
-    window.pauseSpeech = pauseSpeech;
-    window.resumeSpeech = resumeSpeech;
-    window.stopSpeech = stopSpeech;
-    window.backToSetup = backToSetup;
-})();
-</script>
-
+            $('header-back-btn')?.addEventListener('click', () => switchView('setup'));
+            $('fontsize-toggle-btn')?.addEventListener('click', cycleFontSize);
+            $('settings-open-btn')?.addEventListener('click', openSettings);
+            $('settings-cancel-btn')?.addEventListener('click', closeSettings);
+            $('settings-save-btn')?.addEventListener('click', saveApiKey);
+            $('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
+            $('export-btn')?.addEventListener('click', exportAppData);
+            $('import-file-input')?.addEventListener('change', importAppData);
+            $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
+            $('history-close-btn')?.addEventListener('click', closeHistoryModal);
+            $('analyze-btn')?.addEventListener('click', startApp);
+            $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
+            $('tab-word')?.addEventListener('click', () => switchMode('word'));
+            $('pause-speech-btn')?.addEventListener('click', pauseSpeech);
+            $('resume-speech-btn')?.addEventListener('click', resumeSpeech);
+            $('stop-speech-btn')?.addEventListener('click', stopSpeech);
+            $('script-input')?.addEventListener('input', updateTokenEstimate);
+            $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
+            $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
+            $('edit-save-btn')?.addEventListener('click', saveEditedLine);
+            $('edit-cancel-btn')?.addEventListener('click', closeEditLineModal);
+        });
+    })();
+    </script>
 </body>
 </html>
