@@ -199,6 +199,7 @@
             background: #252528;
             border-left: 4px solid transparent;
             transition: background 0.15s, border-left 0.15s;
+            position: relative;
         }
         .line-item.active {
             background-color: #1a2f4c !important;
@@ -211,6 +212,7 @@
             color: #ffffff;
             line-height: 1.6;
             word-break: break-word;
+            padding-right: 50px;
         }
 
         .word-token {
@@ -233,6 +235,20 @@
             line-height: 1.4;
             word-break: break-word;
         }
+
+        .edit-row-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #ccc;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+        }
+        .edit-row-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
         .flashcard-wrapper {
             display: flex;
@@ -516,6 +532,7 @@
             <input type="range" id="fontsize-range" min="0.8" max="1.6" step="0.1" value="1.1">
         </div>
 
+        <!-- API Monitor Box -->
         <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
             <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
                 <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">📊 APIリクエスト・ローカルモニター</span>
@@ -539,6 +556,7 @@
             <button class="tab-btn" id="tab-word" type="button">🎴 単語フラッシュカード</button>
         </div>
 
+        <!-- Audio Player Control Bar -->
         <div class="audio-controls-bar" id="audio-bar" style="display:none;">
             <button class="audio-btn" id="pause-speech-btn" type="button">⏸️ 一時停止</button>
             <button class="audio-btn" id="resume-speech-btn" type="button">▶️ 再開</button>
@@ -553,6 +571,7 @@
         <button class="btn btn-secondary" id="back-to-setup-btn" type="button">テキスト修正に戻る</button>
     </div>
 
+    <!-- Settings Modal -->
     <div class="modal-overlay" id="settings-modal">
         <div class="modal-body">
             <div class="modal-title">🔑 設定 & バックアップ</div>
@@ -585,6 +604,26 @@
         </div>
     </div>
 
+    <!-- Edit Line Modal -->
+    <div class="modal-overlay" id="edit-line-modal">
+        <div class="modal-body">
+            <div class="modal-title">✏️ 文節の編集</div>
+            <input type="hidden" id="edit-line-index">
+            <div>
+                <label for="edit-indonesian-input">インドネシア語テキスト</label>
+                <input type="text" id="edit-indonesian-input" autocomplete="off">
+            </div>
+            <div>
+                <label for="edit-japanese-input">日本語訳</label>
+                <input type="text" id="edit-japanese-input" autocomplete="off">
+            </div>
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <button class="btn btn-secondary" id="edit-cancel-btn" type="button" style="flex:1;">キャンセル</button>
+                <button class="btn" id="edit-save-btn" type="button" style="flex:1;">保存</button>
+            </div>
+        </div>
+    </div>
+
     <div id="toast"></div>
 
 <script>
@@ -593,18 +632,18 @@
 
     const STORAGE = {
         apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v4',
-        tapCounts: 'indo_shadowing_tapcounts_v4',
-        rpm: 'rpm_timestamps_v4',
-        cachePrefix: 'indo_shadowing_cache_v6_'
+        history: 'indo_shadowing_history_v3',
+        tapCounts: 'indo_shadowing_tapcounts_v3',
+        rpm: 'rpm_timestamps_v3',
+        cachePrefix: 'indo_shadowing_cache_v5_'
     };
 
     const CONFIG = {
-        model: 'gemini-3.5-flash-lite',
+        model: 'gemini-2.5-flash',
         endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
         maxRequestsPerMinute: 15,
         maxHistory: 5,
-        cacheVersion: 6
+        cacheVersion: 5
     };
 
     let parsedData = { sentences: [], vocabulary: [] };
@@ -822,51 +861,24 @@
             .trim();
     }
 
-    /*
-       Pre-processing Rules:
-       1. Remove 'indonesian' (case-insensitive).
-       2. Preserve parentheses () ONLY IF they represent scripture references (do NOT contain Japanese characters).
-       3. Remove all Japanese characters (hiragana, katakana, kanji).
-       4. Remove standalone numbers in body text, but preserve numbers inside scripture references.
-       5. Keep required punctuation (.,!?) and hyphens/apostrophes.
-       6. Strip all other symbols and emojis.
-    */
     function preprocessIndonesianText(rawText) {
         if (!rawText) return [];
         
-        let sanitized = rawText.replace(/indonesian/gi, ' ');
-
-        const separator = sanitized.includes('#') ? '#' : '.';
-        const rawSegments = sanitized.split(separator);
+        const separator = rawText.includes('#') ? '#' : '.';
+        const rawSegments = rawText.split(separator);
         const cleanedSegments = [];
 
         rawSegments.forEach(seg => {
-            let scriptureMatches = seg.match(/\([^)]*\)/g) || [];
-            
-            // Exclude parentheses if they contain Japanese characters
-            scriptureMatches = scriptureMatches.filter(s => !/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/gu.test(s));
-
-            let cleaned = seg;
-            scriptureMatches.forEach((s, i) => {
-                cleaned = cleaned.replace(s, `___SCRIPTURE_${i}___`);
-            });
-            
-            // Remove non-scripture parentheses
-            cleaned = cleaned.replace(/[\(\)]/g, ' ');
-
-            // Remove Japanese characters
+            let scriptureMatch = seg.match(/\([^)]*\)/g) || [];
+            let cleaned = seg.replace(/\([^)]*\)/g, '___SCRIPTURE_PLACEHOLDER___');
             cleaned = cleaned.replace(/[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/gu, ' ');
-            
-            // Remove standalone numbers outside scripture brackets
             cleaned = cleaned.replace(/\b\d+\b/g, ' ');
-            
-            // Remove emojis and unwanted symbols, keeping alphanumeric, spaces, hyphens, apostrophes, and punctuation (.,!?)
-            cleaned = cleaned.replace(/[^\w\s\-\'\.\,\!\?]/gu, ' ');
+            cleaned = cleaned.replace(/[^\w\s\-'\.,!\?()]/gu, ' ');
 
-            // Restore valid scripture parentheses
-            scriptureMatches.forEach((s, i) => {
-                cleaned = cleaned.replace(`___SCRIPTURE_${i}___`, s);
-            });
+            if (scriptureMatch.length > 0) {
+                let sIdx = 0;
+                cleaned = cleaned.replace(/___SCRIPTURE_PLACEHOLDER___/g, () => scriptureMatch[sIdx++] || '');
+            }
 
             cleaned = cleaned.replace(/\s+/g, ' ').trim();
 
@@ -1149,7 +1161,7 @@ You will be provided with an array of pure Indonesian text segments.
 Return ONLY valid JSON matching the supplied schema.
 
 Rules:
-1. For each segment provided in the list, return its exact corresponding natural Japanese translation in the "sentences" array (maintaining the exact index order 1-to-1).
+1. For each segment provided in the list, return its exact corresponding natural Japanese translation in the "sentences" array (maintaining the exact index order).
 2. Extract ALL unique Indonesian words appearing in the segments, providing a concise Japanese meaning in the "vocabulary" array. Do not include pure numbers.
 `.trim();
 
@@ -1252,7 +1264,8 @@ Rules:
     }
 
     function updateTabUI() {
-        $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');$('tab-word')?.classList.toggle('active', currentMode === 'word');
+        $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');
+        $('tab-word')?.classList.toggle('active', currentMode === 'word');
     }
 
     function switchMode(mode) {
@@ -1283,6 +1296,15 @@ Rules:
             div.className = 'line-item';
             div.id = `line-${index}`;
 
+            const editBtn = document.createElement('button');
+            editBtn.type = 'button';
+            editBtn.className = 'edit-row-btn';
+            editBtn.textContent = '✏️ 編集';
+            editBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                openEditLineModal(index);
+            });
+
             const idText = document.createElement('div');
             idText.className = 'id-text';
             idText.id = `text-container-${index}`;
@@ -1303,16 +1325,54 @@ Rules:
             jpText.className = 'jp-text';
             jpText.textContent = `💬 ${item.japanese || '（日本語訳なし）'}`;
 
-            div.appendChild(idText);
-            div.appendChild(jpText);
+            div.append(editBtn, idText, jpText);
 
             div.addEventListener('click', event => {
-                if (event.target instanceof Element && event.target.closest('.word-token')) return;
+                if (event.target instanceof Element && event.target.closest('.word-token, .edit-row-btn')) return;
                 playText(item.indonesian, index);
             });
 
             container.appendChild(div);
         });
+    }
+
+    function openEditLineModal(index) {
+        const item = parsedData.sentences[index];
+        if (!item) return;
+
+        $('edit-line-index').value = String(index);
+        $('edit-indonesian-input').value = item.indonesian;
+        $('edit-japanese-input').value = item.japanese;
+
+        const modal = $('edit-line-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeEditLineModal() {
+        const modal = $('edit-line-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function saveEditedLine() {
+        const idx = Number.parseInt($('edit-line-index').value, 10);
+        const newIndonesian = $('edit-indonesian-input').value.trim();
+        const newJapanese = $('edit-japanese-input').value.trim();
+
+        if (isNaN(idx) || !parsedData.sentences[idx]) return;
+        if (!newIndonesian) {
+            showToast('インドネシア語テキストは空にできません。');
+            return;
+        }
+
+        parsedData.sentences[idx].indonesian = newIndonesian;
+        parsedData.sentences[idx].japanese = newJapanese;
+
+        const segments = parsedData.sentences.map(s => s.indonesian);
+        ensureAllWordsExtracted(segments);
+
+        closeEditLineModal();
+        renderSentenceList();
+        showToast('文節を更新しました。');
     }
 
     function cleanTextForSpeech(text) {
@@ -1560,12 +1620,12 @@ Rules:
         const count = wordTapCounts[key] || 0;
         const meaning = vocab.meaning?.trim() || '（日本語の意味なし）';
 
-        if ($('card-counter'))$('card-counter').textContent = `単語 ${cardIndex + 1} / ${currentFilteredVocab.length}`;
-        if ($('front-card-word'))$('front-card-word').textContent = vocab.word;
-        if ($('front-tap-badge'))$('front-tap-badge').textContent = `📌 指定: ${count}回`;
-        if ($('back-card-meaning'))$('back-card-meaning').textContent = meaning;
-        if ($('back-tap-badge'))$('back-tap-badge').textContent = `📌 指定: ${count}回`;
-        if ($('back-card-word-sub'))$('back-card-word-sub').textContent = vocab.word;
+        if ($('card-counter')) $('card-counter').textContent = `単語 ${cardIndex + 1} / ${currentFilteredVocab.length}`;
+        if ($('front-card-word')) $('front-card-word').textContent = vocab.word;
+        if ($('front-tap-badge')) $('front-tap-badge').textContent = `📌 指定: ${count}回`;
+        if ($('back-card-meaning')) $('back-card-meaning').textContent = meaning;
+        if ($('back-tap-badge')) $('back-tap-badge').textContent = `📌 指定: ${count}回`;
+        if ($('back-card-word-sub')) $('back-card-word-sub').textContent = vocab.word;
 
         $('current-flashcard')?.classList.remove('flipped');
     }
@@ -1702,7 +1762,8 @@ Rules:
 
     function backToSetup() {
         stopSpeech();
-        $('player-area').style.display = 'none';$('setup-card').style.display = 'flex';
+        $('player-area').style.display = 'none';
+        $('setup-card').style.display = 'flex';
         updateHistoryUI();
         updateTokenEstimate();
     }
@@ -1765,22 +1826,41 @@ Rules:
     }
 
     function bindStaticEvents() {
-        $('settings-open-btn')?.addEventListener('click', openSettings);$('settings-cancel-btn')?.addEventListener('click', closeSettings);
-        $('settings-save-btn')?.addEventListener('click', saveApiKey);$('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
-        $('export-btn')?.addEventListener('click', exportAppData);$('import-file-input')?.addEventListener('change', importAppData);
-        $('analyze-btn')?.addEventListener('click', startApp);$('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
-        $('tab-word')?.addEventListener('click', () => switchMode('word'));$('back-to-setup-btn')?.addEventListener('click', backToSetup);
-        $('pause-speech-btn')?.addEventListener('click', pauseSpeech);$('resume-speech-btn')?.addEventListener('click', resumeSpeech);
-        $('stop-speech-btn')?.addEventListener('click', stopSpeech);$('history-select')?.addEventListener('change', e => loadHistory(e.target.value));
-        $('script-input')?.addEventListener('input', updateTokenEstimate);$('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
-        $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));$('fontsize-range')?.addEventListener('input', e => updateFontSizeVal(e.target.value));
+        $('settings-open-btn')?.addEventListener('click', openSettings);
+        $('settings-cancel-btn')?.addEventListener('click', closeSettings);
+        $('settings-save-btn')?.addEventListener('click', saveApiKey);
+        $('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
+        $('export-btn')?.addEventListener('click', exportAppData);
+        $('import-file-input')?.addEventListener('change', importAppData);
+        $('analyze-btn')?.addEventListener('click', startApp);
+        $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
+        $('tab-word')?.addEventListener('click', () => switchMode('word'));
+        $('back-to-setup-btn')?.addEventListener('click', backToSetup);
+        $('pause-speech-btn')?.addEventListener('click', pauseSpeech);
+        $('resume-speech-btn')?.addEventListener('click', resumeSpeech);
+        $('stop-speech-btn')?.addEventListener('click', stopSpeech);
+        $('history-select')?.addEventListener('change', e => loadHistory(e.target.value));
+        $('script-input')?.addEventListener('input', updateTokenEstimate);
+        $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
+        $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
+        $('fontsize-range')?.addEventListener('input', e => updateFontSizeVal(e.target.value));
+
+        // Edit Modal Events
+        $('edit-save-btn')?.addEventListener('click', saveEditedLine);
+        $('edit-cancel-btn')?.addEventListener('click', closeEditLineModal);
 
         $('settings-modal')?.addEventListener('click', e => {
             if (e.target === $('settings-modal')) closeSettings();
         });
+        $('edit-line-modal')?.addEventListener('click', e => {
+            if (e.target === $('edit-line-modal')) closeEditLineModal();
+        });
 
         document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeSettings();
+            if (e.key === 'Escape') {
+                closeSettings();
+                closeEditLineModal();
+            }
         });
     }
 
