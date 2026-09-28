@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>インドネシア語 シャドーイング & AIフラッシュカード</title>
+    <title>インドネシア語 シャドーイング & 文法解剖 & AIフラッシュカード</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -55,7 +55,7 @@
         }
 
         h1 {
-            font-size: 1.05rem;
+            font-size: 1.0rem;
             margin: 0;
             color: #fff;
             display: flex;
@@ -177,19 +177,20 @@
 
         .tab-container {
             display: flex;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
         }
         .tab-btn {
             flex: 1;
-            padding: 10px;
+            padding: 8px 4px;
             background: var(--card-sub-bg);
             border: none;
             border-radius: 8px;
             color: #aaa;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             font-weight: bold;
             cursor: pointer;
+            text-align: center;
         }
         .tab-btn.active { background: var(--accent-color); color: #fff; }
 
@@ -246,6 +247,42 @@
             word-break: break-word;
         }
 
+        .grammar-card {
+            background: #252528;
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 12px;
+            border-left: 4px solid #30d158;
+        }
+        .grammar-title {
+            font-size: calc(var(--font-size-id) * 0.95);
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-word;
+        }
+        .grammar-section {
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.08);
+        }
+        .grammar-section-title {
+            font-size: var(--font-size-jp);
+            color: #30d158;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+        .grammar-section-body {
+            font-size: var(--font-size-jp);
+            color: #ddd;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
         .edit-row-btn {
             position: absolute;
             top: 12px;
@@ -283,7 +320,7 @@
             border: 1px solid #444;
             border-radius: 8px;
             color: #fff;
-            font-size: 0.9rem;
+            font-size: var(--font-size-jp);
             outline: none;
         }
 
@@ -309,7 +346,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: var(--font-size-jp);
             background: transparent;
             color: #fff;
             border: 0;
@@ -354,7 +391,7 @@
         .card-front { background: linear-gradient(145deg, #232526, #414345); color: #fff; }
         .card-back { background: linear-gradient(145deg, #0d324d, #7f5a83); color: #fff; transform: rotateY(180deg); }
 
-        .card-word { font-size: 1.8rem; font-weight: bold; margin-bottom: 8px; word-break: break-word; }
+        .card-word { font-size: calc(var(--font-size-id) * 1.5); font-weight: bold; margin-bottom: 8px; word-break: break-word; }
         .tap-count-badge {
             position: absolute;
             top: 12px;
@@ -367,7 +404,7 @@
             border: 1px solid rgba(255, 204, 0, 0.3);
         }
         .card-hint { font-size: 0.75rem; color: #aaa; position: absolute; bottom: 12px; }
-        .card-meaning { font-size: 1.4rem; font-weight: 600; color: #ffd700; word-break: break-word; }
+        .card-meaning { font-size: calc(var(--font-size-id) * 1.2); font-weight: 600; color: #ffd700; word-break: break-word; }
 
         .card-controls {
             display: flex;
@@ -389,6 +426,7 @@
             font-weight: bold;
             flex: 1;
             text-align: center;
+            font-size: var(--font-size-jp);
         }
 
         .audio-controls-bar {
@@ -525,7 +563,8 @@
         <div id="player-area">
             <div class="tab-container">
                 <button class="tab-btn active" id="tab-sentence" type="button">📖 文章・対訳</button>
-                <button class="tab-btn" id="tab-word" type="button">🎴 単語フラッシュカード</button>
+                <button class="tab-btn" id="tab-grammar" type="button">🔬 文法解剖</button>
+                <button class="tab-btn" id="tab-word" type="button">🎴 フラッシュカード</button>
             </div>
 
             <div class="audio-controls-bar" id="audio-bar" style="display:none;">
@@ -612,10 +651,10 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
-            history: 'indo_shadowing_history_v21',
-            tapCounts: 'indo_shadowing_tapcounts_v11',
-            rpm: 'rpm_timestamps_v11',
-            cachePrefix: 'indo_shadowing_cache_v21_'
+            history: 'indo_shadowing_history_v25',
+            tapCounts: 'indo_shadowing_tapcounts_v13',
+            rpm: 'rpm_timestamps_v13',
+            cachePrefix: 'indo_shadowing_cache_v25_'
         };
 
         const CONFIG = {
@@ -623,10 +662,10 @@
             endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 21
+            cacheVersion: 25
         };
 
-        let parsedData = { sentences: [], vocabulary: [] };
+        let parsedData = { sentences: [], grammar: [], vocabulary: [] };
         let wordTapCounts = {};
         let currentMode = 'sentence';
         let cardIndex = 0;
@@ -810,6 +849,7 @@
         function loadHistoryData(historyItem) {
             $('script-input').value = historyItem.text;
             parsedData = historyItem.data;
+            if (!parsedData.grammar) parsedData.grammar = [];
             sortVocabulary();
             currentMode = 'sentence';
             cardIndex = 0;
@@ -879,7 +919,6 @@
             updateTokenEstimate();
         }
 
-        /* 厳格な単語キー正規化および記号除外処理 */
         function cleanWordKey(str) {
             if (!str) return '';
             return String(str)
@@ -889,7 +928,13 @@
                 .trim();
         }
 
-        /* @優先、次にピリオド(.)で文節を抽出 */
+        function cleanTokenString(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '')
+                .trim();
+        }
+
         function preprocessIndonesianText(rawText) {
             if (!rawText) return [];
             
@@ -933,7 +978,7 @@
             if (!text) return 0;
             const chars = [...text].length;
             const words = text.split(/\s+/u).filter(Boolean).length;
-            return Math.ceil(chars * 1.2) + Math.ceil(words * 12) + 250;
+            return Math.ceil(chars * 1.5) + Math.ceil(words * 15) + 400;
         }
 
         function updateTokenEstimate() {
@@ -982,21 +1027,38 @@
         function normalizeParsedData(data, preprocessedSegments) {
             const result = {
                 sentences: [],
+                grammar: [],
                 vocabulary: []
             };
             const aiSentences = Array.isArray(data?.sentences) ? data.sentences : [];
+            const aiGrammar = Array.isArray(data?.grammar) ? data.grammar : [];
 
             result.sentences = preprocessedSegments.map((indonesianText, idx) => ({
                 indonesian: indonesianText,
                 japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
             }));
 
+            result.grammar = preprocessedSegments.map((indonesianText, idx) => {
+                const g = aiGrammar[idx] || {};
+                return {
+                    indonesian: indonesianText,
+                    wordComparison1: g.wordComparison1 || '・前半の語句対比データなし',
+                    syntacticStructure1: g.syntacticStructure1 || '・前半の構文構造データなし',
+                    affixDissection1: g.affixDissection1 || '・前半の接辞解剖データなし',
+                    nuanceExplanation1: g.nuanceExplanation1 || '・前半の解説データなし',
+                    wordComparison2: g.wordComparison2 || '・後半の語句対比データなし',
+                    syntacticStructure2: g.syntacticStructure2 || '・後半の構文構造データなし',
+                    affixDissection2: g.affixDissection2 || '・後半の接辞解剖データなし',
+                    nuanceExplanation2: g.nuanceExplanation2 || '・後半の解説データなし'
+                };
+            });
+
             const rawVocab = Array.isArray(data?.vocabulary) ? data.vocabulary : [];
             const map = new Map();
             
             rawVocab.forEach(v => {
                 const rawWord = typeof v?.word === 'string' ? v.word.trim() : '';
-                const cleanWord = rawWord.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '').trim();
+                const cleanWord = cleanTokenString(rawWord);
                 const key = cleanWordKey(cleanWord);
                 const meaning = typeof v?.meaning === 'string' ? v.meaning.trim() : '';
                 
@@ -1016,10 +1078,10 @@
                 const words = sentence.indonesian.split(/\s+/u).map(w => w.trim()).filter(Boolean);
                 
                 words.forEach(rawToken => {
-                    const cleanToken = rawToken.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '').trim();
+                    const cleanToken = cleanTokenString(rawToken);
                     const key = cleanWordKey(cleanToken);
                     if (key && !/^\d+$/u.test(key) && !existing.has(key)) {
-                        existing.set(key, { word: cleanToken || rawToken, meaning: '（辞書登録なし: AI単語リスト未収録）' });
+                        existing.set(key, { word: cleanToken || rawToken, meaning: '（辞書登録なし: 単体辞書未収録）' });
                     }
                 });
             });
@@ -1090,9 +1152,15 @@
         async function analyzeWithGemini(segments, apiKey) {
             const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
             
-            const systemPrompt = 'You are a professional Indonesian-to-Japanese lexicographer.\n' +
-                'You will receive an array of Indonesian text segments (@ lines). For each segment, provide its exact, natural Japanese translation (japanese).\n' +
-                'CRITICAL FOR VOCABULARY: Extract EVERY unique Indonesian word appearing across all segments. Exclude punctuation marks, hyphens, and numbers from the words. Provide its precise, standalone dictionary meaning in Japanese (meaning) — e.g. "berpikir" -> "考える", "besar" -> "大きい", "rumah" -> "家". NEVER provide contextual sentence translations or phrase meanings for individual words. Every vocabulary item must have a proper dictionary definition.\n' +
+            const systemPrompt = 'You are a professional Indonesian-to-Japanese linguistic expert and lexicographer.\n' +
+                'You will receive an array of Indonesian text segments (each segment represents a ~25-second audio comment containing multiple clauses or syntactic structures).\n' +
+                'For each segment, since it is a long 25-second audio clip, divide it into TWO distinct structural parts/clauses and provide detailed grammar breakdown for both:\n' +
+                '1. "sentences": Exact, natural Japanese translation of the full segment (japanese).\n' +
+                '2. "grammar": Array containing objects with these exact keys for TWO clauses/structures per segment:\n' +
+                '   - wordComparison1, syntacticStructure1, affixDissection1, nuanceExplanation1 (for the first clause/structure)\n' +
+                '   - wordComparison2, syntacticStructure2, affixDissection2, nuanceExplanation2 (for the second clause/structure)\n' +
+                '   Each using the headers 【語句対比】, 【構文構造】, 【接辞解剖】, 【解説・ニュアンス】.\n' +
+                '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide its precise standalone dictionary meaning in Japanese (standalone dictionary form, NOT context-dependent meaning).\n' +
                 'Return ONLY valid JSON matching the exact schema.';
 
             const payload = {
@@ -1111,6 +1179,26 @@
                                     required: ['japanese'] 
                                 } 
                             },
+                            grammar: {
+                                type: 'ARRAY',
+                                items: {
+                                    type: 'OBJECT',
+                                    properties: {
+                                        wordComparison1: { type: 'STRING' },
+                                        syntacticStructure1: { type: 'STRING' },
+                                        affixDissection1: { type: 'STRING' },
+                                        nuanceExplanation1: { type: 'STRING' },
+                                        wordComparison2: { type: 'STRING' },
+                                        syntacticStructure2: { type: 'STRING' },
+                                        affixDissection2: { type: 'STRING' },
+                                        nuanceExplanation2: { type: 'STRING' }
+                                    },
+                                    required: [
+                                        'wordComparison1', 'syntacticStructure1', 'affixDissection1', 'nuanceExplanation1',
+                                        'wordComparison2', 'syntacticStructure2', 'affixDissection2', 'nuanceExplanation2'
+                                    ]
+                                }
+                            },
                             vocabulary: { 
                                 type: 'ARRAY', 
                                 items: { 
@@ -1120,7 +1208,7 @@
                                 } 
                             }
                         },
-                        required: ['sentences', 'vocabulary']
+                        required: ['sentences', 'grammar', 'vocabulary']
                     },
                     temperature: 0.1
                 }
@@ -1151,6 +1239,7 @@
 
         function updateTabUI() {
             $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');
+            $('tab-grammar')?.classList.toggle('active', currentMode === 'grammar');
             $('tab-word')?.classList.toggle('active', currentMode === 'word');
         }
 
@@ -1160,6 +1249,7 @@
             $('audio-bar').style.display = mode === 'sentence' ? 'flex' : 'none';
             updateTabUI();
             if (mode === 'sentence') renderSentenceList();
+            else if (mode === 'grammar') renderGrammarList();
             else { sortVocabulary(); cardIndex = 0; renderFlashcard(); }
         }
 
@@ -1183,10 +1273,11 @@
                 idText.className = 'id-text';
                 item.indonesian.split(/\s+/u).filter(Boolean).forEach((rawWord, wIdx) => {
                     if (wIdx > 0) idText.appendChild(document.createTextNode(' '));
+                    const cleanW = cleanTokenString(rawWord);
                     const span = document.createElement('span');
                     span.className = 'word-token';
                     span.textContent = rawWord;
-                    span.addEventListener('click', event => onWordClick(event, index, wIdx, rawWord));
+                    span.addEventListener('click', event => onWordClick(event, index, wIdx, cleanW));
                     idText.appendChild(span);
                 });
 
@@ -1200,6 +1291,68 @@
                     playText(item.indonesian, index);
                 });
                 container.appendChild(div);
+            });
+        }
+
+        function renderGrammarList() {
+            const container = $('content-area');
+            if (!container) return;
+            container.textContent = '';
+
+            const grammarArray = parsedData.grammar || [];
+            if (!grammarArray.length) {
+                container.innerHTML = '<div style="text-align:center;color:#888;padding:30px;">文法解剖データがありません。</div>';
+                return;
+            }
+
+            grammarArray.forEach((gItem, index) => {
+                const card = document.createElement('div');
+                card.className = 'grammar-card';
+
+                const title = document.createElement('div');
+                title.className = 'grammar-title';
+                title.innerHTML = '<span>文節 ' + (index + 1) + ': ' + (gItem.indonesian || '') + '</span>' +
+                    '<button type="button" class="icon-btn" style="padding:4px 8px;font-size:0.75rem;" onclick="playText(\'' + (gItem.indonesian || '').replace(/'/g, "\\'") + '\')">🔊 聴く</button>';
+
+                card.appendChild(title);
+
+                const parts = [
+                    {
+                        subtitle: '📌 構文パート ①',
+                        sections: [
+                            { title: '【語句対比】 (Word-by-word comparison)', content: gItem.wordComparison1 },
+                            { title: '【構文構造】 (Syntactic structure)', content: gItem.syntacticStructure1 },
+                            { title: '【接辞解剖】 (Affix dissection)', content: gItem.affixDissection1 },
+                            { title: '【解説・ニュアンス】 (Nuance and explanation)', content: gItem.nuanceExplanation1 }
+                        ]
+                    },
+                    {
+                        subtitle: '📌 構文パート ②',
+                        sections: [
+                            { title: '【語句対比】 (Word-by-word comparison)', content: gItem.wordComparison2 },
+                            { title: '【構文構造】 (Syntactic structure)', content: gItem.syntacticStructure2 },
+                            { title: '【接辞解剖】 (Affix dissection)', content: gItem.affixDissection2 },
+                            { title: '【解説・ニュアンス】 (Nuance and explanation)', content: gItem.nuanceExplanation2 }
+                        ]
+                    }
+                ];
+
+                parts.forEach(part => {
+                    const subHeader = document.createElement('div');
+                    subHeader.style.cssText = 'font-size:calc(var(--font-size-jp) * 1.05);font-weight:bold;color:#30d158;margin-top:10px;margin-bottom:4px;border-bottom:1px dashed rgba(48,209,88,0.3);padding-bottom:2px;';
+                    subHeader.textContent = part.subtitle;
+                    card.appendChild(subHeader);
+
+                    part.sections.forEach(sec => {
+                        const sDiv = document.createElement('div');
+                        sDiv.className = 'grammar-section';
+                        sDiv.innerHTML = '<div class="grammar-section-title">' + sec.title + '</div>' +
+                            '<div class="grammar-section-body">' + sec.content + '</div>';
+                        card.appendChild(sDiv);
+                    });
+                });
+
+                container.appendChild(card);
             });
         }
 
@@ -1223,6 +1376,8 @@
 
             parsedData.sentences[idx].indonesian = newIndonesian;
             parsedData.sentences[idx].japanese = newJapanese;
+            if (parsedData.grammar[idx]) parsedData.grammar[idx].indonesian = newIndonesian;
+
             ensureAllWordsExtracted(parsedData.sentences.map(s => s.indonesian), parsedData);
             setCachedResult($('script-input').value, parsedData);
             saveToHistory($('script-input').value, parsedData);
@@ -1246,7 +1401,7 @@
             window.speechSynthesis.speak(utterance);
         }
 
-        function onWordClick(event, lineIndex, wordIndex, clickedWord) {
+        function onWordClick(event, lineIndex, wordIndex, cleanToken) {
             event.stopPropagation();
             document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.word-token').forEach(el => el.classList.remove('highlighted'));
@@ -1256,7 +1411,6 @@
             targetDiv?.classList.add('active');
             tokens[wordIndex]?.classList.add('highlighted');
 
-            const cleanToken = clickedWord.replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '');
             const key = cleanWordKey(cleanToken);
             if (key) {
                 wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
@@ -1309,7 +1463,7 @@
 
             const counter = document.createElement('div');
             counter.id = 'card-counter';
-            counter.style.cssText = 'font-size:0.85rem;color:#aaa;';
+            counter.style.cssText = 'font-size:var(--font-size-jp);color:#aaa;';
 
             const perspective = document.createElement('div');
             perspective.className = 'perspective-box';
@@ -1332,7 +1486,7 @@
             back.innerHTML = '<div style="font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;">裏：単語の基本意味</div>' +
                 '<div class="tap-count-badge" id="back-tap-badge"></div>' +
                 '<div class="card-meaning" id="back-card-meaning"></div>' +
-                '<div id="back-card-word-sub" style="font-size:0.9rem;color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;"></div>';
+                '<div id="back-card-word-sub" style="font-size:var(--font-size-jp);color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;"></div>';
 
             flashcard.append(front, back);
             perspective.appendChild(flashcard);
@@ -1383,7 +1537,7 @@
                 if (!q) { results.style.display = 'none'; currentFilteredVocab = parsedData.vocabulary; updateCardDisplay(); return; }
                 const matches = parsedData.vocabulary.filter(v => v.word.toLowerCase().includes(q) || (v.meaning && v.meaning.toLowerCase().includes(q)));
                 results.textContent = '';
-                if (!matches.length) { results.innerHTML = '<div style="padding:10px;color:#888;font-size:0.85rem;">該当なし</div>'; results.style.display = 'block'; return; }
+                if (!matches.length) { results.innerHTML = '<div style="padding:10px;color:#888;font-size:var(--font-size-jp);">該当なし</div>'; results.style.display = 'block'; return; }
                 matches.forEach(item => {
                     const row = document.createElement('button');
                     row.className = 'search-result-item';
@@ -1448,6 +1602,7 @@
             $('history-close-btn')?.addEventListener('click', closeHistoryModal);
             $('analyze-btn')?.addEventListener('click', startApp);
             $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
+            $('tab-grammar')?.addEventListener('click', () => switchMode('grammar'));
             $('tab-word')?.addEventListener('click', () => switchMode('word'));
             $('pause-speech-btn')?.addEventListener('click', pauseSpeech);
             $('resume-speech-btn')?.addEventListener('click', resumeSpeech);
