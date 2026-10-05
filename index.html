@@ -224,7 +224,7 @@
             color: #ffffff;
             line-height: 1.6;
             word-break: break-word;
-            padding-right: 50px;
+            padding-right: 70px;
         }
 
         .word-token {
@@ -283,10 +283,15 @@
             word-break: break-word;
         }
 
-        .edit-row-btn {
+        .row-action-btns {
             position: absolute;
             top: 12px;
             right: 12px;
+            display: flex;
+            gap: 4px;
+        }
+
+        .edit-row-btn, .audio-gen-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #ccc;
@@ -295,6 +300,7 @@
             font-size: 0.75rem;
             cursor: pointer;
         }
+        .audio-gen-btn.cached { background: #1b5e20; color: #81c784; border-color: #2e7d32; }
 
         .flashcard-wrapper {
             display: flex;
@@ -651,18 +657,20 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
-            history: 'indo_shadowing_history_v25',
+            history: 'indo_shadowing_history_v26',
             tapCounts: 'indo_shadowing_tapcounts_v13',
             rpm: 'rpm_timestamps_v13',
-            cachePrefix: 'indo_shadowing_cache_v25_'
+            cachePrefix: 'indo_shadowing_cache_v26_',
+            ttsCachePrefix: 'indo_shadowing_ttscache_v26_'
         };
 
         const CONFIG = {
             model: 'gemini-3.5-flash-lite',
+            ttsModel: 'gemini-3.8-flash', // Gemini 3.8 Flash TTS preset voice configuration
             endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 25
+            cacheVersion: 26
         };
 
         let parsedData = { sentences: [], grammar: [], vocabulary: [] };
@@ -672,6 +680,7 @@
         let searchDebounceTimer = null;
         let currentFilteredVocab = [];
         let rpmTimestamps = [];
+        let activeAudioElement = null;
 
         const fontSizes = [
             { label: '小', id: 0.9, jp: 0.75 },
@@ -871,6 +880,7 @@
         }
 
         function cacheKeyFor(text) { return STORAGE.cachePrefix + hashCode(text); }
+        function ttsCacheKeyFor(text) { return STORAGE.ttsCachePrefix + hashCode(text); }
 
         function getCachedResult(text) {
             try {
@@ -886,6 +896,20 @@
             try {
                 localStorage.setItem(cacheKeyFor(text), JSON.stringify({ version: CONFIG.cacheVersion, data }));
             } catch (_) {}
+        }
+
+        function getCachedAudio(text) {
+            try {
+                return localStorage.getItem(ttsCacheKeyFor(text));
+            } catch (_) { return null; }
+        }
+
+        function setCachedAudio(text, base64Audio) {
+            try {
+                localStorage.setItem(ttsCacheKeyFor(text), base64Audio);
+            } catch (_) {
+                showToast('音声キャッシュ容量が上限に達した可能性があります');
+            }
         }
 
         function loadPersistentState() {
@@ -972,6 +996,7 @@
             if ($('speed-val-player')) $('speed-val-player').textContent = numVal;
             if ($('speed-range') && $('speed-range').value !== String(val)) $('speed-range').value = String(val);
             if ($('speed-range-player') && $('speed-range-player').value !== String(val)) $('speed-range-player').value = String(val);
+            if (activeAudioElement) activeAudioElement.playbackRate = getSpeechRate();
         }
 
         function estimateTokens(text) {
@@ -1227,6 +1252,87 @@
             return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
         }
 
+        // Gemini 3.8 Flash TTS Preset Voice Integration function
+        async function fetchGeminiTTSAudio(text, btnElement) {
+            const apiKey = getApiKey();
+            if (!apiKey) {
+                showToast('音声合成にはAPIキーが必要です。設定画面から入力してください。');
+                openSettings();
+                return null;
+            }
+
+            // Check cache first
+            const cachedBase64 = getCachedAudio(text);
+            if (cachedBase64) {
+                return cachedBase64;
+            }
+
+            if (btnElement) {
+                btnElement.textContent = '⏳ 生成中...';
+                btnElement.disabled = true;
+            }
+
+            try {
+                // Using Gemini 3.8 Flash with TTS preset voice configuration (Indonesian - Male, Narration style)
+                const apiUrl = CONFIG.endpoint + CONFIG.ttsModel + ':generateContent';
+                const prompt = 'Read the following Indonesian text clearly and naturally as an educational native speaker for shadowing practice.\n' +
+                    '- Maintain standard Indonesian pronunciation (Bahasa Indonesia Baku).\n' +
+                    '- Keep a steady, clear pace without slurring.\n' +
+                    '- Pause slightly at commas and periods to allow proper breathing space.\n' +
+                    '- Style Preset: Narration. Voice: Indonesian - Male (Standard / Neutral).\n\n' +
+                    'Text to read: "' + text + '"';
+
+                const payload = {
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: {
+                        responseModalities: ["AUDIO"],
+                        speechConfig: {
+                            voiceConfig: {
+                                prebuiltVoiceConfig: {
+                                    voiceName: "id-ID-Standard-B" // Indonesian Male Standard/Neutral Narration preset
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const res = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    // Fallback to Web Speech API if multimodal audio generation is restricted on current endpoint key
+                    console.warn('TTS API error or not supported on this model tier, falling back to Web Speech API.', data?.error?.message);
+                    return null;
+                }
+
+                // Extract inline audio data if returned by Gemini TTS
+                const candidate = data?.candidates?.[0];
+                const part = candidate?.content?.parts?.[0];
+                const audioData = part?.inlineData?.data || part?.audioData?.data;
+
+                if (audioData) {
+                    setCachedAudio(text, audioData);
+                    return audioData;
+                }
+
+                return null;
+            } catch (err) {
+                console.warn('Gemini TTS fetch failed, using fallback speech.', err);
+                return null;
+            } finally {
+                if (btnElement) {
+                    const isCached = !!getCachedAudio(text);
+                    btnElement.textContent = isCached ? '🔊 再生 (キャッシュ)' : '🎙️ 音声生成';
+                    btnElement.disabled = false;
+                    if (isCached) btnElement.classList.add('cached');
+                }
+            }
+        }
+
         function sortVocabulary() {
             if (!parsedData?.vocabulary) return;
             parsedData.vocabulary.sort((a, b) => {
@@ -1263,11 +1369,26 @@
                 div.className = 'line-item';
                 div.id = 'line-' + index;
 
+                const actionBtns = document.createElement('div');
+                actionBtns.className = 'row-action-btns';
+
+                const isCached = !!getCachedAudio(item.indonesian);
+                const audioGenBtn = document.createElement('button');
+                audioGenBtn.type = 'button';
+                audioGenBtn.className = 'audio-gen-btn' + (isCached ? ' cached' : '');
+                audioGenBtn.textContent = isCached ? '🔊 再生 (キャッシュ)' : '🎙️ 音声生成';
+                audioGenBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    await playOrGenerateSentenceAudio(item.indonesian, index, audioGenBtn);
+                });
+
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'edit-row-btn';
                 editBtn.textContent = '✏️ 編集';
                 editBtn.addEventListener('click', (e) => { e.stopPropagation(); openEditLineModal(index); });
+
+                actionBtns.append(audioGenBtn, editBtn);
 
                 const idText = document.createElement('div');
                 idText.className = 'id-text';
@@ -1285,13 +1406,67 @@
                 jpText.className = 'jp-text';
                 jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-                div.append(editBtn, idText, jpText);
-                div.addEventListener('click', event => {
-                    if (event.target.closest('.word-token, .edit-row-btn')) return;
-                    playText(item.indonesian, index);
+                div.append(actionBtns, idText, jpText);
+                div.addEventListener('click', async event => {
+                    if (event.target.closest('.word-token, .edit-row-btn, .audio-gen-btn')) return;
+                    await playOrGenerateSentenceAudio(item.indonesian, index, audioGenBtn);
                 });
                 container.appendChild(div);
             });
+        }
+
+        async function playOrGenerateSentenceAudio(text, index, btnEl) {
+            document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+            const targetDiv = $('line-' + index);
+            if (targetDiv) {
+                targetDiv.classList.add('active');
+                targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+
+            stopSpeech();
+
+            // Try Gemini TTS audio cache first
+            let base64Audio = getCachedAudio(text);
+            if (!base64Audio) {
+                base64Audio = await fetchGeminiTTSAudio(text, btnEl);
+            }
+
+            if (base64Audio) {
+                try {
+                    const audioBlob = base64ToBlob(base64Audio, 'audio/mp3');
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    activeAudioElement = audio;
+                    audio.playbackRate = getSpeechRate();
+                    audio.onended = () => {
+                        if (targetDiv) targetDiv.classList.remove('active');
+                    };
+                    await audio.play();
+                    if (btnEl) {
+                        btnEl.textContent = '🔊 再生 (キャッシュ)';
+                        btnEl.classList.add('cached');
+                        btnEl.disabled = false;
+                    }
+                    return;
+                } catch (e) {
+                    console.warn('Audio playback error, falling back to Web Speech API', e);
+                }
+            }
+
+            // Fallback to Web Speech API with Indonesian voice
+            speak(text, () => {
+                if (targetDiv) targetDiv.classList.remove('active');
+            });
+        }
+
+        function base64ToBlob(base64, mime) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mime });
         }
 
         function renderGrammarList() {
@@ -1430,9 +1605,18 @@
             speak(text);
         }
 
-        function pauseSpeech() { if (window.speechSynthesis.speaking) window.speechSynthesis.pause(); }
-        function resumeSpeech() { if (window.speechSynthesis.paused) window.speechSynthesis.resume(); }
-        function stopSpeech() { window.speechSynthesis.cancel(); }
+        function pauseSpeech() {
+            if (activeAudioElement) activeAudioElement.pause();
+            if (window.speechSynthesis.speaking) window.speechSynthesis.pause();
+        }
+        function resumeSpeech() {
+            if (activeAudioElement) activeAudioElement.play();
+            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        }
+        function stopSpeech() {
+            if (activeAudioElement) { activeAudioElement.pause(); activeAudioElement = null; }
+            window.speechSynthesis.cancel();
+        }
 
         function renderFlashcard() {
             const container = $('content-area');
