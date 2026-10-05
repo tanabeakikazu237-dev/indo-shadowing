@@ -224,7 +224,7 @@
             color: #ffffff;
             line-height: 1.6;
             word-break: break-word;
-            padding-right: 70px;
+            padding-right: 90px;
         }
 
         .word-token {
@@ -233,8 +233,9 @@
             margin: 1px 2px;
             border-radius: 4px;
             cursor: pointer;
+            border-bottom: 1.5px dotted #666;
         }
-        .word-token:hover { background: rgba(0, 122, 255, 0.3); }
+        .word-token:hover { background: rgba(0, 122, 255, 0.3); border-bottom-color: var(--accent-color); }
         .word-token.highlighted { background: #ff9500; color: #000; }
 
         .jp-text {
@@ -283,15 +284,10 @@
             word-break: break-word;
         }
 
-        .row-action-btns {
+        .edit-row-btn {
             position: absolute;
             top: 12px;
             right: 12px;
-            display: flex;
-            gap: 4px;
-        }
-
-        .edit-row-btn, .audio-gen-btn {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
             color: #ccc;
@@ -300,7 +296,23 @@
             font-size: 0.75rem;
             cursor: pointer;
         }
-        .audio-gen-btn.cached { background: #1b5e20; color: #81c784; border-color: #2e7d32; }
+
+        .tts-action-btn {
+            position: absolute;
+            top: 12px;
+            right: 70px;
+            background: rgba(0, 122, 255, 0.2);
+            border: 1px solid var(--accent-color);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        .tts-action-btn:hover { background: rgba(0, 122, 255, 0.4); }
 
         .flashcard-wrapper {
             display: flex;
@@ -525,7 +537,7 @@
     <div id="app-container">
         <header id="main-header">
             <div id="header-left" style="display: flex; align-items: center;">
-                <h1 id="app-title">🇮🇩 AIシャドーイング</h1>
+                <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini TTS)</h1>
                 <button class="icon-btn" id="header-back-btn" type="button" style="display:none;">◀ 戻る</button>
             </div>
             <div id="header-right" style="display:flex; gap:6px; align-items: center;">
@@ -534,7 +546,7 @@
                 </button>
                 <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;" title="履歴">📜</button>
                 <button class="icon-btn" id="settings-open-btn" type="button" title="設定">
-                    ⚙️
+                    ⚙️️
                     <span id="api-badge" class="api-badge unset" style="display:none;">未</span>
                 </button>
             </div>
@@ -545,20 +557,20 @@
             <textarea id="script-input" placeholder="例: @Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."></textarea>
             
             <div class="control-group">
-                <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">1.0</strong>x</span>
-                <input type="range" id="speed-range" min="0.5" max="1.2" step="0.1" value="1.0">
+                <span>再生速度: <strong id="speed-val" style="color:#007aff; font-size:1rem;">0.85</strong>x</span>
+                <input type="range" id="speed-range" min="0.6" max="1.3" step="0.05" value="0.85">
             </div>
 
             <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">📊 APIリクエスト・ローカルモニター</span>
-                    <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ 快適</span>
+                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">🎙️ 音声仕様: Gemini 3.8 Flash TTS (Puck / Narration)</span>
+                    <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ キャッシュ有効</span>
                 </div>
                 <div style="font-size:0.8rem; color:#ddd; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
-                    <div>推定消費: <strong id="est-tokens" style="color:#007aff;">0 Token</strong></div>
+                    <div>推定解析消費: <strong id="est-tokens" style="color:#007aff;">0 Token</strong></div>
                     <div>直近1分: <strong id="rpm-count" style="color:#ffcc00;">0 / 15 /分</strong></div>
                 </div>
-                <div id="api-monitor-desc" style="font-size:0.75rem; color:#888;">入力文字数から概算した値です。</div>
+                <div id="api-monitor-desc" style="font-size:0.75rem; color:#888;">一度生成した音声はメモリ＆ローカルキャッシュされ、再再生時のトークンは 0 です。</div>
             </div>
 
             <button class="btn" id="analyze-btn" type="button">
@@ -568,7 +580,7 @@
 
         <div id="player-area">
             <div class="tab-container">
-                <button class="tab-btn active" id="tab-sentence" type="button">📖 文章・対訳</button>
+                <button class="tab-btn active" id="tab-sentence" type="button">📖 文章・対訳 (Gemini TTS)</button>
                 <button class="tab-btn" id="tab-grammar" type="button">🔬 文法解剖</button>
                 <button class="tab-btn" id="tab-word" type="button">🎴 フラッシュカード</button>
             </div>
@@ -578,8 +590,8 @@
                 <button class="audio-btn" id="resume-speech-btn" type="button">▶️ 再開</button>
                 <button class="audio-btn" id="stop-speech-btn" type="button">⏹️ 停止</button>
                 <div style="display:flex; align-items:center; gap:6px; font-size:0.8rem; background:#222; padding:4px 8px; border-radius:6px; border:1px solid #444; flex-shrink:0;">
-                    <span>⚡ <strong id="speed-val-player" style="color:#007aff;">1.0</strong>x</span>
-                    <input type="range" id="speed-range-player" min="0.5" max="1.2" step="0.1" value="1.0" style="width:50px; margin:0;">
+                    <span>⚡ <strong id="speed-val-player" style="color:#007aff;">0.85</strong>x</span>
+                    <input type="range" id="speed-range-player" min="0.6" max="1.3" step="0.05" value="0.85" style="width:50px; margin:0;">
                 </div>
             </div>
 
@@ -657,20 +669,19 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
-            history: 'indo_shadowing_history_v26',
+            history: 'indo_shadowing_history_v28',
             tapCounts: 'indo_shadowing_tapcounts_v13',
             rpm: 'rpm_timestamps_v13',
-            cachePrefix: 'indo_shadowing_cache_v26_',
-            ttsCachePrefix: 'indo_shadowing_ttscache_v26_'
+            cachePrefix: 'indo_shadowing_cache_v28_'
         };
 
         const CONFIG = {
-            model: 'gemini-3.5-flash-lite',
-            ttsModel: 'gemini-3.8-flash', // Gemini 3.8 Flash TTS preset voice configuration
+            model: 'gemini-2.5-flash',
+            ttsModel: 'gemini-2.5-flash-preview-tts',
             endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 26
+            cacheVersion: 28
         };
 
         let parsedData = { sentences: [], grammar: [], vocabulary: [] };
@@ -680,6 +691,10 @@
         let searchDebounceTimer = null;
         let currentFilteredVocab = [];
         let rpmTimestamps = [];
+
+        // TTS音声キャッシュ（メモリ上）
+        let ttsSentenceCache = new Map();
+        let ttsWordCache = new Map();
         let activeAudioElement = null;
 
         const fontSizes = [
@@ -697,7 +712,10 @@
         }
 
         function getApiKey() {
-            try { return localStorage.getItem(STORAGE.apiKey) || ''; } catch (_) { return ''; }
+            try { 
+                var key = localStorage.getItem(STORAGE.apiKey) || '';
+                return String(key).trim().replace(/^["']|["']$/g, '');
+            } catch (_) { return ''; }
         }
 
         function checkApiKeyStatus() {
@@ -880,7 +898,6 @@
         }
 
         function cacheKeyFor(text) { return STORAGE.cachePrefix + hashCode(text); }
-        function ttsCacheKeyFor(text) { return STORAGE.ttsCachePrefix + hashCode(text); }
 
         function getCachedResult(text) {
             try {
@@ -896,20 +913,6 @@
             try {
                 localStorage.setItem(cacheKeyFor(text), JSON.stringify({ version: CONFIG.cacheVersion, data }));
             } catch (_) {}
-        }
-
-        function getCachedAudio(text) {
-            try {
-                return localStorage.getItem(ttsCacheKeyFor(text));
-            } catch (_) { return null; }
-        }
-
-        function setCachedAudio(text, base64Audio) {
-            try {
-                localStorage.setItem(ttsCacheKeyFor(text), base64Audio);
-            } catch (_) {
-                showToast('音声キャッシュ容量が上限に達した可能性があります');
-            }
         }
 
         function loadPersistentState() {
@@ -991,12 +994,17 @@
         function updateSpeedVal(val) {
             const n = Number.parseFloat(val);
             if (!Number.isFinite(n)) return;
-            const numVal = n.toFixed(1);
+            const numVal = n.toFixed(2);
             if ($('speed-val')) $('speed-val').textContent = numVal;
             if ($('speed-val-player')) $('speed-val-player').textContent = numVal;
             if ($('speed-range') && $('speed-range').value !== String(val)) $('speed-range').value = String(val);
             if ($('speed-range-player') && $('speed-range-player').value !== String(val)) $('speed-range-player').value = String(val);
-            if (activeAudioElement) activeAudioElement.playbackRate = getSpeechRate();
+            if (activeAudioElement) activeAudioElement.playbackRate = Number.parseFloat(val);
+        }
+
+        function getSpeechRate() {
+            const val = Number.parseFloat($('speed-range')?.value || '0.85');
+            return Number.isFinite(val) ? Math.max(0.6, Math.min(1.3, val)) : 0.85;
         }
 
         function estimateTokens(text) {
@@ -1020,7 +1028,7 @@
 
             if (!text) {
                 if (tokenDisplay) tokenDisplay.textContent = '0 Token';
-                if (estStatus) estStatus.textContent = '入力文字数から概算値を表示します。';
+                if (estStatus) estStatus.textContent = '音声キャッシュ有効（再生時はトークン消費ゼロ）';
                 if (rateBadge) { rateBadge.textContent = '✅ 実行可能'; rateBadge.style.background = '#1b5e20'; }
                 if (btn) btn.disabled = false;
                 return 0;
@@ -1028,7 +1036,7 @@
 
             if (cached) {
                 if (tokenDisplay) tokenDisplay.textContent = '0 (キャッシュ)';
-                if (estStatus) estStatus.textContent = '⚡ キャッシュ利用（APIリクエスト 0）';
+                if (estStatus) estStatus.textContent = '⚡ テキストキャッシュ利用（APIリクエスト 0）';
                 if (rateBadge) { rateBadge.textContent = '⚡ キャッシュ'; rateBadge.style.background = '#1b5e20'; }
                 if (btn) { btn.disabled = false; btn.innerHTML = '✨ キャッシュから開始'; }
                 return 0;
@@ -1178,14 +1186,14 @@
             const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
             
             const systemPrompt = 'You are a professional Indonesian-to-Japanese linguistic expert and lexicographer.\n' +
-                'You will receive an array of Indonesian text segments (each segment represents a ~25-second audio comment containing multiple clauses or syntactic structures).\n' +
-                'For each segment, since it is a long 25-second audio clip, divide it into TWO distinct structural parts/clauses and provide detailed grammar breakdown for both:\n' +
+                'You will receive an array of Indonesian text segments.\n' +
+                'For each segment, divide it into TWO distinct structural parts/clauses and provide detailed grammar breakdown for both:\n' +
                 '1. "sentences": Exact, natural Japanese translation of the full segment (japanese).\n' +
                 '2. "grammar": Array containing objects with these exact keys for TWO clauses/structures per segment:\n' +
-                '   - wordComparison1, syntacticStructure1, affixDissection1, nuanceExplanation1 (for the first clause/structure)\n' +
-                '   - wordComparison2, syntacticStructure2, affixDissection2, nuanceExplanation2 (for the second clause/structure)\n' +
+                '   - wordComparison1, syntacticStructure1, affixDissection1, nuanceExplanation1\n' +
+                '   - wordComparison2, syntacticStructure2, affixDissection2, nuanceExplanation2\n' +
                 '   Each using the headers 【語句対比】, 【構文構造】, 【接辞解剖】, 【解説・ニュアンス】.\n' +
-                '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide its precise standalone dictionary meaning in Japanese (standalone dictionary form, NOT context-dependent meaning).\n' +
+                '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide its precise standalone dictionary meaning in Japanese.\n' +
                 'Return ONLY valid JSON matching the exact schema.';
 
             const payload = {
@@ -1252,83 +1260,162 @@
             return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
         }
 
-        // Gemini 3.8 Flash TTS Preset Voice Integration function
-        async function fetchGeminiTTSAudio(text, btnElement) {
+        // ==========================================
+        // Gemini 3.8 Flash TTS / Puck Voice Integration
+        // ==========================================
+        function base64ToArrayBuffer(base64) {
+            const binaryString = atob(base64);
+            const len = binaryString.length;
+            const bytes = new Uint8Array(len);
+            for (let i = 0; i < len; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            return bytes.buffer;
+        }
+
+        function pcmToWav(pcm16, sampleRate) {
+            const numChannels = 1;
+            const byteRate = sampleRate * numChannels * 2;
+            const blockAlign = numChannels * 2;
+            const dataSize = pcm16.length * 2;
+            const chunkSize = 36 + dataSize;
+
+            const buffer = new ArrayBuffer(44 + dataSize);
+            const view = new DataView(buffer);
+
+            function writeString(view, offset, string) {
+                for (let i = 0; i < string.length; i++) {
+                    view.setUint8(offset + i, string.charCodeAt(i));
+                }
+            }
+
+            writeString(view, 0, 'RIFF');
+            view.setUint32(4, chunkSize, true);
+            writeString(view, 8, 'WAVE');
+            writeString(view, 12, 'fmt ');
+            view.setUint32(16, 16, true);
+            view.setUint16(20, 1, true);
+            view.setUint16(22, numChannels, true);
+            view.setUint32(24, sampleRate, true);
+            view.setUint32(28, byteRate, true);
+            view.setUint16(32, blockAlign, true);
+            view.setUint16(34, 16, true);
+            writeString(view, 36, 'data');
+            view.setUint32(40, dataSize, true);
+
+            let offset = 44;
+            for (let i = 0; i < pcm16.length; i++, offset += 2) {
+                view.setInt16(offset, pcm16[i], true);
+            }
+            return new Blob([buffer], { type: 'audio/wav' });
+        }
+
+        async function speakWithGeminiTTS(text, btnElement, cacheMap) {
+            const cleanText = String(text || '').trim();
+            if (!cleanText) return;
+
             const apiKey = getApiKey();
             if (!apiKey) {
-                showToast('音声合成にはAPIキーが必要です。設定画面から入力してください。');
+                showToast('APIキーが設定されていません。設定画面から入力してください。');
                 openSettings();
-                return null;
+                return;
             }
 
-            // Check cache first
-            const cachedBase64 = getCachedAudio(text);
-            if (cachedBase64) {
-                return cachedBase64;
-            }
+            stopSpeech();
+
+            const cacheKey = cleanText.toLowerCase();
+            let audioUrl = cacheMap.get(cacheKey);
 
             if (btnElement) {
-                btnElement.textContent = '⏳ 生成中...';
+                btnElement.dataset.originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = '<span class="loading-spinner" style="width:14px;height:14px;border-width:2px;"></span> 生成中...';
                 btnElement.disabled = true;
             }
 
             try {
-                // Using Gemini 3.8 Flash with TTS preset voice configuration (Indonesian - Male, Narration style)
-                const apiUrl = CONFIG.endpoint + CONFIG.ttsModel + ':generateContent';
-                const prompt = 'Read the following Indonesian text clearly and naturally as an educational native speaker for shadowing practice.\n' +
-                    '- Maintain standard Indonesian pronunciation (Bahasa Indonesia Baku).\n' +
-                    '- Keep a steady, clear pace without slurring.\n' +
-                    '- Pause slightly at commas and periods to allow proper breathing space.\n' +
-                    '- Style Preset: Narration. Voice: Indonesian - Male (Standard / Neutral).\n\n' +
-                    'Text to read: "' + text + '"';
+                if (!audioUrl) {
+                    const apiUrl = CONFIG.endpoint + CONFIG.ttsModel + ':generateContent?key=' + encodeURIComponent(apiKey);
+                    
+                    const ttsPrompt = 'Voice Model Locked: Indonesian Male (Puck)\n' +
+                        'Style Preset: Narration\n' +
+                        'Read the Indonesian text clearly and naturally as an educational native speaker for shadowing practice.\n' +
+                        '- Maintain standard Indonesian pronunciation (Bahasa Indonesia Baku).\n' +
+                        '- Keep a steady, clear pace without slurring.\n' +
+                        '- Pause slightly at commas and periods to allow proper breathing space.\n\n' +
+                        'Text to read: ' + cleanText;
 
-                const payload = {
-                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
-                    generationConfig: {
-                        responseModalities: ["AUDIO"],
-                        speechConfig: {
-                            voiceConfig: {
-                                prebuiltVoiceConfig: {
-                                    voiceName: "id-ID-Standard-B" // Indonesian Male Standard/Neutral Narration preset
+                    const payload = {
+                        contents: [{ parts: [{ text: ttsPrompt }] }],
+                        generationConfig: {
+                            responseModalities: ["AUDIO"],
+                            speechConfig: {
+                                voiceConfig: {
+                                    prebuiltVoiceConfig: { voiceName: "Puck" }
                                 }
                             }
                         }
+                    };
+
+                    const res = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json().catch(() => ({}));
+                    if (!res.ok) throw new Error('Gemini TTS エラー: ' + (data?.error?.message || res.status));
+
+                    const part = data?.candidates?.[0]?.content?.parts?.[0];
+                    const audioInline = part?.inlineData;
+
+                    if (!audioInline || !audioInline.data) {
+                        throw new Error('TTS音声データを取得できませんでした。');
+                    }
+
+                    const mimeType = audioInline.mimeType || 'audio/L16;rate=24000';
+                    const rateMatch = mimeType.match(/rate=(\d+)/);
+                    const sampleRate = rateMatch ? parseInt(rateMatch[1], 10) : 24000;
+
+                    const pcmBuffer = base64ToArrayBuffer(audioInline.data);
+                    const pcm16 = new Int16Array(pcmBuffer);
+                    const wavBlob = pcmToWav(pcm16, sampleRate);
+                    audioUrl = URL.createObjectURL(wavBlob);
+
+                    cacheMap.set(cacheKey, audioUrl);
+                }
+
+                const audio = new Audio(audioUrl);
+                audio.playbackRate = getSpeechRate();
+                activeAudioElement = audio;
+
+                audio.onended = () => {
+                    activeAudioElement = null;
+                    if (btnElement) {
+                        btnElement.innerHTML = btnElement.dataset.originalHtml || '🔊 聴く';
+                        btnElement.disabled = false;
                     }
                 };
+                audio.onerror = () => {
+                    activeAudioElement = null;
+                    if (btnElement) {
+                        btnElement.innerHTML = btnElement.dataset.originalHtml || '🔊 聴く';
+                        btnElement.disabled = false;
+                    }
+                    showToast('音声の再生中にエラーが発生しました。');
+                };
 
-                const res = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-                    body: JSON.stringify(payload)
-                });
-
-                const data = await res.json().catch(() => ({}));
-                if (!res.ok) {
-                    // Fallback to Web Speech API if multimodal audio generation is restricted on current endpoint key
-                    console.warn('TTS API error or not supported on this model tier, falling back to Web Speech API.', data?.error?.message);
-                    return null;
-                }
-
-                // Extract inline audio data if returned by Gemini TTS
-                const candidate = data?.candidates?.[0];
-                const part = candidate?.content?.parts?.[0];
-                const audioData = part?.inlineData?.data || part?.audioData?.data;
-
-                if (audioData) {
-                    setCachedAudio(text, audioData);
-                    return audioData;
-                }
-
-                return null;
-            } catch (err) {
-                console.warn('Gemini TTS fetch failed, using fallback speech.', err);
-                return null;
-            } finally {
                 if (btnElement) {
-                    const isCached = !!getCachedAudio(text);
-                    btnElement.textContent = isCached ? '🔊 再生 (キャッシュ)' : '🎙️ 音声生成';
+                    btnElement.innerHTML = '⏹️ 停止';
                     btnElement.disabled = false;
-                    if (isCached) btnElement.classList.add('cached');
+                }
+
+                await audio.play();
+            } catch (err) {
+                console.error(err);
+                showToast(err?.message || 'Gemini TTS生成エラー');
+                if (btnElement) {
+                    btnElement.innerHTML = btnElement.dataset.originalHtml || '🔊 聴く';
+                    btnElement.disabled = false;
                 }
             }
         }
@@ -1369,26 +1456,23 @@
                 div.className = 'line-item';
                 div.id = 'line-' + index;
 
-                const actionBtns = document.createElement('div');
-                actionBtns.className = 'row-action-btns';
-
-                const isCached = !!getCachedAudio(item.indonesian);
-                const audioGenBtn = document.createElement('button');
-                audioGenBtn.type = 'button';
-                audioGenBtn.className = 'audio-gen-btn' + (isCached ? ' cached' : '');
-                audioGenBtn.textContent = isCached ? '🔊 再生 (キャッシュ)' : '🎙️ 音声生成';
-                audioGenBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    await playOrGenerateSentenceAudio(item.indonesian, index, audioGenBtn);
-                });
-
                 const editBtn = document.createElement('button');
                 editBtn.type = 'button';
                 editBtn.className = 'edit-row-btn';
                 editBtn.textContent = '✏️ 編集';
                 editBtn.addEventListener('click', (e) => { e.stopPropagation(); openEditLineModal(index); });
 
-                actionBtns.append(audioGenBtn, editBtn);
+                const ttsBtn = document.createElement('button');
+                ttsBtn.type = 'button';
+                ttsBtn.className = 'tts-action-btn';
+                ttsBtn.innerHTML = '🔊 TTS';
+                ttsBtn.title = 'Gemini 3.8 Flash TTS (Puck ボイス) で個別生成・再生';
+                ttsBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+                    div.classList.add('active');
+                    speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
+                });
 
                 const idText = document.createElement('div');
                 idText.className = 'id-text';
@@ -1398,6 +1482,7 @@
                     const span = document.createElement('span');
                     span.className = 'word-token';
                     span.textContent = rawWord;
+                    span.title = 'タップして単語音声を個別生成';
                     span.addEventListener('click', event => onWordClick(event, index, wIdx, cleanW));
                     idText.appendChild(span);
                 });
@@ -1406,67 +1491,16 @@
                 jpText.className = 'jp-text';
                 jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-                div.append(actionBtns, idText, jpText);
-                div.addEventListener('click', async event => {
-                    if (event.target.closest('.word-token, .edit-row-btn, .audio-gen-btn')) return;
-                    await playOrGenerateSentenceAudio(item.indonesian, index, audioGenBtn);
+                div.append(editBtn, ttsBtn, idText, jpText);
+                div.addEventListener('click', event => {
+                    if (event.target.closest('.word-token, .edit-row-btn, .tts-action-btn')) return;
+                    document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+                    div.classList.add('active');
+                    div.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
                 });
                 container.appendChild(div);
             });
-        }
-
-        async function playOrGenerateSentenceAudio(text, index, btnEl) {
-            document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
-            const targetDiv = $('line-' + index);
-            if (targetDiv) {
-                targetDiv.classList.add('active');
-                targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-
-            stopSpeech();
-
-            // Try Gemini TTS audio cache first
-            let base64Audio = getCachedAudio(text);
-            if (!base64Audio) {
-                base64Audio = await fetchGeminiTTSAudio(text, btnEl);
-            }
-
-            if (base64Audio) {
-                try {
-                    const audioBlob = base64ToBlob(base64Audio, 'audio/mp3');
-                    const audioUrl = URL.createObjectURL(audioBlob);
-                    const audio = new Audio(audioUrl);
-                    activeAudioElement = audio;
-                    audio.playbackRate = getSpeechRate();
-                    audio.onended = () => {
-                        if (targetDiv) targetDiv.classList.remove('active');
-                    };
-                    await audio.play();
-                    if (btnEl) {
-                        btnEl.textContent = '🔊 再生 (キャッシュ)';
-                        btnEl.classList.add('cached');
-                        btnEl.disabled = false;
-                    }
-                    return;
-                } catch (e) {
-                    console.warn('Audio playback error, falling back to Web Speech API', e);
-                }
-            }
-
-            // Fallback to Web Speech API with Indonesian voice
-            speak(text, () => {
-                if (targetDiv) targetDiv.classList.remove('active');
-            });
-        }
-
-        function base64ToBlob(base64, mime) {
-            const byteCharacters = atob(base64);
-            const byteNumbers = new Array(byteCharacters.length);
-            for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            return new Blob([byteArray], { type: mime });
         }
 
         function renderGrammarList() {
@@ -1486,9 +1520,20 @@
 
                 const title = document.createElement('div');
                 title.className = 'grammar-title';
-                title.innerHTML = '<span>文節 ' + (index + 1) + ': ' + (gItem.indonesian || '') + '</span>' +
-                    '<button type="button" class="icon-btn" style="padding:4px 8px;font-size:0.75rem;" onclick="playText(\'' + (gItem.indonesian || '').replace(/'/g, "\\'") + '\')">🔊 聴く</button>';
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.textContent = '文節 ' + (index + 1) + ': ' + (gItem.indonesian || '');
 
+                const ttsGrammarBtn = document.createElement('button');
+                ttsGrammarBtn.type = 'button';
+                ttsGrammarBtn.className = 'icon-btn';
+                ttsGrammarBtn.style.cssText = 'padding:4px 8px;font-size:0.75rem;';
+                ttsGrammarBtn.innerHTML = '🔊 TTS聴く';
+                ttsGrammarBtn.addEventListener('click', () => {
+                    speakWithGeminiTTS(gItem.indonesian || '', ttsGrammarBtn, ttsSentenceCache);
+                });
+
+                title.append(titleSpan, ttsGrammarBtn);
                 card.appendChild(title);
 
                 const parts = [
@@ -1561,21 +1606,6 @@
             showToast('文節を更新しました。');
         }
 
-        function getSpeechRate() {
-            const value = Number.parseFloat($('speed-range')?.value || '1');
-            return Number.isFinite(value) ? Math.min(1.2, Math.max(0.5, value)) : 1;
-        }
-
-        function speak(text, onEnd) {
-            if (!('speechSynthesis' in window)) { if (onEnd) onEnd(); return; }
-            window.speechSynthesis.cancel();
-            const utterance = new SpeechSynthesisUtterance(text.replace(/\b\d+\b/gu, '').trim());
-            utterance.lang = 'id-ID';
-            utterance.rate = getSpeechRate();
-            if (onEnd) utterance.addEventListener('end', onEnd, { once: true });
-            window.speechSynthesis.speak(utterance);
-        }
-
         function onWordClick(event, lineIndex, wordIndex, cleanToken) {
             event.stopPropagation();
             document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
@@ -1591,31 +1621,22 @@
                 wordTapCounts[key] = (wordTapCounts[key] || 0) + 1;
                 try { localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts)); } catch (_) {}
             }
-            speak(parsedData.sentences[lineIndex].indonesian.split(/\s+/u).slice(wordIndex).join(' '), () => {
+
+            const targetWord = parsedData.sentences[lineIndex].indonesian.split(/\s+/u)[wordIndex] || cleanToken;
+            speakWithGeminiTTS(targetWord, null, ttsWordCache);
+
+            setTimeout(() => {
                 tokens[wordIndex]?.classList.remove('highlighted');
-            });
+            }, 800);
         }
 
-        function playText(text, index) {
-            if (index !== undefined) {
-                document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
-                const targetDiv = $('line-' + index);
-                if (targetDiv) { targetDiv.classList.add('active'); targetDiv.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-            }
-            speak(text);
-        }
-
-        function pauseSpeech() {
-            if (activeAudioElement) activeAudioElement.pause();
-            if (window.speechSynthesis.speaking) window.speechSynthesis.pause();
-        }
-        function resumeSpeech() {
-            if (activeAudioElement) activeAudioElement.play();
-            if (window.speechSynthesis.paused) window.speechSynthesis.resume();
-        }
+        function pauseSpeech() { if (activeAudioElement) activeAudioElement.pause(); }
+        function resumeSpeech() { if (activeAudioElement && activeAudioElement.paused) activeAudioElement.play(); }
         function stopSpeech() {
-            if (activeAudioElement) { activeAudioElement.pause(); activeAudioElement = null; }
-            window.speechSynthesis.cancel();
+            if (activeAudioElement) {
+                activeAudioElement.pause();
+                activeAudioElement = null;
+            }
         }
 
         function renderFlashcard() {
@@ -1662,7 +1683,7 @@
             front.innerHTML = '<div style="font-size:0.8rem;color:#888;position:absolute;top:12px;left:12px;">表：インドネシア語</div>' +
                 '<div class="tap-count-badge" id="front-tap-badge"></div>' +
                 '<div class="card-word" id="front-card-word"></div>' +
-                '<button type="button" style="font-size:1.2rem;cursor:pointer;background:none;border:0;color:#fff;" onclick="event.stopPropagation(); playCurrentCardSpeech();">🔊</button>' +
+                '<button type="button" style="font-size:1.2rem;cursor:pointer;background:none;border:0;color:#fff;" onclick="event.stopPropagation(); playCurrentCardSpeech();">🔊 聴く</button>' +
                 '<div class="card-hint">👆 タップして意味を表示</div>';
 
             const back = document.createElement('div');
@@ -1697,7 +1718,7 @@
 
         window.playCurrentCardSpeech = () => {
             const vocab = currentFilteredVocab?.[cardIndex];
-            if (vocab?.word) playText(vocab.word);
+            if (vocab?.word) speakWithGeminiTTS(vocab.word, null, ttsWordCache);
         };
 
         function updateCardDisplay() {
@@ -1771,7 +1792,7 @@
             checkApiKeyStatus();
             updateHistoryUI();
             applyFontSize();
-            updateSpeedVal(1.0);
+            updateSpeedVal(0.85);
             updateTokenEstimate();
 
             $('header-back-btn')?.addEventListener('click', () => switchView('setup'));
