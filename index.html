@@ -546,7 +546,7 @@
                 </button>
                 <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;" title="履歴">📜</button>
                 <button class="icon-btn" id="settings-open-btn" type="button" title="設定">
-                    ⚙️️
+                    ⚙
                     <span id="api-badge" class="api-badge unset" style="display:none;">未</span>
                 </button>
             </div>
@@ -563,7 +563,7 @@
 
             <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">🎙️ 音声仕様: Gemini 3.8 Flash TTS (Puck / Narration)</span>
+                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">🎙️ 音声仕様: Gemini 2.5 Flash TTS (Puck / Narration)</span>
                     <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ キャッシュ有効</span>
                 </div>
                 <div style="font-size:0.8rem; color:#ddd; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
@@ -681,7 +681,7 @@
             endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 28
+            cacheVersion: 29
         };
 
         let parsedData = { sentences: [], grammar: [], vocabulary: [] };
@@ -692,7 +692,6 @@
         let currentFilteredVocab = [];
         let rpmTimestamps = [];
 
-        // TTS音声キャッシュ（メモリ上）
         let ttsSentenceCache = new Map();
         let ttsWordCache = new Map();
         let activeAudioElement = null;
@@ -1155,7 +1154,10 @@
                     showToast('⚡ キャッシュから復元しました（APIリクエスト 0）');
                 } else {
                     if (!canMakeApiCall()) throw new Error('レート制限に達しています。');
-                    const aiResult = await analyzeWithGemini(preprocessedSegments, apiKey);
+                    
+                    // 自動リトライロジックを含む関数を呼び出し
+                    const aiResult = await analyzeWithGeminiWithRetry(preprocessedSegments, apiKey, btn);
+                    
                     recordApiCall();
                     ensureAllWordsExtracted(preprocessedSegments, aiResult);
                     setCachedResult(rawText, parsedData);
@@ -1179,6 +1181,37 @@
                 }
             } finally {
                 updateTokenEstimate();
+            }
+        }
+
+        async function analyzeWithGeminiWithRetry(segments, apiKey, btnElement) {
+            const maxRetries = 3;
+            let delay = 2000; // 初期待機時間 (ミリ秒)
+
+            for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                try {
+                    return await analyzeWithGemini(segments, apiKey);
+                } catch (err) {
+                    // Gemini API特有の高負荷・レート制限エラーの検知
+                    const isOverloaded = err.message && (
+                        err.message.includes('503') || 
+                        err.message.includes('overloaded') || 
+                        err.message.includes('high demand') ||
+                        err.message.includes('429')
+                    );
+                    
+                    if (isOverloaded && attempt < maxRetries) {
+                        console.warn(`API is overloaded. Retrying in ${delay}ms... (Attempt ${attempt} of ${maxRetries})`, err);
+                        if (btnElement) {
+                            btnElement.innerHTML = `<span class="loading-spinner"></span> 混雑中のため自動再試行 (${attempt}/${maxRetries})...`;
+                        }
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2; // 指数的バックオフ (2s -> 4s -> 8s)
+                        continue; // ループの次へ (再試行)
+                    }
+                    // 最大試行回数に達したか、他の種類のエラーの場合は例外を投げる
+                    throw err;
+                }
             }
         }
 
@@ -1260,9 +1293,6 @@
             return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
         }
 
-        // ==========================================
-        // Gemini 3.8 Flash TTS / Puck Voice Integration
-        // ==========================================
         function base64ToArrayBuffer(base64) {
             const binaryString = atob(base64);
             const len = binaryString.length;
@@ -1466,7 +1496,7 @@
                 ttsBtn.type = 'button';
                 ttsBtn.className = 'tts-action-btn';
                 ttsBtn.innerHTML = '🔊 TTS';
-                ttsBtn.title = 'Gemini 3.8 Flash TTS (Puck ボイス) で個別生成・再生';
+                ttsBtn.title = 'Gemini 2.5 Flash TTS (Puck ボイス) で個別生成・再生';
                 ttsBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
