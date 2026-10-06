@@ -1371,6 +1371,12 @@
     const ttsSentenceCache = new Map();
     const ttsWordCache = new Map();
 
+    /*
+     * 同じ文章を連打したときの重複TTSリクエスト防止。
+     * cacheに入る前の生成中Promiseも共有する。
+     */
+    const ttsInflight = new Map();
+
 
     /*
      * Web Audio API の再生状態
@@ -3840,13 +3846,29 @@
 
             if (!audioData) {
 
-                audioData =
-                    await generateGeminiTTS(
+                /*
+                 * 同一文章の生成中リクエストがあれば共有する。
+                 * これによりTTSボタンの連打で同じAPIを複数回叩かない。
+                 */
+                let pending = ttsInflight.get(cacheKey);
+
+                if (!pending) {
+                    pending = generateGeminiTTS(
                         cleanText,
                         apiKey,
                         btnElement
                     );
 
+                    ttsInflight.set(cacheKey, pending);
+                }
+
+                try {
+                    audioData = await pending;
+                } finally {
+                    if (ttsInflight.get(cacheKey) === pending) {
+                        ttsInflight.delete(cacheKey);
+                    }
+                }
 
                 /*
                  * メモリキャッシュ。
