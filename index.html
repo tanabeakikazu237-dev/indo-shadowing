@@ -605,11 +605,23 @@
                     APIキーや学習履歴はこのブラウザに保存されます。
                 </p>
                 <div>
-                    <label for="api-key-input">Gemini API Key</label>
+                    <label for="api-key-input">Gemini 無料/通常 API Key</label>
                     <input type="password" id="api-key-input" placeholder="AIzaSy..." autocomplete="off">
                 </div>
+                <div>
+                    <label for="paid-api-key-input">💳 Gemini 有料 API Key</label>
+                    <input type="password" id="paid-api-key-input" placeholder="有料プロジェクトのAPIキー" autocomplete="off">
+                </div>
+                <div>
+                    <label for="api-key-mode">使用するAPIキー</label>
+                    <select id="api-key-mode" style="width:100%; padding:10px; border-radius:8px; background:#252528; color:#fff; border:1px solid #444;">
+                        <option value="free">無料/通常キー</option>
+                        <option value="paid">💳 有料キー</option>
+                    </select>
+                    <div style="font-size:0.75rem;color:#999;margin-top:5px;line-height:1.5;">有料キーを選ぶと、そのキーのプロジェクトに紐づく有料枠でAPIを呼び出します。キーそのものに「有料/無料」の設定があるわけではなく、プロジェクトの課金状態が適用されます。</div>
+                </div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#007aff; font-size:0.8rem; text-decoration:none;">🔑 API Keyを無料取得</a>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#007aff; font-size:0.8rem; text-decoration:none;">🔑 API Keyを取得 / 有料化</a>
                     <button type="button" id="key-visibility-btn" style="background:none; border:none; color:#aaa; font-size:0.80rem; cursor:pointer;">表示/非表示</button>
                 </div>
 
@@ -669,6 +681,8 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
+            paidApiKey: 'gemini_paid_api_key',
+            apiKeyMode: 'gemini_api_key_mode',
             history: 'indo_shadowing_history_v28',
             tapCounts: 'indo_shadowing_tapcounts_v13',
             rpm: 'rpm_timestamps_v13',
@@ -710,10 +724,24 @@
             try { return JSON.parse(value); } catch (_) { return fallback; }
         }
 
+        function cleanApiKey(value) {
+            return String(value || '').trim().replace(/^["']|["']$/g, '');
+        }
+
+        function getApiKeyMode() {
+            try {
+                return localStorage.getItem(STORAGE.apiKeyMode) === 'paid' ? 'paid' : 'free';
+            } catch (_) { return 'free'; }
+        }
+
         function getApiKey() {
-            try { 
-                var key = localStorage.getItem(STORAGE.apiKey) || '';
-                return String(key).trim().replace(/^["']|["']$/g, '');
+            try {
+                const paid = cleanApiKey(localStorage.getItem(STORAGE.paidApiKey) || '');
+                const free = cleanApiKey(localStorage.getItem(STORAGE.apiKey) || '');
+                const mode = getApiKeyMode();
+                if (mode === 'paid' && paid) return paid;
+                if (free) return free;
+                return paid;
             } catch (_) { return ''; }
         }
 
@@ -721,8 +749,9 @@
             const badge = $('api-badge');
             if (!badge) return;
             const key = getApiKey();
-            if(key) {
-                badge.textContent = '済';
+            const mode = getApiKeyMode();
+            if (key) {
+                badge.textContent = mode === 'paid' ? '有料' : '無料';
                 badge.className = 'api-badge set';
                 badge.style.display = 'inline-block';
             } else {
@@ -753,8 +782,13 @@
         }
 
         function openSettings() {
-            const input = $('api-key-input');
-            if (input) input.value = getApiKey();
+            const freeInput = $('api-key-input');
+            const paidInput = $('paid-api-key-input');
+            if (freeInput) freeInput.value = cleanApiKey(localStorage.getItem(STORAGE.apiKey) || '');
+            if (paidInput) paidInput.value = cleanApiKey(localStorage.getItem(STORAGE.paidApiKey) || '');
+            const mode = getApiKeyMode();
+            const modeSelect = $('api-key-mode');
+            if (modeSelect) modeSelect.value = mode;
             const modal = $('settings-modal');
             if (modal) modal.style.display = 'flex';
         }
@@ -765,18 +799,26 @@
         }
 
         function saveApiKey() {
-            const input = $('api-key-input');
-            const key = input ? input.value.trim() : '';
+            const freeInput = $('api-key-input');
+            const paidInput = $('paid-api-key-input');
+            const modeSelect = $('api-key-mode');
+            const freeKey = cleanApiKey(freeInput ? freeInput.value : '');
+            const paidKey = cleanApiKey(paidInput ? paidInput.value : '');
+            const mode = modeSelect?.value === 'paid' ? 'paid' : 'free';
             try {
-                if (key) localStorage.setItem(STORAGE.apiKey, key);
+                if (freeKey) localStorage.setItem(STORAGE.apiKey, freeKey);
                 else localStorage.removeItem(STORAGE.apiKey);
+                if (paidKey) localStorage.setItem(STORAGE.paidApiKey, paidKey);
+                else localStorage.removeItem(STORAGE.paidApiKey);
+                localStorage.setItem(STORAGE.apiKeyMode, mode);
             } catch (e) {
                 showToast('APIキーの保存に失敗しました: ' + e.message);
                 return;
             }
             checkApiKeyStatus();
             closeSettings();
-            showToast(key ? 'APIキーを保存しました。' : 'APIキーを削除しました。');
+            const activeKey = mode === 'paid' ? paidKey : freeKey;
+            showToast(activeKey ? (mode === 'paid' ? '有料APIキーを使用する設定で保存しました。' : '無料APIキーを使用する設定で保存しました。') : 'APIキーを削除しました。');
         }
 
         function toggleKeyVisibility() {
