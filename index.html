@@ -537,7 +537,7 @@
     <div id="app-container">
         <header id="main-header">
             <div id="header-left" style="display: flex; align-items: center;">
-                <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini TTS)</h1>
+                <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini 3.8 Flash)</h1>
                 <button class="icon-btn" id="header-back-btn" type="button" style="display:none;">◀ 戻る</button>
             </div>
             <div id="header-right" style="display:flex; gap:6px; align-items: center;">
@@ -546,7 +546,7 @@
                 </button>
                 <button class="icon-btn" id="history-modal-open-btn" type="button" style="display:none;" title="履歴">📜</button>
                 <button class="icon-btn" id="settings-open-btn" type="button" title="設定">
-                    ⚙️️
+                    ⚙
                     <span id="api-badge" class="api-badge unset" style="display:none;">未</span>
                 </button>
             </div>
@@ -563,7 +563,7 @@
 
             <div class="control-group" style="flex-direction: column; align-items: flex-start; gap: 6px; background: #252528; border: 1px solid #3d3d42;">
                 <div style="display:flex; justify-content:space-between; width:100%; align-items:center;">
-                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">🎙️ 音声仕様: Gemini 3.8 Flash TTS (Puck / Narration)</span>
+                    <span style="font-size:0.8rem; font-weight:bold; color:#aaa;">🎙️ 音声仕様: Gemini 3.8 Flash TTS (Puck / Interactions API)</span>
                     <span id="rate-badge" style="font-size:0.75rem; padding:2px 6px; border-radius:4px; background:#1b5e20; color:#81c784;">✅ キャッシュ有効</span>
                 </div>
                 <div style="font-size:0.8rem; color:#ddd; width:100%; display:grid; grid-template-columns: 1fr 1fr; gap:4px;">
@@ -574,7 +574,7 @@
             </div>
 
             <button class="btn" id="analyze-btn" type="button">
-                ✨ Gemini AI で解析して開始
+                ✨ Gemini 3.8 Flash で解析して開始
             </button>
         </div>
 
@@ -669,19 +669,19 @@
 
         const STORAGE = {
             apiKey: 'gemini_api_key',
-            history: 'indo_shadowing_history_v28',
-            tapCounts: 'indo_shadowing_tapcounts_v13',
-            rpm: 'rpm_timestamps_v13',
-            cachePrefix: 'indo_shadowing_cache_v28_'
+            history: 'indo_shadowing_history_v31',
+            tapCounts: 'indo_shadowing_tapcounts_v16',
+            rpm: 'rpm_timestamps_v16',
+            cachePrefix: 'indo_shadowing_cache_v31_'
         };
 
         const CONFIG = {
-            model: 'gemini-2.5-flash',
-            ttsModel: 'gemini-2.5-flash-preview-tts',
-            endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
+            model: 'gemini-3.8-flash',
+            ttsModel: 'gemini-3.8-flash-tts',
+            interactionsEndpoint: 'https://generativelanguage.googleapis.com/v1beta/interactions',
             maxRequestsPerMinute: 15,
             maxHistory: 3,
-            cacheVersion: 28
+            cacheVersion: 31
         };
 
         let parsedData = { sentences: [], grammar: [], vocabulary: [] };
@@ -692,7 +692,6 @@
         let currentFilteredVocab = [];
         let rpmTimestamps = [];
 
-        // TTS音声キャッシュ（メモリ上）
         let ttsSentenceCache = new Map();
         let ttsWordCache = new Map();
         let activeAudioElement = null;
@@ -971,7 +970,7 @@
             if (atMatches && atMatches.length > 0) {
                 for (let line of atMatches) {
                     let content = line.replace(/^@\s*/, '').trim();
-                    content = content.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '').trim();
+                    content = content.replace(/\s+\d+(?:[.,]\s*\d+)*$/, '').trim();
                     if (content) {
                         extracted.push(content);
                     }
@@ -1052,59 +1051,82 @@
             } else {
                 if (estStatus) estStatus.textContent = '✅ API実行可能';
                 if (rateBadge) { rateBadge.textContent = '✅ 実行可能'; rateBadge.style.background = '#1b5e20'; }
-                if (btn) { btn.disabled = false; btn.innerHTML = '✨ Gemini AI で解析して開始'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '✨ Gemini 3.8 Flash で解析して開始'; }
             }
             return total;
         }
 
-        function normalizeParsedData(data, preprocessedSegments) {
+        function normalizeInteractionsData(data, preprocessedSegments) {
             const result = {
                 sentences: [],
                 grammar: [],
                 vocabulary: []
             };
+
             const aiSentences = Array.isArray(data?.sentences) ? data.sentences : [];
             const aiGrammar = Array.isArray(data?.grammar) ? data.grammar : [];
+            const rawVocab = Array.isArray(data?.vocabulary) ? data.vocabulary : [];
 
-            result.sentences = preprocessedSegments.map((indonesianText, idx) => ({
-                indonesian: indonesianText,
-                japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
-            }));
-
-            result.grammar = preprocessedSegments.map((indonesianText, idx) => {
-                const g = aiGrammar[idx] || {};
+            result.sentences = preprocessedSegments.map((indonesianText, idx) => {
+                const found = aiSentences.find(s => s && s.original && s.original.trim() === indonesianText.trim()) || aiSentences[idx] || {};
                 return {
                     indonesian: indonesianText,
-                    wordComparison1: g.wordComparison1 || '・前半の語句対比データなし',
-                    syntacticStructure1: g.syntacticStructure1 || '・前半の構文構造データなし',
-                    affixDissection1: g.affixDissection1 || '・前半の接辞解剖データなし',
-                    nuanceExplanation1: g.nuanceExplanation1 || '・前半の解説データなし',
-                    wordComparison2: g.wordComparison2 || '・後半の語句対比データなし',
-                    syntacticStructure2: g.syntacticStructure2 || '・後半の構文構造データなし',
-                    affixDissection2: g.affixDissection2 || '・後半の接辞解剖データなし',
-                    nuanceExplanation2: g.nuanceExplanation2 || '・後半の解説データなし'
+                    japanese: found.japanese || found.meaning || '（日本語訳なし）'
                 };
             });
 
-            const rawVocab = Array.isArray(data?.vocabulary) ? data.vocabulary : [];
+            result.grammar = preprocessedSegments.map((indonesianText, idx) => {
+                const found = aiGrammar.find(g => g && g.original && g.original.trim() === indonesianText.trim()) || aiGrammar[idx] || {};
+                const parts = Array.isArray(found.parts) ? found.parts : [];
+                
+                const p1 = parts[0] || { title: '【解説 ①】', content: '解説データなし' };
+                const p2 = parts[1] || { title: '【解説 ②】', content: '解説データなし' };
+
+                return {
+                    indonesian: indonesianText,
+                    wordComparison1: p1.title + '\n' + p1.content,
+                    syntacticStructure1: '構造分析データ',
+                    affixDissection1: '接辞分析データ',
+                    nuanceExplanation1: p1.content,
+                    wordComparison2: p2.title + '\n' + p2.content,
+                    syntacticStructure2: '構造分析データ',
+                    affixDissection2: '接辞分析データ',
+                    nuanceExplanation2: p2.content
+                };
+            });
+
             const map = new Map();
             
+            aiSentences.forEach(s => {
+                if (Array.isArray(s?.words)) {
+                    s.words.forEach(w => {
+                        const rawWord = typeof w?.word === 'string' ? w.word.trim() : '';
+                        const cleanWord = cleanTokenString(rawWord);
+                        const key = cleanWordKey(cleanWord);
+                        const meaning = typeof w?.meaning === 'string' ? w.meaning.trim() : '';
+                        if (key && !/^\d+$/u.test(key) && meaning) {
+                            map.set(key, { word: cleanWord || rawWord, meaning });
+                        }
+                    });
+                }
+            });
+
             rawVocab.forEach(v => {
                 const rawWord = typeof v?.word === 'string' ? v.word.trim() : '';
                 const cleanWord = cleanTokenString(rawWord);
                 const key = cleanWordKey(cleanWord);
                 const meaning = typeof v?.meaning === 'string' ? v.meaning.trim() : '';
-                
-                if (key && !/^\d+$/u.test(key) && meaning && meaning !== '（意味不明）' && meaning !== '（辞書登録なし）') {
+                if (key && !/^\d+$/u.test(key) && meaning) {
                     map.set(key, { word: cleanWord || rawWord, meaning });
                 }
             });
+
             result.vocabulary = [...map.values()];
             return result;
         }
 
         function ensureAllWordsExtracted(preprocessedSegments, aiResultData) {
-            parsedData = normalizeParsedData(aiResultData, preprocessedSegments);
+            parsedData = normalizeInteractionsData(aiResultData, preprocessedSegments);
             const existing = new Map(parsedData.vocabulary.map(v => [cleanWordKey(v.word), v]));
 
             parsedData.sentences.forEach(sentence => {
@@ -1145,7 +1167,7 @@
             const btn = $('analyze-btn');
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<span class="loading-spinner"></span> AI解析中...';
+                btn.innerHTML = '<span class="loading-spinner"></span> Gemini 3.8 解析中...';
             }
 
             try {
@@ -1175,7 +1197,7 @@
                 showToast(err?.message || '解析中にエラーが発生しました。');
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = '✨ Gemini AI で解析して開始';
+                    btn.innerHTML = '✨ Gemini 3.8 Flash で解析して開始';
                 }
             } finally {
                 updateTokenEstimate();
@@ -1183,86 +1205,151 @@
         }
 
         async function analyzeWithGemini(segments, apiKey) {
-            const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
-            
-            const systemPrompt = 'You are a professional Indonesian-to-Japanese linguistic expert and lexicographer.\n' +
-                'You will receive an array of Indonesian text segments.\n' +
-                'For each segment, divide it into TWO distinct structural parts/clauses and provide detailed grammar breakdown for both:\n' +
-                '1. "sentences": Exact, natural Japanese translation of the full segment (japanese).\n' +
-                '2. "grammar": Array containing objects with these exact keys for TWO clauses/structures per segment:\n' +
-                '   - wordComparison1, syntacticStructure1, affixDissection1, nuanceExplanation1\n' +
-                '   - wordComparison2, syntacticStructure2, affixDissection2, nuanceExplanation2\n' +
-                '   Each using the headers 【語句対比】, 【構文構造】, 【接辞解剖】, 【解説・ニュアンス】.\n' +
-                '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide its precise standalone dictionary meaning in Japanese.\n' +
-                'Return ONLY valid JSON matching the exact schema.';
+            if (!apiKey) {
+                throw new Error('Gemini APIキーが設定されていません。');
+            }
 
-            const payload = {
-                systemInstruction: { parts: [{ text: systemPrompt }] },
-                contents: [{ role: 'user', parts: [{ text: JSON.stringify(segments) }] }],
-                generationConfig: {
-                    responseMimeType: 'application/json',
-                    responseSchema: {
-                        type: 'OBJECT',
-                        properties: {
-                            sentences: { 
-                                type: 'ARRAY', 
-                                items: { 
-                                    type: 'OBJECT', 
-                                    properties: { japanese: { type: 'STRING' } }, 
-                                    required: ['japanese'] 
-                                } 
-                            },
-                            grammar: {
-                                type: 'ARRAY',
-                                items: {
-                                    type: 'OBJECT',
-                                    properties: {
-                                        wordComparison1: { type: 'STRING' },
-                                        syntacticStructure1: { type: 'STRING' },
-                                        affixDissection1: { type: 'STRING' },
-                                        nuanceExplanation1: { type: 'STRING' },
-                                        wordComparison2: { type: 'STRING' },
-                                        syntacticStructure2: { type: 'STRING' },
-                                        affixDissection2: { type: 'STRING' },
-                                        nuanceExplanation2: { type: 'STRING' }
-                                    },
-                                    required: [
-                                        'wordComparison1', 'syntacticStructure1', 'affixDissection1', 'nuanceExplanation1',
-                                        'wordComparison2', 'syntacticStructure2', 'affixDissection2', 'nuanceExplanation2'
-                                    ]
+            if (!Array.isArray(segments) || segments.length === 0) {
+                throw new Error('解析する文章がありません。');
+            }
+
+            const systemInstruction = `
+あなたはプロフェッショナルなインドネシア語・日本語の言語学者および辞書編纂者です。
+入力されたインドネシア語文章を、日本人学習者向けに詳細に解析してください。
+必ず以下のJSON Schemaに完全に従って出力してください。
+
+1. sentences:
+   - 各セグメントの original, japanese, words (word と meaning) を含める。
+2. grammar:
+   - 各セグメントにつき original, japanese, parts (必ず2つの要素で構成し、それぞれの title と content を詳細に記述)。
+3. vocabulary:
+   - 重複のない重要単語のリスト (word と meaning)。
+`;
+
+            const userInput = segments
+                .map((text, index) => (index + 1) + '. ' + text)
+                .join('\n');
+
+            const schema = {
+                type: 'object',
+                properties: {
+                    sentences: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                original: { type: 'string' },
+                                japanese: { type: 'string' },
+                                words: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            word: { type: 'string' },
+                                            meaning: { type: 'string' }
+                                        },
+                                        required: ['word', 'meaning']
+                                    }
                                 }
                             },
-                            vocabulary: { 
-                                type: 'ARRAY', 
-                                items: { 
-                                    type: 'OBJECT', 
-                                    properties: { word: { type: 'STRING' }, meaning: { type: 'STRING' } }, 
-                                    required: ['word', 'meaning'] 
-                                } 
-                            }
-                        },
-                        required: ['sentences', 'grammar', 'vocabulary']
+                            required: ['original', 'japanese', 'words']
+                        }
                     },
-                    temperature: 0.1
-                }
+                    grammar: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                original: { type: 'string' },
+                                japanese: { type: 'string' },
+                                parts: {
+                                    type: 'array',
+                                    items: {
+                                        type: 'object',
+                                        properties: {
+                                            title: { type: 'string' },
+                                            content: { type: 'string' }
+                                        },
+                                        required: ['title', 'content']
+                                    }
+                                }
+                            },
+                            required: ['original', 'japanese', 'parts']
+                        }
+                    },
+                    vocabulary: {
+                        type: 'array',
+                        items: {
+                            type: 'object',
+                            properties: {
+                                word: { type: 'string' },
+                                meaning: { type: 'string' }
+                            },
+                            required: ['word', 'meaning']
+                        }
+                    }
+                },
+                required: ['sentences', 'grammar', 'vocabulary']
             };
 
-            const res = await fetch(apiUrl, {
+            const response = await fetch(CONFIG.interactionsEndpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-                body: JSON.stringify(payload)
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-goog-api-key': apiKey
+                },
+                body: JSON.stringify({
+                    model: CONFIG.model,
+                    input: [
+                        {
+                            type: 'user_input',
+                            content: [
+                                {
+                                    type: 'text',
+                                    text: systemInstruction + '\n\n' + userInput
+                                }
+                            ]
+                        }
+                    ],
+                    response_format: {
+                        type: 'text',
+                        mime_type: 'application/json',
+                        schema: schema
+                    },
+                    generation_config: {
+                        temperature: 0.1
+                    }
+                })
             });
 
-            const data = await res.json().catch(() => ({}));
-            if (!res.ok) throw new Error('Gemini APIエラー: ' + (data?.error?.message || res.status));
+            const data = await response.json();
 
-            const jsonText = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-            return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
+            if (!response.ok) {
+                const message = data?.error?.message || data?.message || ('Gemini API Error: HTTP ' + response.status);
+                throw new Error(message);
+            }
+
+            const outputText = data?.output_text ||
+                (data?.steps || [])
+                    .flatMap(step => step.content || [])
+                    .filter(item => item.type === 'text')
+                    .map(item => item.text)
+                    .join('') || '';
+
+            if (!outputText) {
+                throw new Error('Geminiから解析結果が返されませんでした。');
+            }
+
+            let parsed;
+            try {
+                parsed = JSON.parse(outputText);
+            } catch (error) {
+                throw new Error('GeminiのJSON解析結果を読み取れませんでした。');
+            }
+
+            return parsed;
         }
 
-        // ==========================================
-        // Gemini 3.8 Flash TTS / Puck Voice Integration
-        // ==========================================
         function base64ToArrayBuffer(base64) {
             const binaryString = atob(base64);
             const len = binaryString.length;
@@ -1334,7 +1421,7 @@
 
             try {
                 if (!audioUrl) {
-                    const apiUrl = CONFIG.endpoint + CONFIG.ttsModel + ':generateContent?key=' + encodeURIComponent(apiKey);
+                    const apiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/' + CONFIG.ttsModel + ':generateContent';
                     
                     const ttsPrompt = 'Voice Model Locked: Indonesian Male (Puck)\n' +
                         'Style Preset: Narration\n' +
@@ -1358,7 +1445,10 @@
 
                     const res = await fetch(apiUrl, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-goog-api-key': apiKey
+                        },
                         body: JSON.stringify(payload)
                     });
 
@@ -1540,19 +1630,15 @@
                     {
                         subtitle: '📌 構文パート ①',
                         sections: [
-                            { title: '【語句対比】 (Word-by-word comparison)', content: gItem.wordComparison1 },
-                            { title: '【構文構造】 (Syntactic structure)', content: gItem.syntacticStructure1 },
-                            { title: '【接辞解剖】 (Affix dissection)', content: gItem.affixDissection1 },
-                            { title: '【解説・ニュアンス】 (Nuance and explanation)', content: gItem.nuanceExplanation1 }
+                            { title: '【語句対比】', content: gItem.wordComparison1 },
+                            { title: '【解説・ニュアンス】', content: gItem.nuanceExplanation1 }
                         ]
                     },
                     {
                         subtitle: '📌 構文パート ②',
                         sections: [
-                            { title: '【語句対比】 (Word-by-word comparison)', content: gItem.wordComparison2 },
-                            { title: '【構文構造】 (Syntactic structure)', content: gItem.syntacticStructure2 },
-                            { title: '【接辞解剖】 (Affix dissection)', content: gItem.affixDissection2 },
-                            { title: '【解説・ニュアンス】 (Nuance and explanation)', content: gItem.nuanceExplanation2 }
+                            { title: '【語句対比】', content: gItem.wordComparison2 },
+                            { title: '【解説・ニュアンス】', content: gItem.nuanceExplanation2 }
                         ]
                     }
                 ];
