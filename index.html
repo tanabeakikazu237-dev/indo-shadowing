@@ -110,6 +110,7 @@
             flex: 1;
             min-height: 140px;
             padding: 12px;
+            padding-left: 20px; /* 左端に半角スペースほどの余白を設ける */
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
@@ -727,7 +728,6 @@
 </head>
 
 <body>
-
 <div id="app-container">
 
     <header id="main-header">
@@ -792,17 +792,27 @@
     <!-- =========================
          SETUP
     ========================== -->
-
     <div class="card" id="setup-card">
 
-        <label for="script-input">
-            インドネシア語のテキストを入力または貼り付け
-            （@優先、次に.で文節抽出）
-        </label>
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; gap: 8px;">
+            <label for="script-input" style="flex: 1; margin-bottom: 0;">
+                インドネシア語のテキストを入力または貼り付け
+                （@優先、次に.で文節抽出）
+            </label>
+            <button
+                id="refresh-text-btn"
+                type="button"
+                class="icon-btn"
+                style="padding: 4px 8px; font-size: 0.75rem; background: transparent; color: #aaa; border-color: #444; flex-shrink: 0;"
+                title="テキストをクリア"
+            >
+                🔄 クリア
+            </button>
+        </div>
 
         <textarea
             id="script-input"
-            placeholder="例: @Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."
+            placeholder=" 例: @Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."
         ></textarea>
 
 
@@ -928,7 +938,6 @@
     <!-- =========================
          PLAYER
     ========================== -->
-
     <div id="player-area">
 
         <div class="tab-container">
@@ -1038,7 +1047,6 @@
     <!-- =========================
          SETTINGS
     ========================== -->
-
     <div
         class="modal-overlay"
         id="settings-modal"
@@ -1184,7 +1192,6 @@
     <!-- =========================
          HISTORY
     ========================== -->
-
     <div
         class="modal-overlay"
         id="history-modal"
@@ -1315,7 +1322,6 @@
     /* =========================================================
        STORAGE / CONFIG
     ========================================================= */
-
     const STORAGE = {
         apiKey: 'gemini_api_key',
         history: 'indo_shadowing_history_v28',
@@ -1344,7 +1350,6 @@
     /* =========================================================
        STATE
     ========================================================= */
-
     let parsedData = {
         sentences: [],
         grammar: [],
@@ -1418,7 +1423,6 @@
     /* =========================================================
        BASIC HELPERS
     ========================================================= */
-
     function $(id) {
         return document.getElementById(id);
     }
@@ -1487,7 +1491,6 @@
     /* =========================================================
        VIEW
     ========================================================= */
-
     function switchView(view) {
 
         if (view === 'setup') {
@@ -1525,7 +1528,6 @@
     /* =========================================================
        SETTINGS
     ========================================================= */
-
     function openSettings() {
 
         const input = $('api-key-input');
@@ -1603,7 +1605,6 @@
     /* =========================================================
        FONT SIZE
     ========================================================= */
-
     function cycleFontSize() {
 
         currentFontSizeIndex =
@@ -1646,7 +1647,6 @@
     /* =========================================================
        HISTORY
     ========================================================= */
-
     function getHistory() {
 
         try {
@@ -1867,7 +1867,6 @@
     /* =========================================================
        TEXT CACHE
     ========================================================= */
-
     function hashCode(str) {
 
         let hash = 5381;
@@ -1950,7 +1949,6 @@
     /* =========================================================
        RPM
     ========================================================= */
-
     function loadPersistentState() {
 
         try {
@@ -2056,7 +2054,6 @@
     /* =========================================================
        WORD HELPERS
     ========================================================= */
-
     function cleanWordKey(str) {
 
         if (!str) return '';
@@ -2088,7 +2085,6 @@
     /* =========================================================
        PREPROCESS
     ========================================================= */
-
     function preprocessIndonesianText(rawText) {
 
         if (!rawText) return [];
@@ -2148,7 +2144,6 @@
     /* =========================================================
        SPEED
     ========================================================= */
-
     function updateSpeedVal(val) {
 
         const n =
@@ -2235,7 +2230,6 @@
     /* =========================================================
        TOKEN ESTIMATE
     ========================================================= */
-
     function estimateTokens(text) {
 
         if (!text) return 0;
@@ -2422,7 +2416,6 @@
     /* =========================================================
        PARSE / NORMALIZE
     ========================================================= */
-
     function normalizeParsedData(
         data,
         preprocessedSegments
@@ -2633,7 +2626,6 @@
     /* =========================================================
        GEMINI ANALYSIS
     ========================================================= */
-
     async function startApp() {
 
         const rawText =
@@ -3093,7 +3085,6 @@
     /* =========================================================
        AUDIO CONTEXT
     ========================================================= */
-
     function getAudioContext() {
 
         if (audioContext) {
@@ -3141,7 +3132,6 @@
     /* =========================================================
        BASE64
     ========================================================= */
-
     function base64ToArrayBuffer(base64) {
 
         if (!base64) {
@@ -3175,7 +3165,6 @@
     /* =========================================================
        TTS RESPONSE EXTRACTION
     ========================================================= */
-
     function extractAudioInlineData(data) {
 
         const parts =
@@ -3213,7 +3202,6 @@
     /* =========================================================
        TTS API
     ========================================================= */
-
     async function generateGeminiTTS(
         text,
         apiKey,
@@ -3497,7 +3485,6 @@
     /* =========================================================
        AUDIO BUFFER DECODE
     ========================================================= */
-
     async function decodeAudioBuffer(
         arrayBuffer
     ) {
@@ -3521,7 +3508,6 @@
     /* =========================================================
        PLAYBACK BUTTON UI
     ========================================================= */
-
     function setTTSButtonState(
         btn,
         state
@@ -3580,7 +3566,6 @@
     /* =========================================================
        ACTIVE PLAYBACK
     ========================================================= */
-
     function createSourceForPlayback(
         playback,
         offset
@@ -3751,7 +3736,6 @@
     /* =========================================================
        TTS MAIN
     ========================================================= */
-
     async function speakWithGeminiTTS(
         text,
         btnElement,
@@ -3936,7 +3920,6 @@
     /* =========================================================
        SORT VOCABULARY
     ========================================================= */
-
     function sortVocabulary() {
 
         if (!parsedData?.vocabulary) {
@@ -3978,7 +3961,6 @@
     /* =========================================================
        TABS
     ========================================================= */
-
     function updateTabUI() {
 
         $('tab-sentence')
@@ -4041,7 +4023,6 @@
     /* =========================================================
        SENTENCE LIST
     ========================================================= */
-
     function renderSentenceList() {
 
         const container =
@@ -4287,7 +4268,6 @@
     /* =========================================================
        GRAMMAR
     ========================================================= */
-
     function renderGrammarList() {
 
         const container =
@@ -4551,7 +4531,6 @@
     /* =========================================================
        EDIT LINE
     ========================================================= */
-
     function openEditLineModal(index) {
 
         const item =
@@ -4674,7 +4653,6 @@
     /* =========================================================
        WORD CLICK
     ========================================================= */
-
     async function onWordClick(
         event,
         lineIndex,
@@ -4796,7 +4774,6 @@
     /* =========================================================
        AUDIO CONTROLS
     ========================================================= */
-
     function getCurrentPlaybackPosition(
         playback
     ) {
@@ -5007,7 +4984,6 @@
     /* =========================================================
        FLASHCARD
     ========================================================= */
-
     function renderFlashcard() {
 
         const container =
@@ -5522,7 +5498,6 @@
     /* =========================================================
        SEARCH
     ========================================================= */
-
     function handleSearchInput(query) {
 
         clearTimeout(
@@ -5680,7 +5655,6 @@
     /* =========================================================
        EXPORT / IMPORT
     ========================================================= */
-
     function exportAppData() {
 
         try {
@@ -5843,7 +5817,6 @@
     /* =========================================================
        MODAL OUTSIDE CLICK
     ========================================================= */
-
     function setupModalOutsideClose(
         modalId
     ) {
@@ -5873,7 +5846,6 @@
     /* =========================================================
        INITIALIZE
     ========================================================= */
-
     window.addEventListener(
         'load',
         () => {
@@ -5982,6 +5954,19 @@
                 ?.addEventListener(
                     'click',
                     startApp
+                );
+
+            $('refresh-text-btn')
+                ?.addEventListener(
+                    'click',
+                    () => {
+                        const input = $('script-input');
+                        if (input) {
+                            input.value = '';
+                            updateTokenEstimate();
+                            input.focus();
+                        }
+                    }
                 );
 
 
