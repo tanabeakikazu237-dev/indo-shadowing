@@ -116,7 +116,6 @@
             flex: 1;
             min-height: 140px;
             padding: 12px;
-            padding-left: 40px; /* 先頭にタップしやすいよう十分な余白を設ける */
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
@@ -860,97 +859,11 @@
             >
         </div>
 
-
-        <div
-            class="control-group"
-            style="
-                flex-direction:column;
-                align-items:flex-start;
-                gap:6px;
-                background:#252528;
-                border:1px solid #3d3d42;
-            "
-        >
-            <div
-                style="
-                    display:flex;
-                    justify-content:space-between;
-                    width:100%;
-                    align-items:center;
-                "
-            >
-                <span
-                    style="
-                        font-size:0.8rem;
-                        font-weight:bold;
-                        color:#aaa;
-                    "
-                >
-                    🎙️ 音声仕様: Gemini 3.8 Flash TTS
-                    (Puck / Young Male Indonesian Narration)
-                </span>
-
-                <span
-                    id="rate-badge"
-                    style="
-                        font-size:0.75rem;
-                        padding:2px 6px;
-                        border-radius:4px;
-                        background:#1b5e20;
-                        color:#81c784;
-                    "
-                >
-                    ✅ キャッシュ有効
-                </span>
-            </div>
-
-            <div
-                style="
-                    font-size:0.8rem;
-                    color:#ddd;
-                    width:100%;
-                    display:grid;
-                    grid-template-columns:1fr 1fr;
-                    gap:4px;
-                "
-            >
-                <div>
-                    推定解析消費:
-                    <strong
-                        id="est-tokens"
-                        style="color:#007aff;"
-                    >
-                        0 Token
-                    </strong>
-                </div>
-
-                <div>
-                    直近1分:
-                    <strong
-                        id="rpm-count"
-                        style="color:#ffcc00;"
-                    >
-                        0 / 15 /分
-                    </strong>
-                </div>
-            </div>
-
-            <div
-                id="api-monitor-desc"
-                style="
-                    font-size:0.75rem;
-                    color:#888;
-                "
-            >
-                一度生成した音声はメモリキャッシュされ、再生時のTTS生成を省略します。
-            </div>
-        </div>
-
-
         <button
             class="btn"
             id="analyze-btn"
             type="button"
+            style="margin-top: 8px;"
         >
             ✨ Gemini AI で解析して開始
         </button>
@@ -2281,154 +2194,43 @@
                 ?.value
                 .trim() || '';
 
-        const tokenDisplay =
-            $('est-tokens');
-
-        const estStatus =
-            $('api-monitor-desc');
-
-        const rpmBadge =
-            $('rpm-count');
-
-        const rateBadge =
-            $('rate-badge');
-
         const btn =
             $('analyze-btn');
 
         pruneRpm();
-
-        if (rpmBadge) {
-            rpmBadge.textContent =
-                rpmTimestamps.length +
-                ' / ' +
-                CONFIG.maxRequestsPerMinute +
-                ' /分';
-        }
 
         const cached =
             text
                 ? !!getCachedResult(text)
                 : false;
 
-
         if (!text) {
-
-            if (tokenDisplay) {
-                tokenDisplay.textContent =
-                    '0 Token';
-            }
-
-            if (estStatus) {
-                estStatus.textContent =
-                    '音声キャッシュ有効（再生成を省略）';
-            }
-
-            if (rateBadge) {
-
-                rateBadge.textContent =
-                    '✅ 実行可能';
-
-                rateBadge.style.background =
-                    '#1b5e20';
-            }
-
             if (btn) {
                 btn.disabled = false;
+                btn.innerHTML = '✨ Gemini AI で解析して開始';
             }
-
             return 0;
         }
-
 
         if (cached) {
-
-            if (tokenDisplay) {
-                tokenDisplay.textContent =
-                    '0 (キャッシュ)';
-            }
-
-            if (estStatus) {
-                estStatus.textContent =
-                    '⚡ テキストキャッシュ利用（APIリクエスト 0）';
-            }
-
-            if (rateBadge) {
-
-                rateBadge.textContent =
-                    '⚡ キャッシュ';
-
-                rateBadge.style.background =
-                    '#1b5e20';
-            }
-
             if (btn) {
-
                 btn.disabled = false;
-
-                btn.innerHTML =
-                    '✨ キャッシュから開始';
+                btn.innerHTML = '✨ キャッシュから開始';
             }
-
             return 0;
         }
 
-
-        const total =
-            estimateTokens(text);
-
-        if (tokenDisplay) {
-            tokenDisplay.textContent =
-                '~' + total + ' Token';
-        }
-
+        const total = estimateTokens(text);
 
         if (!canMakeApiCall()) {
-
-            if (estStatus) {
-                estStatus.textContent =
-                    '🚫 レート制限に達しました。';
-            }
-
-            if (rateBadge) {
-
-                rateBadge.textContent =
-                    '⏳ 待機';
-
-                rateBadge.style.background =
-                    '#7f1d1d';
-            }
-
             if (btn) {
-
                 btn.disabled = true;
-
-                btn.innerHTML =
-                    '⏳ 1分間の制限中';
+                btn.innerHTML = '⏳ 1分間の制限中';
             }
-
         } else {
-
-            if (estStatus) {
-                estStatus.textContent =
-                    '✅ API実行可能';
-            }
-
-            if (rateBadge) {
-
-                rateBadge.textContent =
-                    '✅ 実行可能';
-
-                rateBadge.style.background =
-                    '#1b5e20';
-            }
-
             if (btn) {
-
                 btn.disabled = false;
-
-                btn.innerHTML =
-                    '✨ Gemini AI で解析して開始';
+                btn.innerHTML = '✨ Gemini AI で解析して開始';
             }
         }
 
