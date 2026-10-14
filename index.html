@@ -807,7 +807,6 @@
         </div>
     </header>
 
-
     <!-- SETUP VIEW -->
     <div class="card" id="setup-card">
 
@@ -831,7 +830,6 @@
             id="script-input"
             placeholder=" 例: @Saat memikirkan hikmat Yehuwa, kita merasa sangat kecil..."
         ></textarea>
-
 
         <div class="control-group">
             <span>
@@ -865,7 +863,6 @@
 
     </div>
 
-
     <!-- PLAYER VIEW -->
     <div id="player-area">
 
@@ -896,7 +893,6 @@
             </button>
 
         </div>
-
 
         <div
             class="audio-controls-bar"
@@ -948,14 +944,12 @@
 
         </div>
 
-
         <div
             class="content-area"
             id="content-area"
         ></div>
 
     </div>
-
 
     <!-- SETTINGS MODAL -->
     <div
@@ -1026,7 +1020,6 @@
                 </button>
             </div>
 
-
             <div
                 style="
                     border-top:1px solid #444;
@@ -1069,7 +1062,6 @@
                 </div>
             </div>
 
-
             <div
                 style="
                     display:flex;
@@ -1098,7 +1090,6 @@
 
         </div>
     </div>
-
 
     <!-- HISTORY MODAL -->
     <div
@@ -1147,7 +1138,6 @@
 
 </div>
 
-
 <script>
 (() => {
 
@@ -1155,10 +1145,10 @@
 
     const STORAGE = {
         apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v29',
+        history: 'indo_shadowing_history_v30',
         tapCounts: 'indo_shadowing_tapcounts_v13',
         rpm: 'rpm_timestamps_v13',
-        cachePrefix: 'indo_shadowing_cache_v29_'
+        cachePrefix: 'indo_shadowing_cache_v30_'
     };
 
     const CONFIG = {
@@ -1167,11 +1157,10 @@
         endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
         maxRequestsPerMinute: 15,
         maxHistory: 3,
-        cacheVersion: 29,
+        cacheVersion: 30,
         ttsVoice: 'Puck',
         ttsLanguageCode: 'id-ID'
     };
-
 
     let parsedData = {
         sentences: [],
@@ -1193,9 +1182,7 @@
     let audioContext = null;
     let activePlayback = null;
 
-    /*
-     * 文字サイズ設定：さらに2段階大きめの「超特大」「極大」を追加した全6段階
-     */
+    /* 全6段階のフォントサイズ設定 */
     const fontSizes = [
         { label: '小', id: 0.9, jp: 0.75 },
         { label: '標準', id: 1.1, jp: 0.9 },
@@ -1206,7 +1193,6 @@
     ];
 
     let currentFontSizeIndex = 1;
-
 
     function $(id) {
         return document.getElementById(id);
@@ -1254,7 +1240,6 @@
             toast.style.display = 'none';
         }, 4500);
     }
-
 
     function switchView(view) {
         if (view === 'setup') {
@@ -1316,7 +1301,6 @@
         input.type = input.type === 'password' ? 'text' : 'password';
     }
 
-
     function cycleFontSize() {
         currentFontSizeIndex = (currentFontSizeIndex + 1) % fontSizes.length;
         applyFontSize();
@@ -1333,7 +1317,6 @@
             textarea.style.fontSize = config.id + 'rem';
         }
     }
-
 
     function getHistory() {
         try {
@@ -1469,7 +1452,6 @@
         } catch (_) {}
     }
 
-
     function loadPersistentState() {
         try {
             const storedRpm = safeJsonParse(localStorage.getItem(STORAGE.rpm), []);
@@ -1505,7 +1487,6 @@
         updateTokenEstimate();
     }
 
-
     function cleanWordKey(str) {
         if (!str) return '';
         return String(str).normalize('NFKC').toLowerCase().replace(/[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]/g, '').trim();
@@ -1538,7 +1519,6 @@
         }
         return extracted;
     }
-
 
     function updateSpeedVal(val) {
         const n = Number.parseFloat(val);
@@ -1613,7 +1593,6 @@
         return total;
     }
 
-
     function normalizeParsedData(data, preprocessedSegments) {
         const result = {
             sentences: [],
@@ -1679,7 +1658,6 @@
 
         parsedData.vocabulary = [...existing.values()];
     }
-
 
     async function startApp() {
         const rawText = $('script-input')?.value.trim() || '';
@@ -1770,18 +1748,18 @@
     async function analyzeWithGemini(segments, apiKey) {
         const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
         
-        /* 4段階分析（1:語句対比, 2:構文構造, 3:接辞解剖, 4:解説・ニュアンス）を提示するプロンプト */
+        /* 構文構造を初心者にもわかりやすく簡潔・平易に説明するプロンプト */
         const systemPrompt =
-            'You are a professional Indonesian-to-Japanese linguistic expert and lexicographer.\n' +
+            'You are a friendly, expert Indonesian tutor for Japanese learners.\n' +
             'You will receive an array of Indonesian text segments.\n' +
-            'For each segment, analyze its grammar across exactly 4 distinct structured steps:\n' +
-            '1. "sentences": Exact, natural Japanese translation of the full segment (japanese).\n' +
+            'Analyze each segment in clear, beginner-friendly, easy-to-understand Japanese without overly complex academic jargon:\n' +
+            '1. "sentences": Natural Japanese translation of the full segment (japanese).\n' +
             '2. "grammar": Array containing objects with these exact 4 keys per segment:\n' +
-            '   - wordComparison: 【語句対比】 Detailed word-for-word comparison/alignment between Indonesian and Japanese.\n' +
-            '   - syntacticStructure: 【構文構造】 Clear syntactic pattern, clause structure, and word order explanation.\n' +
-            '   - affixDissection: 【接辞解剖】 Morphological analysis (prefixes me-, ber-, di-, suffixes -kan, -an, roots).\n' +
-            '   - nuanceExplanation: 【解説・ニュアンス】 Detailed usage context, nuances, and key grammar tips.\n' +
-            '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide its precise standalone dictionary meaning in Japanese.\n' +
+            '   - wordComparison: 【語句対比】 直訳・単語対応（どの単語がどの日本語に対応するかを簡潔に対比）\n' +
+            '   - syntacticStructure: 【構文構造】 語順や文法構造（例:「S（主語）+ V（動詞）+ O（目的語）」など、一目でわかる親切で簡単な言葉で説明）\n' +
+            '   - affixDissection: 【接辞解剖】 接頭辞・接尾辞（me-, ber-, di-, -kan, -an などの役割と原形を分かりやすく分解）\n' +
+            '   - nuanceExplanation: 【解説・ニュアンス】 日常会話の使い分けやニュアンス、役立つ学習ワンポイント\n' +
+            '3. "vocabulary": Extract EVERY unique Indonesian word. Strip punctuation and numbers. Provide precise standalone dictionary meaning in Japanese.\n' +
             'Return ONLY valid JSON matching the exact schema.';
 
         const payload = {
@@ -1850,7 +1828,6 @@
 
         return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
     }
-
 
     function getAudioContext() {
         if (audioContext) return audioContext;
@@ -1982,7 +1959,6 @@
         const copy = arrayBuffer.slice(0);
         return await ctx.decodeAudioData(copy);
     }
-
 
     function setTTSButtonState(btn, state) {
         if (!btn) return;
@@ -2130,7 +2106,6 @@
         }
     }
 
-
     function getCurrentPlaybackPosition(playback) {
         if (!playback) return 0;
         if (playback.paused) return playback.offset;
@@ -2170,9 +2145,6 @@
         }
     }
 
-    /*
-     * 単語長押し時に呼び出す一時停止・再開切替
-     */
     function togglePauseResumeSpeech() {
         if (!activePlayback) {
             showToast('現在再生中の音声はありません。');
@@ -2209,7 +2181,6 @@
         }
     }
 
-
     function sortVocabulary() {
         if (!parsedData?.vocabulary) return;
         parsedData.vocabulary.sort((a, b) => {
@@ -2243,7 +2214,6 @@
             renderFlashcard();
         }
     }
-
 
     function renderSentenceList() {
         const container = $('content-area');
@@ -2283,11 +2253,9 @@
                 const span = document.createElement('span');
                 span.className = 'word-token';
                 span.textContent = rawWord;
-                span.title = '1回タップ: 単語再生 | 2回タップ: 文再生 | 長押し: 一時停止/再開';
+                span.title = '1回タップ: 単語のみ再生 | 2回タップ: その単語以降も再生 | 長押し: 一時停止/再開';
 
-                /*
-                 * 1回タップ / 2回タップ / 長押しの判定処理を実装
-                 */
+                /* 1回タップ / 2回タップ / 長押し(500ms)のジェスチャー処理 */
                 attachWordTokenGesture(span, index, wIdx, cleanW, item, ttsBtn);
 
                 idText.appendChild(span);
@@ -2343,7 +2311,6 @@
         span.addEventListener('click', (e) => {
             e.stopPropagation();
 
-            // 長押しが成立していた場合はクリック処理を実行しない
             if (isLongPress) {
                 isLongPress = false;
                 return;
@@ -2360,8 +2327,8 @@
             } else if (tapCount === 2) {
                 clearTimeout(tapTimer);
                 tapCount = 0;
-                // 2回タップ: その単語が含まれる文を再生
-                handleDoubleWordTap(lineIndex, sentenceItem, sentenceTtsBtn);
+                // 2回タップ: タップした単語から文末まで（その単語以降）を再生
+                handleDoubleWordTap(lineIndex, wordIndex, sentenceItem, sentenceTtsBtn);
             }
         });
     }
@@ -2392,15 +2359,19 @@
         }, 800);
     }
 
-    async function handleDoubleWordTap(lineIndex, sentenceItem, sentenceTtsBtn) {
+    async function handleDoubleWordTap(lineIndex, wordIndex, sentenceItem, sentenceTtsBtn) {
         document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
         const targetDiv = $('line-' + lineIndex);
         targetDiv?.classList.add('active');
 
-        // 文全体の再生
-        await speakWithGeminiTTS(sentenceItem.indonesian, sentenceTtsBtn, ttsSentenceCache);
-    }
+        // その単語から文末までのテキストを取得（その単語以降を再生）
+        const words = sentenceItem.indonesian.split(/\s+/u).filter(Boolean);
+        const remainingText = words.slice(wordIndex).join(' ');
 
+        if (remainingText) {
+            await speakWithGeminiTTS(remainingText, sentenceTtsBtn, ttsSentenceCache);
+        }
+    }
 
     function renderGrammarList() {
         const container = $('content-area');
@@ -2468,7 +2439,6 @@
             container.appendChild(card);
         });
     }
-
 
     function renderFlashcard() {
         const container = $('content-area');
@@ -2656,7 +2626,6 @@
         $('current-flashcard')?.classList.remove('flipped');
     }
 
-
     function handleSearchInput(query) {
         clearTimeout(searchDebounceTimer);
         searchDebounceTimer = setTimeout(() => {
@@ -2709,7 +2678,6 @@
             results.style.display = 'block';
         }, 120);
     }
-
 
     function exportAppData() {
         try {
@@ -2765,7 +2733,6 @@
             if (event.target === modal) modal.style.display = 'none';
         });
     }
-
 
     window.addEventListener('load', () => {
         loadPersistentState();
