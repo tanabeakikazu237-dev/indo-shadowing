@@ -268,28 +268,6 @@
             position: relative;
         }
 
-        /* グループ（親見出し・子枝項目）のスタイル追加 */
-        .group-container {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 16px;
-        }
-
-        .line-item.header-item {
-            background: #1e293b;
-            border-left: 4px solid #007aff;
-            margin-bottom: 8px;
-        }
-
-        .line-item.child-item {
-            background: #252528;
-            margin-left: 16px;
-            margin-bottom: 6px;
-            border-left: 3px solid #444;
-        }
-
         .line-item.active {
             background-color: #1a2f4c !important;
             border-left: 4px solid var(--accent-color) !important;
@@ -835,7 +813,7 @@
         <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; gap: 8px;">
             <label for="script-input" style="flex: 1; margin-bottom: 0;">
                 インドネシア語のテキストを入力または貼り付け
-                （@がある行は優先抽出＋全改行を自動文節化）
+                （@優先、次に.で文節抽出）
             </label>
             <button
                 id="refresh-text-btn"
@@ -1519,54 +1497,27 @@
         return String(str).replace(/^[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+|[.,/#!$%^&*;:{}=\-_`~()[\]？。、「」"'“”’‘！？:\/\\]+$/g, '').trim();
     }
 
-    /**
-     * 【グループ構造対応テキスト前処理】
-     * @付き行を見出し(header)、通常行を枝項目(child)としてグループ構造化
-     */
     function preprocessIndonesianText(rawText) {
         if (!rawText) return [];
+        const atMatches = rawText.match(/@.*/g);
+        let extracted = [];
 
-        const lines = rawText.split('\n');
-        const groups = [];
-        let currentGroup = null;
-
-        lines.forEach(line => {
-            let cleaned = line.replace(/^[　\s\-–—・]+/g, '').trim();
-            if (!cleaned) return;
-
-            // @ または ＠ で始まる見出し行
-            if (/[＠@]/.test(cleaned)) {
-                cleaned = cleaned.replace(/^[＠@]\s*/, '').replace(/[＠@]/g, '').trim();
-                if (cleaned) {
-                    currentGroup = {
-                        header: cleaned,
-                        children: []
-                    };
-                    groups.push(currentGroup);
-                }
-            } else {
-                // 枝項目または通常行
-                if (!currentGroup) {
-                    currentGroup = { header: null, children: [] };
-                    groups.push(currentGroup);
-                }
-                currentGroup.children.push(cleaned);
+        if (atMatches && atMatches.length > 0) {
+            for (let line of atMatches) {
+                let content = line.replace(/^@\s*/, '').trim();
+                content = content.replace(/\s+\d+(?:[、,]\s*\d+)*$/, '').trim();
+                if (content) extracted.push(content);
             }
-        });
+        }
 
-        return groups;
-    }
-
-    /**
-     * AI解析用にフラットな配列として渡しつつグループ構造情報を保持
-     */
-    function flattenGroups(groups) {
-        const flatSegments = [];
-        groups.forEach(g => {
-            if (g.header) flatSegments.push(g.header);
-            g.children.forEach(c => flatSegments.push(c));
-        });
-        return flatSegments;
+        if (extracted.length === 0) {
+            const sentences = rawText.split('.');
+            for (let s of sentences) {
+                let content = s.trim();
+                if (content) extracted.push(content);
+            }
+        }
+        return extracted;
     }
 
     function updateSpeedVal(val) {
@@ -1797,6 +1748,7 @@
     async function analyzeWithGemini(segments, apiKey) {
         const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
         
+        /* 構文構造を初心者にもわかりやすく簡潔・平易に説明するプロンプト */
         const systemPrompt =
             'You are a friendly, expert Indonesian tutor for Japanese learners.\n' +
             'You will receive an array of Indonesian text segments.\n' +
@@ -2268,31 +2220,9 @@
         if (!container) return;
         container.textContent = '';
 
-        let globalIndex = 0;
-
-        // parsedData内の文節をグループごとにまとめる処理
-        const groups = [];
-        let currentGroup = null;
-
-        parsedData.sentences.forEach((item, index) => {
-            // 元のテキスト構造に基づいた判定
-            const isHeader = item.isHeader; 
-            
-            if (isHeader || !currentGroup) {
-                currentGroup = { headerItem: isHeader ? item : null, headerIndex: isHeader ? index : -1, children: [] };
-                groups.push(currentGroup);
-                if (!isHeader) {
-                    currentGroup.children.push({ item, index });
-                }
-            } else {
-                currentGroup.children.push({ item, index });
-            }
-        });
-
-        // レンダリング
         parsedData.sentences.forEach((item, index) => {
             const div = document.createElement('div');
-            div.className = 'line-item' + (item.isHeader ? ' header-item' : ' child-item');
+            div.className = 'line-item';
             div.id = 'line-' + index;
 
             /* TTSボタン（文全体再生） */
@@ -2314,13 +2244,6 @@
             const idText = document.createElement('div');
             idText.className = 'id-text';
 
-            if (item.isHeader) {
-                const badge = document.createElement('span');
-                badge.style.cssText = 'font-size:0.75rem;background:#007aff;color:#fff;padding:2px 6px;border-radius:4px;margin-right:8px;vertical-align:middle;';
-                badge.textContent = '見出し';
-                idText.appendChild(badge);
-            }
-
             item.indonesian.split(/\s+/u).filter(Boolean).forEach((rawWord, wIdx) => {
                 if (wIdx > 0) {
                     idText.appendChild(document.createTextNode(' '));
@@ -2330,7 +2253,9 @@
                 const span = document.createElement('span');
                 span.className = 'word-token';
                 span.textContent = rawWord;
-                
+                span.title = '1回タップ: 単語のみ再生 | 2回タップ: その単語以降も再生 | 長押し: 一時停止/再開';
+
+                /* 1回タップ / 2回タップ / 長押し(500ms)のジェスチャー処理 */
                 attachWordTokenGesture(span, index, wIdx, cleanW, item, ttsBtn);
 
                 idText.appendChild(span);
