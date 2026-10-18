@@ -6,6 +6,7 @@
     <title>インドネシア語 シャドーイング & 4段階文法解剖 & AIフラッシュカード</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* STREAMING_CHUNK: Base CSS Variables and Layout */
         * {
             box-sizing: border-box;
             -webkit-tap-highlight-color: transparent;
@@ -266,6 +267,7 @@
             background: #252528;
             border-left: 4px solid transparent;
             position: relative;
+            transition: border-left-color 0.2s, background-color 0.2s;
         }
 
         .line-item.active {
@@ -273,13 +275,19 @@
             border-left: 4px solid var(--accent-color) !important;
         }
 
+        /* 付箋（Sticky Note）のカラー指定クラス */
+        .sticky-yellow { border-left-color: #f59e0b !important; }
+        .sticky-green  { border-left-color: #10b981 !important; }
+        .sticky-pink   { border-left-color: #ec4899 !important; }
+        .sticky-blue   { border-left-color: #3b82f6 !important; }
+
         .id-text {
             font-size: var(--font-size-id);
             font-weight: bold;
             color: #ffffff;
             line-height: 1.6;
             word-break: break-word;
-            padding-right: 48px;
+            padding-right: 90px;
         }
 
         .word-token {
@@ -314,12 +322,30 @@
             word-break: break-word;
         }
 
+        /* 付箋メモ表示エリア */
+        .sticky-note-display {
+            margin-top: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: calc(var(--font-size-jp) * 0.95);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            word-break: break-word;
+            font-weight: 500;
+        }
+        .sticky-note-display.sticky-yellow { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .sticky-note-display.sticky-green  { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .sticky-note-display.sticky-pink   { background: rgba(236, 72, 153, 0.15); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+        .sticky-note-display.sticky-blue   { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+
         .grammar-card {
             background: #252528;
             border-radius: 10px;
             padding: 14px;
             margin-bottom: 12px;
             border-left: 4px solid #30d158;
+            position: relative;
         }
 
         .grammar-title {
@@ -334,6 +360,7 @@
             word-break: break-word;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 8px;
+            padding-right: 90px;
         }
 
         .grammar-grid {
@@ -373,10 +400,38 @@
             word-break: break-word;
         }
 
-        .tts-action-btn {
+        .action-btn-group {
             position: absolute;
             top: 10px;
             right: 12px;
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .sticky-trigger-btn {
+            height: 28px;
+            padding: 0 8px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ddd;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            transition: background 0.15s;
+        }
+        .sticky-trigger-btn:hover { background: rgba(255, 255, 255, 0.18); }
+        .sticky-trigger-btn.has-note {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }
+
+        .tts-action-btn {
             width: 34px;
             height: 28px;
             padding: 0;
@@ -420,7 +475,7 @@
         .grammar-tts-btn {
             flex-shrink: 0;
             width: 34px;
-            height: 30px;
+            height: 28px;
             padding: 0 !important;
             border-radius: 6px !important;
             font-size: 0.9rem !important;
@@ -674,6 +729,30 @@
             font-size: 0.9rem;
         }
 
+        /* 付箋カラーラジオボタン */
+        .color-picker-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+        .color-option {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #000;
+            font-weight: bold;
+        }
+        .color-option.selected {
+            border-color: #ffffff;
+            box-shadow: 0 0 8px rgba(255,255,255,0.6);
+        }
+
         .loading-spinner {
             display: inline-block;
             width: 16px;
@@ -724,12 +803,20 @@
                 padding: 13px 12px;
             }
 
-            .id-text {
-                padding-right: 42px;
+            .id-text, .grammar-title {
+                padding-right: 84px;
+            }
+
+            .action-btn-group {
+                right: 8px;
+            }
+
+            .sticky-trigger-btn {
+                padding: 0 6px;
+                font-size: 0.7rem;
             }
 
             .tts-action-btn {
-                right: 8px;
                 width: 32px;
                 height: 27px;
             }
@@ -747,6 +834,7 @@
 </head>
 
 <body>
+<!-- STREAMING_CHUNK: DOM Structure and Containers -->
 <div id="app-container">
 
     <header id="main-header">
@@ -969,7 +1057,7 @@
                     margin:0;
                 "
             >
-                APIキーや学習履歴はこのブラウザに保存されます。
+                APIキーや学習履歴・付箋メモはこのブラウザに保存されます。
             </p>
 
             <div>
@@ -1091,6 +1179,45 @@
         </div>
     </div>
 
+    <!-- STICKY NOTE MODAL (付箋タグ編集モーダル) -->
+    <div class="modal-overlay" id="sticky-modal">
+        <div class="modal-body">
+            <div class="modal-title">
+                📌 文節の付箋メモ指定
+            </div>
+            <p style="font-size:0.8rem;color:#aaa;margin:0;">
+                この文節に練習メモや注意点を残せます。
+            </p>
+
+            <div>
+                <label for="sticky-text-input">メモ内容（任意）</label>
+                <input type="text" id="sticky-text-input" placeholder="例: Rの発音に注意、要復習..." maxlength="60">
+            </div>
+
+            <div>
+                <label>付箋カラー</label>
+                <div class="color-picker-group">
+                    <div class="color-option selected" data-color="sticky-yellow" style="background:#f59e0b;">✓</div>
+                    <div class="color-option" data-color="sticky-green" style="background:#10b981;"></div>
+                    <div class="color-option" data-color="sticky-pink" style="background:#ec4899;"></div>
+                    <div class="color-option" data-color="sticky-blue" style="background:#3b82f6;"></div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:8px;margin-top:8px;">
+                <button class="btn btn-secondary" id="sticky-delete-btn" type="button" style="flex:1;background-color:#7f1d1d;color:#fca5a5;">
+                    削除
+                </button>
+                <button class="btn btn-secondary" id="sticky-cancel-btn" type="button" style="flex:1;">
+                    キャンセル
+                </button>
+                <button class="btn" id="sticky-save-btn" type="button" style="flex:1;">
+                    保存
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- HISTORY MODAL -->
     <div
         class="modal-overlay"
@@ -1139,16 +1266,18 @@
 </div>
 
 <script>
+/* STREAMING_CHUNK: Application Logic and State Management */
 (() => {
 
     'use strict';
 
     const STORAGE = {
         apiKey: 'gemini_api_key',
-        history: 'indo_shadowing_history_v30',
+        history: 'indo_shadowing_history_v31',
         tapCounts: 'indo_shadowing_tapcounts_v13',
         rpm: 'rpm_timestamps_v13',
-        cachePrefix: 'indo_shadowing_cache_v30_'
+        stickyNotes: 'indo_shadowing_sticky_v1',
+        cachePrefix: 'indo_shadowing_cache_v31_'
     };
 
     const CONFIG = {
@@ -1157,7 +1286,7 @@
         endpoint: 'https://generativelanguage.googleapis.com/v1beta/models/',
         maxRequestsPerMinute: 15,
         maxHistory: 3,
-        cacheVersion: 30,
+        cacheVersion: 31,
         ttsVoice: 'Puck',
         ttsLanguageCode: 'id-ID'
     };
@@ -1169,6 +1298,10 @@
     };
 
     let wordTapCounts = {};
+    let stickyNotes = {}; // 付箋メモの記憶 { sentenceIndex: { text: string, color: string } }
+    let editingStickyIndex = -1;
+    let selectedStickyColor = 'sticky-yellow';
+
     let currentMode = 'sentence';
     let cardIndex = 0;
     let searchDebounceTimer = null;
@@ -1458,9 +1591,12 @@
             rpmTimestamps = Array.isArray(storedRpm) ? storedRpm.filter(Number.isFinite) : [];
             const storedCounts = safeJsonParse(localStorage.getItem(STORAGE.tapCounts), {});
             wordTapCounts = storedCounts && typeof storedCounts === 'object' ? storedCounts : {};
+            const storedSticky = safeJsonParse(localStorage.getItem(STORAGE.stickyNotes), {});
+            stickyNotes = storedSticky && typeof storedSticky === 'object' ? storedSticky : {};
         } catch (_) {
             rpmTimestamps = [];
             wordTapCounts = {};
+            stickyNotes = {};
         }
         pruneRpm();
     }
@@ -1659,6 +1795,7 @@
         parsedData.vocabulary = [...existing.values()];
     }
 
+    /* STREAMING_CHUNK: API Calls and Async Audio Handling */
     async function startApp() {
         const rawText = $('script-input')?.value.trim() || '';
         if (!rawText) {
@@ -1748,7 +1885,6 @@
     async function analyzeWithGemini(segments, apiKey) {
         const apiUrl = CONFIG.endpoint + CONFIG.model + ':generateContent';
         
-        /* 構文構造を初心者にもわかりやすく簡潔・平易に説明するプロンプト */
         const systemPrompt =
             'You are a friendly, expert Indonesian tutor for Japanese learners.\n' +
             'You will receive an array of Indonesian text segments.\n' +
@@ -1826,7 +1962,8 @@
         const jsonText = data?.candidates?.[0]?.content?.parts?.find(part => typeof part?.text === 'string')?.text || '';
         if (!jsonText) throw new Error('Geminiから解析結果を取得できませんでした。');
 
-        return JSON.parse(jsonText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim());
+        return JSON.parse(jsonText.replace(/^
+```json\s*/i, '').replace(/```\s*$/, '').trim());
     }
 
     function getAudioContext() {
@@ -2215,17 +2352,105 @@
         }
     }
 
+    /* STREAMING_CHUNK: Sticky Note Logic and UI Rendering */
+    function openStickyModal(index) {
+        editingStickyIndex = index;
+        const noteObj = stickyNotes[index] || { text: '', color: 'sticky-yellow' };
+        
+        const input = $('sticky-text-input');
+        if (input) input.value = noteObj.text || '';
+
+        selectedStickyColor = noteObj.color || 'sticky-yellow';
+        updateStickyColorPickerUI();
+
+        const modal = $('sticky-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeStickyModal() {
+        const modal = $('sticky-modal');
+        if (modal) modal.style.display = 'none';
+        editingStickyIndex = -1;
+    }
+
+    function updateStickyColorPickerUI() {
+        const options = document.querySelectorAll('.color-option');
+        options.forEach(opt => {
+            const color = opt.getAttribute('data-color');
+            if (color === selectedStickyColor) {
+                opt.classList.add('selected');
+                opt.textContent = '✓';
+            } else {
+                opt.classList.remove('selected');
+                opt.textContent = '';
+            }
+        });
+    }
+
+    function saveStickyNote() {
+        if (editingStickyIndex < 0) return;
+        const text = $('sticky-text-input')?.value.trim() || '';
+        
+        stickyNotes[editingStickyIndex] = {
+            text: text,
+            color: selectedStickyColor
+        };
+
+        try {
+            localStorage.setItem(STORAGE.stickyNotes, JSON.stringify(stickyNotes));
+        } catch (_) {}
+
+        closeStickyModal();
+        if (currentMode === 'sentence') {
+            renderSentenceList();
+        } else if (currentMode === 'grammar') {
+            renderGrammarList();
+        }
+        showToast('付箋メモを保存しました。');
+    }
+
+    function deleteStickyNote() {
+        if (editingStickyIndex < 0) return;
+        delete stickyNotes[editingStickyIndex];
+
+        try {
+            localStorage.setItem(STORAGE.stickyNotes, JSON.stringify(stickyNotes));
+        } catch (_) {}
+
+        closeStickyModal();
+        if (currentMode === 'sentence') {
+            renderSentenceList();
+        } else if (currentMode === 'grammar') {
+            renderGrammarList();
+        }
+        showToast('付箋メモを削除しました。');
+    }
+
     function renderSentenceList() {
         const container = $('content-area');
         if (!container) return;
         container.textContent = '';
 
         parsedData.sentences.forEach((item, index) => {
+            const noteObj = stickyNotes[index];
             const div = document.createElement('div');
-            div.className = 'line-item';
+            div.className = 'line-item' + (noteObj ? ' ' + noteObj.color : '');
             div.id = 'line-' + index;
 
-            /* TTSボタン（文全体再生） */
+            /* アクションボタン（付箋＋TTS再生） */
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'action-btn-group';
+
+            const stickyBtn = document.createElement('button');
+            stickyBtn.type = 'button';
+            stickyBtn.className = 'sticky-trigger-btn' + (noteObj ? ' has-note' : '');
+            stickyBtn.innerHTML = noteObj ? '📌 付箋' : '📌 付箋';
+            stickyBtn.title = '文節に付箋メモ・注釈を追加';
+            stickyBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                openStickyModal(index);
+            });
+
             const ttsBtn = document.createElement('button');
             ttsBtn.type = 'button';
             ttsBtn.className = 'tts-action-btn';
@@ -2239,6 +2464,8 @@
 
                 await speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
             });
+
+            btnGroup.append(stickyBtn, ttsBtn);
 
             /* Indonesian text and Word Token creation */
             const idText = document.createElement('div');
@@ -2266,10 +2493,18 @@
             jpText.className = 'jp-text';
             jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-            div.append(ttsBtn, idText, jpText);
+            div.append(btnGroup, idText, jpText);
+
+            /* 付箋メモがある場合は直下に表示 */
+            if (noteObj && (noteObj.text || noteObj.color)) {
+                const noteDisplay = document.createElement('div');
+                noteDisplay.className = 'sticky-note-display ' + noteObj.color;
+                noteDisplay.innerHTML = `<span>📌</span> <span>${noteObj.text ? noteObj.text : '（指定あり）'}</span>`;
+                div.appendChild(noteDisplay);
+            }
 
             div.addEventListener('click', event => {
-                if (event.target.closest('.word-token, .tts-action-btn')) {
+                if (event.target.closest('.word-token, .action-btn-group')) {
                     return;
                 }
                 document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
@@ -2385,14 +2620,28 @@
         }
 
         grammarArray.forEach((gItem, index) => {
+            const noteObj = stickyNotes[index];
             const card = document.createElement('div');
-            card.className = 'grammar-card';
+            card.className = 'grammar-card' + (noteObj ? ' ' + noteObj.color : '');
 
             const title = document.createElement('div');
             title.className = 'grammar-title';
 
             const titleSpan = document.createElement('span');
             titleSpan.textContent = '文節 ' + (index + 1) + ': ' + (gItem.indonesian || '');
+
+            const btnGroup = document.createElement('div');
+            btnGroup.className = 'action-btn-group';
+
+            const stickyBtn = document.createElement('button');
+            stickyBtn.type = 'button';
+            stickyBtn.className = 'sticky-trigger-btn' + (noteObj ? ' has-note' : '');
+            stickyBtn.innerHTML = noteObj ? '📌 付箋' : '📌 付箋';
+            stickyBtn.title = '文節に付箋メモ・注釈を追加';
+            stickyBtn.addEventListener('click', e => {
+                e.stopPropagation();
+                openStickyModal(index);
+            });
 
             const ttsGrammarBtn = document.createElement('button');
             ttsGrammarBtn.type = 'button';
@@ -2405,8 +2654,18 @@
                 await speakWithGeminiTTS(gItem.indonesian || '', ttsGrammarBtn, ttsSentenceCache);
             });
 
-            title.append(titleSpan, ttsGrammarBtn);
-            card.appendChild(title);
+            btnGroup.append(stickyBtn, ttsGrammarBtn);
+            title.append(titleSpan);
+            card.append(btnGroup, title);
+
+            /* 付箋メモ表示 */
+            if (noteObj && (noteObj.text || noteObj.color)) {
+                const noteDisplay = document.createElement('div');
+                noteDisplay.className = 'sticky-note-display ' + noteObj.color;
+                noteDisplay.style.marginBottom = '10px';
+                noteDisplay.innerHTML = `<span>📌</span> <span>${noteObj.text ? noteObj.text : '（指定あり）'}</span>`;
+                card.appendChild(noteDisplay);
+            }
 
             /* 4段階分解表示構造（1: 語句対比, 2: 構文構造, 3: 接辞解剖, 4: 解説・ニュアンス） */
             const sections = [
@@ -2440,6 +2699,7 @@
         });
     }
 
+    /* STREAMING_CHUNK: Flashcards and Search Implementation */
     function renderFlashcard() {
         const container = $('content-area');
         if (!container) return;
@@ -2681,7 +2941,11 @@
 
     function exportAppData() {
         try {
-            const data = { history: getHistory(), tapCounts: wordTapCounts };
+            const data = { 
+                history: getHistory(), 
+                tapCounts: wordTapCounts,
+                stickyNotes: stickyNotes
+            };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2715,6 +2979,10 @@
                     wordTapCounts = json.tapCounts;
                     localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts));
                 }
+                if (json.stickyNotes && typeof json.stickyNotes === 'object') {
+                    stickyNotes = json.stickyNotes;
+                    localStorage.setItem(STORAGE.stickyNotes, JSON.stringify(stickyNotes));
+                }
                 updateHistoryUI();
                 closeSettings();
                 showToast('インポート成功しました。');
@@ -2734,6 +3002,7 @@
         });
     }
 
+    /* STREAMING_CHUNK: Event Listeners and App Initialization */
     window.addEventListener('load', () => {
         loadPersistentState();
         checkApiKeyStatus();
@@ -2750,18 +3019,24 @@
         });
 
         $('fontsize-toggle-btn')?.addEventListener('click', cycleFontSize);
-        $('settings-open-btn')?.addEventListener('click', openSettings);
-        $('settings-cancel-btn')?.addEventListener('click', closeSettings);
-        $('settings-save-btn')?.addEventListener('click', saveApiKey);
-        $('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
-        $('export-btn')?.addEventListener('click', exportAppData);
-        $('import-file-input')?.addEventListener('change', importAppData);
-        $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
-        $('history-close-btn')?.addEventListener('click', closeHistoryModal);
+        $('settings-open-btn')?.addEventListener('click', openSettings);$('settings-cancel-btn')?.addEventListener('click', closeSettings);
+        $('settings-save-btn')?.addEventListener('click', saveApiKey);$('key-visibility-btn')?.addEventListener('click', toggleKeyVisibility);
+        $('export-btn')?.addEventListener('click', exportAppData);$('import-file-input')?.addEventListener('change', importAppData);
+        $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);$('history-close-btn')?.addEventListener('click', closeHistoryModal);
+
+        /* Sticky Modal Listener */
+        $('sticky-cancel-btn')?.addEventListener('click', closeStickyModal);
+        $('sticky-save-btn')?.addEventListener('click', saveStickyNote);$('sticky-delete-btn')?.addEventListener('click', deleteStickyNote);
+
+        document.querySelectorAll('.color-option').forEach(opt => {
+            opt.addEventListener('click', () => {
+                selectedStickyColor = opt.getAttribute('data-color') || 'sticky-yellow';
+                updateStickyColorPickerUI();
+            });
+        });
 
         /* Main Setup */
-        $('analyze-btn')?.addEventListener('click', startApp);
-        $('refresh-text-btn')?.addEventListener('click', () => {
+        $('analyze-btn')?.addEventListener('click', startApp);$('refresh-text-btn')?.addEventListener('click', () => {
             const input = $('script-input');
             if (input) {
                 input.value = '';
@@ -2772,19 +3047,17 @@
 
         /* Mode Tabs */
         $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
-        $('tab-grammar')?.addEventListener('click', () => switchMode('grammar'));
-        $('tab-word')?.addEventListener('click', () => switchMode('word'));
+        $('tab-grammar')?.addEventListener('click', () => switchMode('grammar'));$('tab-word')?.addEventListener('click', () => switchMode('word'));
 
         /* Audio Control Bar (Stop button & speed) */
         $('stop-speech-btn')?.addEventListener('click', stopSpeech);
 
         /* Input listeners */
-        $('script-input')?.addEventListener('input', updateTokenEstimate);
-        $('script-input')?.addEventListener('paste', e => {
+        $('script-input')?.addEventListener('input', updateTokenEstimate);$('script-input')?.addEventListener('paste', e => {
             e.preventDefault();
             const text = (e.clipboardData || window.clipboardData).getData('text');
             if (text) {
-                const transformedText = text.split('\n').map(line => line ? '　' + line : line).join('\n');
+                const transformedText = text.split('\n').map(line => line ? ' ' + line : line).join('\n');
                 const el = e.target;
                 const start = el.selectionStart;
                 const end = el.selectionEnd;
@@ -2793,16 +3066,16 @@
             }
         });
 
-        $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
-        $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
+        $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));$('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
 
         /* Modal outside clicks */
         setupModalOutsideClose('settings-modal');
         setupModalOutsideClose('history-modal');
+        setupModalOutsideClose('sticky-modal');
 
         document.addEventListener('keydown', event => {
             if (event.key !== 'Escape') return;
-            ['settings-modal', 'history-modal'].forEach(id => {
+            ['settings-modal', 'history-modal', 'sticky-modal'].forEach(id => {
                 const modal = $(id);
                 if (modal) modal.style.display = 'none';
             });
@@ -2818,3 +3091,4 @@
 
 </body>
 </html>
+```eof
