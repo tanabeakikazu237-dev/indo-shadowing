@@ -20,8 +20,8 @@
             --accent-color: #007aff;
             --text-main: #f0f0f0;
             --text-sub: #aaaaaa;
-            --font-size-id: 1.05rem;
-            --font-size-jp: 0.88rem;
+            --font-size-id: 1.1rem;
+            --font-size-jp: 0.9rem;
         }
 
         body {
@@ -34,6 +34,7 @@
             align-items: center;
             min-height: 100vh;
             min-height: 100dvh;
+            overflow: hidden;
         }
 
         #app-container {
@@ -48,6 +49,7 @@
             color: var(--text-main);
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            overflow: hidden;
         }
 
         @media (min-width: 768px) {
@@ -63,6 +65,16 @@
             margin-bottom: 12px;
             flex-shrink: 0;
             min-height: 40px;
+            gap: 8px;
+            width: 100%;
+        }
+
+        #header-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+            flex: 1;
         }
 
         h1 {
@@ -72,6 +84,16 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        #header-right {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-shrink: 0;
         }
 
         .icon-btn {
@@ -87,6 +109,8 @@
             justify-content: center;
             gap: 4px;
             font-weight: 600;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .icon-btn:active {
@@ -102,6 +126,7 @@
             gap: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
         }
 
@@ -115,7 +140,7 @@
         textarea {
             width: 100%;
             flex: 1;
-            min-height: 140px;
+            min-height: 100px;
             padding: 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
@@ -142,16 +167,20 @@
             border-radius: 8px;
             width: 100%;
             flex-shrink: 0;
+            gap: 8px;
         }
 
         .control-group span {
             font-size: 0.85rem;
             color: #ddd;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         input[type="range"] {
             flex: 1;
-            margin: 0 12px;
+            margin: 0 8px;
+            min-width: 60px;
         }
 
         .btn {
@@ -221,14 +250,16 @@
             display: none;
             flex-direction: column;
             flex: 1;
+            min-height: 0;
             overflow: hidden;
             gap: 10px;
         }
 
         .tab-container {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             flex-shrink: 0;
+            width: 100%;
         }
 
         .tab-btn {
@@ -238,10 +269,13 @@
             border: none;
             border-radius: 8px;
             color: #aaa;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .tab-btn.active {
@@ -251,6 +285,7 @@
 
         .content-area {
             flex: 1;
+            min-height: 0;
             overflow-y: auto;
             background: var(--card-bg);
             border-radius: 14px;
@@ -261,14 +296,12 @@
         }
 
         .line-item {
-            padding: 12px 14px;
+            padding: 14px 16px;
             margin-bottom: 10px;
             border-radius: 10px;
             background: #252528;
             border-left: 4px solid transparent;
             position: relative;
-            display: flex;
-            flex-direction: column;
         }
 
         .line-item.active {
@@ -276,36 +309,25 @@
             border-left: 4px solid var(--accent-color) !important;
         }
 
-        .line-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 8px;
-            width: 100%;
-        }
-
         .id-text {
             font-size: var(--font-size-id);
-            font-weight: 600;
+            font-weight: bold;
             color: #ffffff;
-            line-height: 1.5;
+            line-height: 1.6;
             word-break: break-word;
-            flex: 1;
-            padding-right: 0;
+            padding-right: 48px;
         }
 
         .word-token {
-            display: inline;
-            padding: 1px 2px;
-            margin: 0;
-            border-radius: 3px;
+            display: inline-block;
+            padding: 2px 4px;
+            margin: 1px 2px;
+            border-radius: 4px;
             cursor: pointer;
-            border-bottom: 1.5px dotted #777;
+            border-bottom: 1.5px dotted #666;
             user-select: none;
             -webkit-user-select: none;
             transition: background 0.15s, border-color 0.15s;
-            box-decoration-break: clone;
-            -webkit-box-decoration-break: clone;
         }
 
         .word-token:hover {
@@ -324,7 +346,7 @@
             margin-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 6px;
-            line-height: 1.45;
+            line-height: 1.4;
             word-break: break-word;
         }
 
@@ -343,7 +365,7 @@
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             gap: 8px;
             word-break: break-word;
             border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -377,6 +399,7 @@
             display: flex;
             align-items: center;
             gap: 4px;
+            flex-wrap: wrap;
         }
 
         .grammar-section-body {
@@ -388,21 +411,22 @@
         }
 
         .tts-action-btn {
-            flex-shrink: 0;
-            width: 32px;
-            height: 30px;
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            width: 34px;
+            height: 28px;
             padding: 0;
             background: rgba(0, 122, 255, 0.14);
             border: 1px solid rgba(0, 122, 255, 0.65);
             color: #fff;
             border-radius: 6px;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.15s, transform 0.1s;
-            margin-top: 2px;
         }
 
         .tts-action-btn:hover {
@@ -425,9 +449,9 @@
 
         .tts-action-btn.loading {
             width: auto;
-            min-width: 32px;
-            padding: 0 6px;
-            font-size: 0.65rem;
+            min-width: 34px;
+            padding: 0 7px;
+            font-size: 0.68rem;
         }
 
         .grammar-tts-btn {
@@ -445,7 +469,7 @@
             align-items: center;
             justify-content: flex-start;
             height: 100%;
-            gap: 12px;
+            gap: 10px;
             width: 100%;
         }
 
@@ -453,7 +477,7 @@
             width: 100%;
             max-width: 100%;
             position: relative;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
 
         .search-input-box {
@@ -506,7 +530,13 @@
             perspective: 1000px;
             width: 100%;
             max-width: 100%;
-            height: 240px;
+            height: 200px;
+        }
+
+        @media (min-height: 700px) {
+            .perspective-box {
+                height: 240px;
+            }
         }
 
         .flashcard {
@@ -532,7 +562,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
             text-align: center;
             border: 1px solid #333;
             box-shadow: 0 8px 20px rgba(0,0,0,0.4);
@@ -550,7 +580,7 @@
         }
 
         .card-word {
-            font-size: calc(var(--font-size-id) * 1.5);
+            font-size: calc(var(--font-size-id) * 1.3);
             font-weight: bold;
             margin-bottom: 8px;
             word-break: break-word;
@@ -558,25 +588,25 @@
 
         .tap-count-badge {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            font-size: 0.75rem;
+            top: 10px;
+            right: 10px;
+            font-size: 0.72rem;
             background: rgba(255, 255, 255, 0.15);
-            padding: 3px 8px;
+            padding: 2px 6px;
             border-radius: 12px;
             color: #ffcc00;
             border: 1px solid rgba(255, 204, 0, 0.3);
         }
 
         .card-hint {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: #aaa;
             position: absolute;
-            bottom: 12px;
+            bottom: 10px;
         }
 
         .card-meaning {
-            font-size: calc(var(--font-size-id) * 1.2);
+            font-size: calc(var(--font-size-id) * 1.1);
             font-weight: 600;
             color: #ffd700;
             word-break: break-word;
@@ -585,7 +615,7 @@
         .card-controls {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 6px;
             width: 100%;
             max-width: 100%;
             justify-content: space-between;
@@ -599,7 +629,7 @@
                 max-width: 480px;
             }
             .perspective-box {
-                height: 280px;
+                height: 260px;
             }
         }
 
@@ -607,13 +637,14 @@
             background: var(--card-sub-bg);
             border: 1px solid #444;
             color: #fff;
-            padding: 10px 16px;
+            padding: 8px 6px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             flex: 1;
             text-align: center;
-            font-size: var(--font-size-jp);
+            font-size: 0.8rem;
+            white-space: nowrap;
         }
 
         .audio-controls-bar {
@@ -621,10 +652,10 @@
             align-items: center;
             justify-content: space-between;
             background: var(--card-sub-bg);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 10px;
-            margin-bottom: 10px;
-            gap: 10px;
+            margin-bottom: 2px;
+            gap: 8px;
             flex-shrink: 0;
         }
 
@@ -632,11 +663,12 @@
             background: #333;
             border: 1px solid #555;
             color: #fff;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 6px;
             font-size: 0.8rem;
             cursor: pointer;
             text-align: center;
+            white-space: nowrap;
         }
 
         .audio-btn:disabled {
@@ -654,23 +686,25 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 16px;
         }
 
         .modal-body {
             background: var(--card-bg);
-            padding: 20px;
+            padding: 16px;
             border-radius: 14px;
             width: 100%;
             max-width: 400px;
+            max-height: 90vh;
+            overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 12px;
             border: 1px solid #444;
         }
 
         .modal-title {
-            font-size: 1.1rem;
+            font-size: 1.05rem;
             font-weight: bold;
             margin: 0;
             color: #fff;
@@ -720,43 +754,54 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
-        @media (max-width: 640px) {
-            :root {
-                --font-size-id: 1.0rem;
-                --font-size-jp: 0.85rem;
-            }
-
+        @media (max-width: 480px) {
             #app-container {
-                padding: 6px;
-            }
-
-            .content-area {
                 padding: 8px;
             }
 
-            .line-item {
-                padding: 10px 10px 8px 10px;
+            header {
                 margin-bottom: 8px;
             }
 
-            .word-token {
-                padding: 1px 1px;
-                margin: 0;
-            }
-
-            .tts-action-btn {
-                width: 30px;
-                height: 28px;
-            }
-        }
-
-        @media (max-width: 480px) {
             h1 {
-                font-size: 0.88rem;
+                font-size: 0.82rem;
             }
 
             .icon-btn {
-                padding: 5px 8px;
+                padding: 5px 7px;
+                font-size: 0.78rem;
+                border-radius: 6px;
+            }
+
+            #fontsize-label {
+                display: none;
+            }
+
+            .card {
+                padding: 12px;
+                gap: 10px;
+            }
+
+            .tab-btn {
+                padding: 7px 2px;
+                font-size: 0.72rem;
+            }
+
+            .line-item {
+                padding: 10px 10px;
+                margin-bottom: 8px;
+            }
+
+            .id-text {
+                padding-right: 38px;
+                font-size: calc(var(--font-size-id) * 0.95);
+            }
+
+            .tts-action-btn {
+                right: 6px;
+                top: 8px;
+                width: 30px;
+                height: 26px;
                 font-size: 0.8rem;
             }
 
@@ -768,6 +813,25 @@
                 padding: 5px 8px;
                 font-size: 0.75rem;
             }
+
+            .modal-body {
+                padding: 14px;
+                max-width: calc(100vw - 20px);
+                gap: 10px;
+            }
+
+            .grammar-card {
+                padding: 10px;
+            }
+
+            .grammar-section {
+                padding: 8px 10px;
+            }
+
+            .ctrl-btn {
+                padding: 8px 4px;
+                font-size: 0.75rem;
+            }
         }
     </style>
 </head>
@@ -776,7 +840,7 @@
 <div id="app-container">
 
     <header id="main-header">
-        <div id="header-left" style="display:flex;align-items:center;">
+        <div id="header-left">
             <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini TTS)</h1>
 
             <button
@@ -789,7 +853,7 @@
             </button>
         </div>
 
-        <div id="header-right" style="display:flex;gap:6px;align-items:center;">
+        <div id="header-right">
             <button
                 class="icon-btn"
                 id="fontsize-toggle-btn"
@@ -836,10 +900,10 @@
     <!-- SETUP VIEW -->
     <div class="card" id="setup-card">
 
-        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; gap: 8px;">
-            <label for="script-input" style="flex: 1; margin-bottom: 0;">
+        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
+            <label for="script-input" style="flex: 1; margin-bottom: 0; line-height: 1.3;">
                 インドネシア語のテキストを入力または貼り付け
-                （@優先、次に.で文節抽出）
+                <span style="display: block; font-size: 0.75rem; color: #888;">（@優先、次に.で文節抽出）</span>
             </label>
             <button
                 id="refresh-text-btn"
@@ -882,7 +946,7 @@
             class="btn"
             id="analyze-btn"
             type="button"
-            style="margin-top: 8px;"
+            style="margin-top: 4px;"
         >
             ✨ Gemini AI で解析して開始
         </button>
@@ -1211,11 +1275,11 @@
     /* 全6段階のフォントサイズ設定 */
     const fontSizes = [
         { label: '小', id: 0.9, jp: 0.75 },
-        { label: '標準', id: 1.05, jp: 0.88 },
-        { label: '大', id: 1.2, jp: 1.0 },
-        { label: '特大', id: 1.35, jp: 1.15 },
-        { label: '超特大', id: 1.5, jp: 1.3 },
-        { label: '極大', id: 1.7, jp: 1.45 }
+        { label: '標準', id: 1.1, jp: 0.9 },
+        { label: '大', id: 1.3, jp: 1.05 },
+        { label: '特大', id: 1.5, jp: 1.2 },
+        { label: '超特大', id: 1.7, jp: 1.35 },
+        { label: '極大', id: 1.9, jp: 1.5 }
     ];
 
     let currentFontSizeIndex = 1;
@@ -2249,10 +2313,6 @@
             div.className = 'line-item';
             div.id = 'line-' + index;
 
-            const lineHeader = document.createElement('div');
-            lineHeader.className = 'line-header';
-
-            /* TTSボタン（文全体再生） */
             const ttsBtn = document.createElement('button');
             ttsBtn.type = 'button';
             ttsBtn.className = 'tts-action-btn';
@@ -2267,7 +2327,6 @@
                 await speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
             });
 
-            /* Indonesian text and Word Token creation */
             const idText = document.createElement('div');
             idText.className = 'id-text';
 
@@ -2283,17 +2342,15 @@
                 span.title = '1回タップ: 単語のみ再生 | 2回タップ: その単語以降も再生 | 長押し: 一時停止/再開';
 
                 attachWordTokenGesture(span, index, wIdx, cleanW, item, ttsBtn);
+
                 idText.appendChild(span);
             });
 
-            lineHeader.append(idText, ttsBtn);
-
-            /* Japanese translation */
             const jpText = document.createElement('div');
             jpText.className = 'jp-text';
             jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-            div.append(lineHeader, jpText);
+            div.append(ttsBtn, idText, jpText);
 
             div.addEventListener('click', event => {
                 if (event.target.closest('.word-token, .tts-action-btn')) {
@@ -2473,7 +2530,6 @@
         const wrapper = document.createElement('div');
         wrapper.className = 'flashcard-wrapper';
 
-        /* Search */
         const searchContainer = document.createElement('div');
         searchContainer.className = 'search-container';
 
@@ -2489,12 +2545,10 @@
 
         searchContainer.append(searchInput, results);
 
-        /* Counter */
         const counter = document.createElement('div');
         counter.id = 'card-counter';
         counter.style.cssText = 'font-size:var(--font-size-jp);color:#aaa;';
 
-        /* Flashcard */
         const perspective = document.createElement('div');
         perspective.className = 'perspective-box';
 
@@ -2507,7 +2561,6 @@
             playCurrentCardSpeech();
         });
 
-        /* Front */
         const front = document.createElement('div');
         front.className = 'card-face card-front';
 
@@ -2538,7 +2591,6 @@
 
         front.append(frontLabel, frontBadge, frontWord, frontAudio, frontHint);
 
-        /* Back */
         const back = document.createElement('div');
         back.className = 'card-face card-back';
 
@@ -2563,7 +2615,6 @@
         flashcard.append(front, back);
         perspective.appendChild(flashcard);
 
-        /* Controls */
         const controls = document.createElement('div');
         controls.className = 'card-controls';
 
@@ -2794,7 +2845,7 @@
         $('tab-grammar')?.addEventListener('click', () => switchMode('grammar'));
         $('tab-word')?.addEventListener('click', () => switchMode('word'));
 
-        /* Audio Control Bar (Stop button & speed) */
+        /* Audio Control Bar */
         $('stop-speech-btn')?.addEventListener('click', stopSpeech);
 
         /* Input listeners */
