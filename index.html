@@ -20,8 +20,8 @@
             --accent-color: #007aff;
             --text-main: #f0f0f0;
             --text-sub: #aaaaaa;
-            --font-size-id: 1.1rem;
-            --font-size-jp: 0.9rem;
+            --font-size-id: 1.0rem;
+            --font-size-jp: 0.85rem;
         }
 
         body {
@@ -35,17 +35,18 @@
             min-height: 100vh;
             min-height: 100dvh;
             overflow: hidden;
+            width: 100%;
         }
 
         #app-container {
             background-color: var(--app-bg);
-            width: 100%;
+            width: 100vw;
             max-width: 1024px;
             height: 100vh;
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding: 12px;
+            padding: 8px;
             color: var(--text-main);
             position: relative;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
@@ -54,7 +55,8 @@
 
         @media (min-width: 768px) {
             #app-container {
-                padding: 24px;
+                padding: 20px;
+                width: 100%;
             }
         }
 
@@ -62,10 +64,10 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
             flex-shrink: 0;
-            min-height: 40px;
-            gap: 8px;
+            min-height: 36px;
+            gap: 6px;
             width: 100%;
         }
 
@@ -264,12 +266,12 @@
 
         .tab-btn {
             flex: 1;
-            padding: 8px 4px;
+            padding: 8px 2px;
             background: var(--card-sub-bg);
             border: none;
             border-radius: 8px;
             color: #aaa;
-            font-size: 0.78rem;
+            font-size: 0.75rem;
             font-weight: bold;
             cursor: pointer;
             text-align: center;
@@ -289,15 +291,15 @@
             overflow-y: auto;
             background: var(--card-bg);
             border-radius: 14px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             -webkit-overflow-scrolling: touch;
         }
 
         .line-item {
-            padding: 14px 16px;
-            margin-bottom: 10px;
+            padding: 10px 12px;
+            margin-bottom: 8px;
             border-radius: 10px;
             background: #252528;
             border-left: 4px solid transparent;
@@ -313,21 +315,23 @@
             font-size: var(--font-size-id);
             font-weight: bold;
             color: #ffffff;
-            line-height: 1.6;
-            word-break: break-word;
-            padding-right: 48px;
+            line-height: 1.5;
+            word-break: normal;
+            overflow-wrap: break-word;
+            padding-right: 36px;
         }
 
         .word-token {
             display: inline-block;
-            padding: 2px 4px;
-            margin: 1px 2px;
+            padding: 2px 3px;
+            margin: 1px 1px;
             border-radius: 4px;
             cursor: pointer;
             border-bottom: 1.5px dotted #666;
             user-select: none;
             -webkit-user-select: none;
             transition: background 0.15s, border-color 0.15s;
+            white-space: nowrap;
         }
 
         .word-token:hover {
@@ -756,81 +760,89 @@
 
         @media (max-width: 480px) {
             #app-container {
-                padding: 8px;
+                padding: 6px;
+                width: 100vw;
             }
 
             header {
-                margin-bottom: 8px;
+                margin-bottom: 6px;
             }
 
             h1 {
-                font-size: 0.82rem;
+                font-size: 0.8rem;
             }
 
             .icon-btn {
-                padding: 5px 7px;
-                font-size: 0.78rem;
+                padding: 4px 6px;
+                font-size: 0.75rem;
                 border-radius: 6px;
             }
 
             #fontsize-label {
-                display: none;
+                display: inline;
             }
 
             .card {
-                padding: 12px;
-                gap: 10px;
+                padding: 10px;
+                gap: 8px;
             }
 
             .tab-btn {
-                padding: 7px 2px;
-                font-size: 0.72rem;
+                padding: 6px 1px;
+                font-size: 0.7rem;
+                white-space: nowrap;
             }
 
             .line-item {
-                padding: 10px 10px;
-                margin-bottom: 8px;
+                padding: 8px 10px;
+                margin-bottom: 6px;
             }
 
             .id-text {
-                padding-right: 38px;
-                font-size: calc(var(--font-size-id) * 0.95);
+                padding-right: 32px;
+                font-size: var(--font-size-id);
+            }
+
+            .word-token {
+                padding: 1px 2px;
+                margin: 1px 1px;
+                white-space: nowrap;
             }
 
             .tts-action-btn {
                 right: 6px;
-                top: 8px;
-                width: 30px;
-                height: 26px;
-                font-size: 0.8rem;
+                top: 6px;
+                width: 28px;
+                height: 24px;
+                font-size: 0.75rem;
             }
 
             .audio-controls-bar {
-                padding: 6px 8px;
+                padding: 4px 6px;
             }
 
             .audio-btn {
-                padding: 5px 8px;
-                font-size: 0.75rem;
+                padding: 4px 8px;
+                font-size: 0.72rem;
             }
 
             .modal-body {
-                padding: 14px;
-                max-width: calc(100vw - 20px);
-                gap: 10px;
+                padding: 12px;
+                max-width: calc(100vw - 16px);
+                gap: 8px;
             }
 
             .grammar-card {
-                padding: 10px;
+                padding: 8px;
             }
 
             .grammar-section {
-                padding: 8px 10px;
+                padding: 6px 8px;
             }
 
             .ctrl-btn {
-                padding: 8px 4px;
-                font-size: 0.75rem;
+                padding: 6px 2px;
+                font-size: 0.72rem;
             }
         }
     </style>
@@ -1272,14 +1284,14 @@
     let audioContext = null;
     let activePlayback = null;
 
-    /* 全6段階のフォントサイズ設定 */
+    /* 全6段階のフォントサイズ設定（モバイル画面最適化版） */
     const fontSizes = [
-        { label: '小', id: 0.9, jp: 0.75 },
-        { label: '標準', id: 1.1, jp: 0.9 },
-        { label: '大', id: 1.3, jp: 1.05 },
-        { label: '特大', id: 1.5, jp: 1.2 },
-        { label: '超特大', id: 1.7, jp: 1.35 },
-        { label: '極大', id: 1.9, jp: 1.5 }
+        { label: '小', id: 0.85, jp: 0.75 },
+        { label: '標準', id: 1.0, jp: 0.85 },
+        { label: '大', id: 1.15, jp: 0.95 },
+        { label: '特大', id: 1.3, jp: 1.05 },
+        { label: '超特大', id: 1.45, jp: 1.15 },
+        { label: '極大', id: 1.6, jp: 1.25 }
     ];
 
     let currentFontSizeIndex = 1;
