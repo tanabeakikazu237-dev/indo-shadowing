@@ -3,7 +3,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>インドネシア語 シャドーイング & 4段階文法解剖 & AIフラッシュカード</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -20,43 +20,49 @@
             --accent-color: #007aff;
             --text-main: #f0f0f0;
             --text-sub: #aaaaaa;
-            --font-size-id: 1.0rem;
-            --font-size-jp: 0.85rem;
+            --font-size-id: 0.95rem;
+            --font-size-jp: 0.82rem;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 0;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: stretch;
             min-height: 100vh;
             min-height: 100dvh;
-            overflow: hidden;
-            width: 100%;
         }
 
         #app-container {
             background-color: var(--app-bg);
             width: 100vw;
-            max-width: 1024px;
+            max-width: 100%;
             height: 100vh;
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            padding: 8px;
+            padding: 8px 8px 12px 8px;
             color: var(--text-main);
             position: relative;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: none;
             overflow: hidden;
         }
 
         @media (min-width: 768px) {
             #app-container {
-                padding: 20px;
                 width: 100%;
+                max-width: 1024px;
+                padding: 16px 20px;
+                box-shadow: 0 0 20px rgba(0,0,0,0.5);
             }
         }
 
@@ -66,7 +72,7 @@
             justify-content: space-between;
             margin-bottom: 8px;
             flex-shrink: 0;
-            min-height: 36px;
+            min-height: 38px;
             gap: 6px;
             width: 100%;
         }
@@ -80,20 +86,21 @@
         }
 
         h1 {
-            font-size: 1.0rem;
+            font-size: clamp(0.78rem, 3.6vw, 1.0rem);
             margin: 0;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 4px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-weight: 700;
         }
 
         #header-right {
             display: flex;
-            gap: 6px;
+            gap: 4px;
             align-items: center;
             flex-shrink: 0;
         }
@@ -102,17 +109,18 @@
             background: var(--card-sub-bg);
             border: 1px solid #444;
             color: #fff;
-            padding: 6px 12px;
+            padding: 5px 8px;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 4px;
+            gap: 3px;
             font-weight: 600;
             white-space: nowrap;
             flex-shrink: 0;
+            touch-action: manipulation;
         }
 
         .icon-btn:active {
@@ -121,29 +129,38 @@
 
         .card {
             background: var(--card-bg);
-            padding: 16px;
-            border-radius: 14px;
+            padding: 12px;
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             flex: 1;
             min-height: 0;
             overflow-y: auto;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .card {
+                padding: 18px;
+                gap: 14px;
+            }
         }
 
         label {
-            font-size: 0.85rem;
+            font-size: clamp(0.75rem, 3.2vw, 0.85rem);
             color: var(--text-sub);
             display: block;
             width: 100%;
+            line-height: 1.35;
         }
 
         textarea {
             width: 100%;
             flex: 1;
-            min-height: 100px;
-            padding: 12px;
+            min-height: 120px;
+            padding: 10px 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
@@ -151,12 +168,12 @@
             font-size: var(--font-size-id);
             resize: none;
             display: block;
-            line-height: 1.5;
+            line-height: 1.45;
         }
 
         @media (min-width: 768px) {
             textarea {
-                min-height: 240px;
+                min-height: 220px;
             }
         }
 
@@ -165,7 +182,7 @@
             align-items: center;
             justify-content: space-between;
             background: var(--card-sub-bg);
-            padding: 10px 14px;
+            padding: 8px 12px;
             border-radius: 8px;
             width: 100%;
             flex-shrink: 0;
@@ -173,7 +190,7 @@
         }
 
         .control-group span {
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: #ddd;
             white-space: nowrap;
             flex-shrink: 0;
@@ -181,22 +198,25 @@
 
         input[type="range"] {
             flex: 1;
-            margin: 0 8px;
-            min-width: 60px;
+            margin: 0 6px;
+            min-width: 50px;
         }
 
         .btn {
             background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 14px;
+            padding: 12px 8px;
             border-radius: 10px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: clamp(0.85rem, 3.8vw, 1rem);
             font-weight: bold;
             width: 100%;
             text-align: center;
             flex-shrink: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .btn:active {
@@ -217,25 +237,25 @@
             background-color: #3a3a3c;
             color: white;
             border: 1px solid #555;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 8px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             cursor: pointer;
             text-align: center;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
             text-decoration: none;
         }
 
         .api-badge {
-            font-size: 0.75rem;
-            padding: 4px 8px;
+            font-size: 0.7rem;
+            padding: 2px 6px;
             border-radius: 4px;
             display: inline-block;
-            margin-left: 8px;
+            margin-left: 4px;
         }
 
         .api-badge.set {
@@ -254,7 +274,8 @@
             flex: 1;
             min-height: 0;
             overflow: hidden;
-            gap: 10px;
+            gap: 8px;
+            width: 100%;
         }
 
         .tab-container {
@@ -271,13 +292,16 @@
             border: none;
             border-radius: 8px;
             color: #aaa;
-            font-size: 0.75rem;
+            font-size: clamp(0.68rem, 2.7vw, 0.8rem);
             font-weight: bold;
             cursor: pointer;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .tab-btn.active {
@@ -290,20 +314,28 @@
             min-height: 0;
             overflow-y: auto;
             background: var(--card-bg);
-            border-radius: 14px;
-            padding: 10px;
+            border-radius: 12px;
+            padding: 8px;
             display: flex;
             flex-direction: column;
             -webkit-overflow-scrolling: touch;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .content-area {
+                padding: 14px;
+            }
         }
 
         .line-item {
-            padding: 10px 12px;
+            padding: 10px 10px;
             margin-bottom: 8px;
             border-radius: 10px;
             background: #252528;
             border-left: 4px solid transparent;
             position: relative;
+            width: 100%;
         }
 
         .line-item.active {
@@ -319,11 +351,12 @@
             word-break: normal;
             overflow-wrap: break-word;
             padding-right: 36px;
+            width: 100%;
         }
 
         .word-token {
             display: inline-block;
-            padding: 2px 3px;
+            padding: 1px 3px;
             margin: 1px 1px;
             border-radius: 4px;
             cursor: pointer;
@@ -332,6 +365,7 @@
             -webkit-user-select: none;
             transition: background 0.15s, border-color 0.15s;
             white-space: nowrap;
+            word-break: keep-all;
         }
 
         .word-token:hover {
@@ -347,7 +381,7 @@
         .jp-text {
             font-size: var(--font-size-jp);
             color: #30d158;
-            margin-top: 8px;
+            margin-top: 6px;
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 6px;
             line-height: 1.4;
@@ -357,29 +391,30 @@
         .grammar-card {
             background: #252528;
             border-radius: 10px;
-            padding: 14px;
-            margin-bottom: 12px;
+            padding: 10px 12px;
+            margin-bottom: 10px;
             border-left: 4px solid #30d158;
+            width: 100%;
         }
 
         .grammar-title {
             font-size: calc(var(--font-size-id) * 0.95);
             font-weight: bold;
             color: #fff;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            gap: 8px;
+            gap: 6px;
             word-break: break-word;
             border-bottom: 1px solid rgba(255,255,255,0.1);
-            padding-bottom: 8px;
+            padding-bottom: 6px;
         }
 
         .grammar-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 10px;
+            gap: 8px;
         }
 
         @media (min-width: 640px) {
@@ -390,7 +425,7 @@
 
         .grammar-section {
             background: #1e1e22;
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-radius: 8px;
             border: 1px solid #333;
         }
@@ -409,23 +444,23 @@
         .grammar-section-body {
             font-size: var(--font-size-jp);
             color: #ddd;
-            line-height: 1.5;
+            line-height: 1.45;
             white-space: pre-wrap;
             word-break: break-word;
         }
 
         .tts-action-btn {
             position: absolute;
-            top: 10px;
-            right: 12px;
-            width: 34px;
-            height: 28px;
+            top: 8px;
+            right: 8px;
+            width: 32px;
+            height: 26px;
             padding: 0;
             background: rgba(0, 122, 255, 0.14);
             border: 1px solid rgba(0, 122, 255, 0.65);
             color: #fff;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -453,18 +488,18 @@
 
         .tts-action-btn.loading {
             width: auto;
-            min-width: 34px;
-            padding: 0 7px;
-            font-size: 0.68rem;
+            min-width: 32px;
+            padding: 0 5px;
+            font-size: 0.65rem;
         }
 
         .grammar-tts-btn {
             flex-shrink: 0;
-            width: 34px;
-            height: 30px;
+            width: 32px;
+            height: 28px;
             padding: 0 !important;
             border-radius: 6px !important;
-            font-size: 0.9rem !important;
+            font-size: 0.85rem !important;
         }
 
         .flashcard-wrapper {
@@ -473,7 +508,7 @@
             align-items: center;
             justify-content: flex-start;
             height: 100%;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
@@ -486,7 +521,7 @@
 
         .search-input-box {
             width: 100%;
-            padding: 10px 14px;
+            padding: 8px 12px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
@@ -512,7 +547,7 @@
         }
 
         .search-result-item {
-            padding: 10px 12px;
+            padding: 8px 10px;
             border-bottom: 1px solid #2d2d32;
             cursor: pointer;
             display: flex;
@@ -534,12 +569,12 @@
             perspective: 1000px;
             width: 100%;
             max-width: 100%;
-            height: 200px;
+            height: 190px;
         }
 
         @media (min-height: 700px) {
             .perspective-box {
-                height: 240px;
+                height: 230px;
             }
         }
 
@@ -561,15 +596,15 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
-            border-radius: 16px;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
             text-align: center;
             border: 1px solid #333;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.4);
         }
 
         .card-front {
@@ -584,33 +619,33 @@
         }
 
         .card-word {
-            font-size: calc(var(--font-size-id) * 1.3);
+            font-size: calc(var(--font-size-id) * 1.25);
             font-weight: bold;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             word-break: break-word;
         }
 
         .tap-count-badge {
             position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 0.72rem;
+            top: 8px;
+            right: 8px;
+            font-size: 0.7rem;
             background: rgba(255, 255, 255, 0.15);
             padding: 2px 6px;
-            border-radius: 12px;
+            border-radius: 10px;
             color: #ffcc00;
             border: 1px solid rgba(255, 204, 0, 0.3);
         }
 
         .card-hint {
-            font-size: 0.72rem;
+            font-size: 0.7rem;
             color: #aaa;
             position: absolute;
-            bottom: 10px;
+            bottom: 8px;
         }
 
         .card-meaning {
-            font-size: calc(var(--font-size-id) * 1.1);
+            font-size: calc(var(--font-size-id) * 1.05);
             font-weight: 600;
             color: #ffd700;
             word-break: break-word;
@@ -623,7 +658,7 @@
             width: 100%;
             max-width: 100%;
             justify-content: space-between;
-            margin-top: 4px;
+            margin-top: 2px;
         }
 
         @media (min-width: 640px) {
@@ -633,7 +668,7 @@
                 max-width: 480px;
             }
             .perspective-box {
-                height: 260px;
+                height: 250px;
             }
         }
 
@@ -641,13 +676,13 @@
             background: var(--card-sub-bg);
             border: 1px solid #444;
             color: #fff;
-            padding: 8px 6px;
+            padding: 8px 4px;
             border-radius: 8px;
             cursor: pointer;
             font-weight: bold;
             flex: 1;
             text-align: center;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             white-space: nowrap;
         }
 
@@ -656,20 +691,21 @@
             align-items: center;
             justify-content: space-between;
             background: var(--card-sub-bg);
-            padding: 6px 10px;
-            border-radius: 10px;
+            padding: 5px 8px;
+            border-radius: 8px;
             margin-bottom: 2px;
-            gap: 8px;
+            gap: 6px;
             flex-shrink: 0;
+            width: 100%;
         }
 
         .audio-btn {
             background: #333;
             border: 1px solid #555;
             color: #fff;
-            padding: 6px 12px;
+            padding: 5px 10px;
             border-radius: 6px;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             cursor: pointer;
             text-align: center;
             white-space: nowrap;
@@ -686,29 +722,29 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(0,0,0,0.75);
+            background: rgba(0,0,0,0.8);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 16px;
+            padding: 12px;
         }
 
         .modal-body {
             background: var(--card-bg);
-            padding: 16px;
-            border-radius: 14px;
+            padding: 14px;
+            border-radius: 12px;
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
             max-height: 90vh;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
             border: 1px solid #444;
         }
 
         .modal-title {
-            font-size: 1.05rem;
+            font-size: 1.0rem;
             font-weight: bold;
             margin: 0;
             color: #fff;
@@ -717,18 +753,18 @@
         input[type="password"],
         input[type="text"] {
             width: 100%;
-            padding: 10px;
+            padding: 8px 10px;
             background: var(--card-sub-bg);
             border: 1px solid #444;
             border-radius: 8px;
             color: #fff;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .loading-spinner {
             display: inline-block;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             border: 2px solid rgba(255,255,255,.3);
             border-radius: 50%;
             border-top-color: #fff;
@@ -742,108 +778,20 @@
 
         #toast {
             position: fixed;
-            bottom: 20px;
+            bottom: 16px;
             left: 50%;
             transform: translateX(-50%);
             background: rgba(0, 0, 0, 0.95);
             color: white;
-            padding: 12px 20px;
-            border-radius: 16px;
-            font-size: 0.85rem;
+            padding: 10px 16px;
+            border-radius: 14px;
+            font-size: 0.8rem;
             display: none;
             z-index: 2000;
             border: 1px solid #555;
             text-align: center;
-            max-width: 90vw;
+            max-width: 92vw;
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-        }
-
-        @media (max-width: 480px) {
-            #app-container {
-                padding: 6px;
-                width: 100vw;
-            }
-
-            header {
-                margin-bottom: 6px;
-            }
-
-            h1 {
-                font-size: 0.8rem;
-            }
-
-            .icon-btn {
-                padding: 4px 6px;
-                font-size: 0.75rem;
-                border-radius: 6px;
-            }
-
-            #fontsize-label {
-                display: inline;
-            }
-
-            .card {
-                padding: 10px;
-                gap: 8px;
-            }
-
-            .tab-btn {
-                padding: 6px 1px;
-                font-size: 0.7rem;
-                white-space: nowrap;
-            }
-
-            .line-item {
-                padding: 8px 10px;
-                margin-bottom: 6px;
-            }
-
-            .id-text {
-                padding-right: 32px;
-                font-size: var(--font-size-id);
-            }
-
-            .word-token {
-                padding: 1px 2px;
-                margin: 1px 1px;
-                white-space: nowrap;
-            }
-
-            .tts-action-btn {
-                right: 6px;
-                top: 6px;
-                width: 28px;
-                height: 24px;
-                font-size: 0.75rem;
-            }
-
-            .audio-controls-bar {
-                padding: 4px 6px;
-            }
-
-            .audio-btn {
-                padding: 4px 8px;
-                font-size: 0.72rem;
-            }
-
-            .modal-body {
-                padding: 12px;
-                max-width: calc(100vw - 16px);
-                gap: 8px;
-            }
-
-            .grammar-card {
-                padding: 8px;
-            }
-
-            .grammar-section {
-                padding: 6px 8px;
-            }
-
-            .ctrl-btn {
-                padding: 6px 2px;
-                font-size: 0.72rem;
-            }
         }
     </style>
 </head>
@@ -853,7 +801,7 @@
 
     <header id="main-header">
         <div id="header-left">
-            <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini TTS)</h1>
+            <h1 id="app-title">🇮🇩 AIシャドーイング</h1>
 
             <button
                 class="icon-btn"
@@ -875,7 +823,7 @@
                 Aa
                 <span
                     id="fontsize-label"
-                    style="font-size:0.7rem;color:#aaa;margin-left:2px;"
+                    style="font-size:0.68rem;color:#aaa;margin-left:2px;"
                 >
                     標準
                 </span>
@@ -912,16 +860,16 @@
     <!-- SETUP VIEW -->
     <div class="card" id="setup-card">
 
-        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px;">
-            <label for="script-input" style="flex: 1; margin-bottom: 0; line-height: 1.3;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; gap: 6px;">
+            <label for="script-input" style="flex: 1; margin-bottom: 0;">
                 インドネシア語のテキストを入力または貼り付け
-                <span style="display: block; font-size: 0.75rem; color: #888;">（@優先、次に.で文節抽出）</span>
+                <span style="display: block; font-size: 0.72rem; color: #888;">（@優先、次に.で文節抽出）</span>
             </label>
             <button
                 id="refresh-text-btn"
                 type="button"
                 class="icon-btn"
-                style="padding: 4px 8px; font-size: 0.75rem; background: transparent; color: #aaa; border-color: #444; flex-shrink: 0;"
+                style="padding: 3px 6px; font-size: 0.72rem; background: transparent; color: #aaa; border-color: #444; flex-shrink: 0;"
                 title="テキストをクリア"
             >
                 🔄 クリア
@@ -938,7 +886,7 @@
                 再生速度:
                 <strong
                     id="speed-val"
-                    style="color:#007aff;font-size:1rem;"
+                    style="color:#007aff;font-size:0.9rem;"
                 >
                     0.85
                 </strong>x
@@ -1015,9 +963,9 @@
                     display:flex;
                     align-items:center;
                     gap:6px;
-                    font-size:0.8rem;
+                    font-size:0.75rem;
                     background:#222;
-                    padding:4px 8px;
+                    padding:3px 6px;
                     border-radius:6px;
                     border:1px solid #444;
                     flex-shrink:0;
@@ -1064,13 +1012,7 @@
                 🔑 設定 & バックアップ
             </div>
 
-            <p
-                style="
-                    font-size:0.8rem;
-                    color:#aaa;
-                    margin:0;
-                "
-            >
+            <p style="font-size:0.78rem;color:#aaa;margin:0;">
                 APIキーや学習履歴はこのブラウザに保存されます。
             </p>
 
@@ -1087,22 +1029,12 @@
                 >
             </div>
 
-            <div
-                style="
-                    display:flex;
-                    justify-content:space-between;
-                    align-items:center;
-                "
-            >
+            <div style="display:flex;justify-content:space-between;align-items:center;">
                 <a
                     href="https://aistudio.google.com/app/apikey"
                     target="_blank"
                     rel="noopener noreferrer"
-                    style="
-                        color:#007aff;
-                        font-size:0.8rem;
-                        text-decoration:none;
-                    "
+                    style="color:#007aff;font-size:0.78rem;text-decoration:none;"
                 >
                     🔑 API Keyを取得
                 </a>
@@ -1110,39 +1042,18 @@
                 <button
                     type="button"
                     id="key-visibility-btn"
-                    style="
-                        background:none;
-                        border:none;
-                        color:#aaa;
-                        font-size:0.80rem;
-                        cursor:pointer;
-                    "
+                    style="background:none;border:none;color:#aaa;font-size:0.75rem;cursor:pointer;"
                 >
                     表示/非表示
                 </button>
             </div>
 
-            <div
-                style="
-                    border-top:1px solid #444;
-                    padding-top:10px;
-                    display:flex;
-                    flex-direction:column;
-                    gap:8px;
-                "
-            >
-                <label
-                    style="
-                        font-size:0.8rem;
-                        font-weight:bold;
-                        color:#ddd;
-                    "
-                >
-                    🔄 マルチデバイス・データ移行
+            <div style="border-top:1px solid #444;padding-top:8px;display:flex;flex-direction:column;gap:6px;">
+                <label style="font-size:0.78rem;font-weight:bold;color:#ddd;">
+                    🔄 データ移行・バックアップ
                 </label>
 
-                <div style="display:flex;gap:8px;">
-
+                <div style="display:flex;gap:6px;">
                     <button
                         class="backup-action-btn"
                         id="export-btn"
@@ -1160,17 +1071,10 @@
                             style="display:none;"
                         >
                     </label>
-
                 </div>
             </div>
 
-            <div
-                style="
-                    display:flex;
-                    gap:8px;
-                    margin-top:8px;
-                "
-            >
+            <div style="display:flex;gap:6px;margin-top:6px;">
                 <button
                     class="btn btn-secondary"
                     id="settings-cancel-btn"
@@ -1204,25 +1108,13 @@
                 📜 解析済み履歴（最大3件）
             </div>
 
-            <p
-                style="
-                    font-size:0.8rem;
-                    color:#aaa;
-                    margin:0;
-                "
-            >
+            <p style="font-size:0.78rem;color:#aaa;margin:0;">
                 APIを消費せず、すぐに続きから学習を再開できます。
             </p>
 
             <div
                 id="history-items-container"
-                style="
-                    display:flex;
-                    flex-direction:column;
-                    gap:8px;
-                    max-height:250px;
-                    overflow-y:auto;
-                "
+                style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto;"
             ></div>
 
             <button
@@ -1284,14 +1176,14 @@
     let audioContext = null;
     let activePlayback = null;
 
-    /* 全6段階のフォントサイズ設定（モバイル画面最適化版） */
+    /* スマホ画面用に最適化した6段階フォントサイズ */
     const fontSizes = [
-        { label: '小', id: 0.85, jp: 0.75 },
-        { label: '標準', id: 1.0, jp: 0.85 },
-        { label: '大', id: 1.15, jp: 0.95 },
-        { label: '特大', id: 1.3, jp: 1.05 },
-        { label: '超特大', id: 1.45, jp: 1.15 },
-        { label: '極大', id: 1.6, jp: 1.25 }
+        { label: '小', id: 0.85, jp: 0.72 },
+        { label: '標準', id: 0.95, jp: 0.82 },
+        { label: '大', id: 1.08, jp: 0.90 },
+        { label: '特大', id: 1.20, jp: 0.98 },
+        { label: '超特大', id: 1.32, jp: 1.06 },
+        { label: '極大', id: 1.45, jp: 1.15 }
     ];
 
     let currentFontSizeIndex = 1;
@@ -1340,7 +1232,7 @@
         clearTimeout(showToast._timer);
         showToast._timer = setTimeout(() => {
             toast.style.display = 'none';
-        }, 4500);
+        }, 4000);
     }
 
     function switchView(view) {
@@ -1472,14 +1364,14 @@
             btn.style.flexDirection = 'column';
             btn.style.alignItems = 'flex-start';
             btn.style.textAlign = 'left';
-            btn.style.padding = '10px';
+            btn.style.padding = '8px';
 
             const dateDiv = document.createElement('div');
-            dateDiv.style.cssText = 'font-size:0.75rem;color:#aaa;margin-bottom:4px;';
+            dateDiv.style.cssText = 'font-size:0.7rem;color:#aaa;margin-bottom:2px;';
             dateDiv.textContent = dateStr;
 
             const previewDiv = document.createElement('div');
-            previewDiv.style.cssText = 'font-size:0.9rem;';
+            previewDiv.style.cssText = 'font-size:0.85rem;';
             previewDiv.textContent = previewText;
 
             btn.append(dateDiv, previewDiv);
@@ -2498,10 +2390,10 @@
             card.appendChild(title);
 
             const sections = [
-                { num: '1', title: '語句対比', subtitle: 'Word-by-word comparison', content: gItem.wordComparison },
-                { num: '2', title: '構文構造', subtitle: 'Syntactic structure', content: gItem.syntacticStructure },
-                { num: '3', title: '接辞解剖', subtitle: 'Affix dissection', content: gItem.affixDissection },
-                { num: '4', title: '解説・ニュアンス', subtitle: 'Nuance & explanation', content: gItem.nuanceExplanation }
+                { num: '1', title: '語句対比', subtitle: 'Word comparison', content: gItem.wordComparison },
+                { num: '2', title: '構文構造', subtitle: 'Structure', content: gItem.syntacticStructure },
+                { num: '3', title: '接辞解剖', subtitle: 'Affixes', content: gItem.affixDissection },
+                { num: '4', title: '解説・ニュアンス', subtitle: 'Nuance', content: gItem.nuanceExplanation }
             ];
 
             const grid = document.createElement('div');
@@ -2513,7 +2405,7 @@
 
                 const titleDiv = document.createElement('div');
                 titleDiv.className = 'grammar-section-title';
-                titleDiv.innerHTML = `<span>【${sec.num} ${sec.title}】</span><span style="font-size:0.75rem;color:#888;font-weight:normal;">(${sec.subtitle})</span>`;
+                titleDiv.innerHTML = `<span>【${sec.num} ${sec.title}】</span><span style="font-size:0.7rem;color:#888;font-weight:normal;">(${sec.subtitle})</span>`;
 
                 const bodyDiv = document.createElement('div');
                 bodyDiv.className = 'grammar-section-body';
@@ -2577,7 +2469,7 @@
         front.className = 'card-face card-front';
 
         const frontLabel = document.createElement('div');
-        frontLabel.style.cssText = 'font-size:0.8rem;color:#888;position:absolute;top:12px;left:12px;';
+        frontLabel.style.cssText = 'font-size:0.75rem;color:#888;position:absolute;top:10px;left:10px;';
         frontLabel.textContent = '表：インドネシア語';
 
         const frontBadge = document.createElement('div');
@@ -2590,7 +2482,7 @@
 
         const frontAudio = document.createElement('button');
         frontAudio.type = 'button';
-        frontAudio.style.cssText = 'font-size:1.2rem;cursor:pointer;background:none;border:0;color:#fff;';
+        frontAudio.style.cssText = 'font-size:1.1rem;cursor:pointer;background:none;border:0;color:#fff;';
         frontAudio.textContent = '🔊 聴く';
         frontAudio.addEventListener('click', event => {
             event.stopPropagation();
@@ -2607,7 +2499,7 @@
         back.className = 'card-face card-back';
 
         const backLabel = document.createElement('div');
-        backLabel.style.cssText = 'font-size:0.8rem;color:#ccc;position:absolute;top:12px;left:12px;';
+        backLabel.style.cssText = 'font-size:0.75rem;color:#ccc;position:absolute;top:10px;left:10px;';
         backLabel.textContent = '裏：単語の基本意味';
 
         const backBadge = document.createElement('div');
@@ -2620,7 +2512,7 @@
 
         const backWord = document.createElement('div');
         backWord.id = 'back-card-word-sub';
-        backWord.style.cssText = 'font-size:var(--font-size-jp);color:#eee;margin-top:12px;border-top:1px solid rgba(255,255,255,0.2);padding-top:6px;';
+        backWord.style.cssText = 'font-size:var(--font-size-jp);color:#eee;margin-top:10px;border-top:1px solid rgba(255,255,255,0.2);padding-top:4px;';
 
         back.append(backLabel, backBadge, backMeaning, backWord);
 
@@ -2729,7 +2621,7 @@
             results.textContent = '';
             if (!matches.length) {
                 const empty = document.createElement('div');
-                empty.style.cssText = 'padding:10px;color:#888;font-size:var(--font-size-jp);';
+                empty.style.cssText = 'padding:8px;color:#888;font-size:var(--font-size-jp);';
                 empty.textContent = '該当なし';
                 results.appendChild(empty);
                 results.style.display = 'block';
@@ -2825,7 +2717,6 @@
         updateTokenEstimate();
         updateAudioControls();
 
-        /* Header buttons */
         $('header-back-btn')?.addEventListener('click', () => {
             stopSpeech();
             switchView('setup');
@@ -2841,7 +2732,6 @@
         $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
         $('history-close-btn')?.addEventListener('click', closeHistoryModal);
 
-        /* Main Setup */
         $('analyze-btn')?.addEventListener('click', startApp);
         $('refresh-text-btn')?.addEventListener('click', () => {
             const input = $('script-input');
@@ -2852,15 +2742,12 @@
             }
         });
 
-        /* Mode Tabs */
         $('tab-sentence')?.addEventListener('click', () => switchMode('sentence'));
         $('tab-grammar')?.addEventListener('click', () => switchMode('grammar'));
         $('tab-word')?.addEventListener('click', () => switchMode('word'));
 
-        /* Audio Control Bar */
         $('stop-speech-btn')?.addEventListener('click', stopSpeech);
 
-        /* Input listeners */
         $('script-input')?.addEventListener('input', updateTokenEstimate);
         $('script-input')?.addEventListener('paste', e => {
             e.preventDefault();
@@ -2878,7 +2765,6 @@
         $('speed-range')?.addEventListener('input', e => updateSpeedVal(e.target.value));
         $('speed-range-player')?.addEventListener('input', e => updateSpeedVal(e.target.value));
 
-        /* Modal outside clicks */
         setupModalOutsideClose('settings-modal');
         setupModalOutsideClose('history-modal');
 
