@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>インドネシア語 シャドーイング & 4段階文法解剖 & 付箋メモ付き</title>
+    <title>インドネシア語 シャドーイング & 4段階文法解剖 & AIフラッシュカード</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * {
@@ -71,20 +72,6 @@
             display: flex;
             align-items: center;
             gap: 6px;
-        }
-
-        #header-left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        #header-back-btn {
-            margin-left: 8px;
-            padding: 6px 14px;
-            background: #2a2a2e;
-            border: 1px solid #555;
-            font-weight: bold;
         }
 
         .icon-btn {
@@ -275,73 +262,40 @@
 
         .line-item {
             padding: 14px 16px;
-            margin-bottom: 12px;
-            border-radius: 12px;
+            margin-bottom: 10px;
+            border-radius: 10px;
             background: #252528;
-            border-left: 5px solid transparent;
+            border-left: 4px solid transparent;
             position: relative;
-            transition: border-color 0.2s, background-color 0.2s;
-            display: flex;
-            gap: 12px;
-            justify-content: space-between;
-            align-items: flex-start;
         }
 
         .line-item.active {
             background-color: #1a2f4c !important;
-            border-left-color: var(--accent-color) !important;
+            border-left: 4px solid var(--accent-color) !important;
         }
-
-        /* 付箋（Tag/Sticky Note）スタイル */
-        .sticky-tag-yellow { border-left-color: #ffd60a !important; }
-        .sticky-tag-pink   { border-left-color: #ff375f !important; }
-        .sticky-tag-green  { border-left-color: #30d158 !important; }
-        .sticky-tag-blue   { border-left-color: #64d2ff !important; }
-
-        .line-main-content {
-            flex: 1;
-            min-width: 0; /* フレックス要素内の溢れ防止 */
-        }
-
-        .sticky-note-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-top: 10px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            font-size: 0.85rem;
-            font-weight: bold;
-            line-height: 1.4;
-            max-width: 100%;
-            word-break: break-word;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.25);
-        }
-
-        .sticky-note-badge.color-yellow { background: #3a3200; color: #ffd60a; border: 1px solid #ffd60a; }
-        .sticky-note-badge.color-pink   { background: #3b0e18; color: #ff375f; border: 1px solid #ff375f; }
-        .sticky-note-badge.color-green  { background: #0c3313; color: #30d158; border: 1px solid #30d158; }
-        .sticky-note-badge.color-blue   { background: #0f2d3d; color: #64d2ff; border: 1px solid #64d2ff; }
 
         .id-text {
             font-size: var(--font-size-id);
             font-weight: bold;
             color: #ffffff;
-            line-height: 1.6;
-            word-break: break-word;
-            padding-right: 0;
+            line-height: 1.7;
+            overflow-wrap: break-word;
+            word-break: normal;
+            padding-right: 42px;
+            text-align: left;
         }
 
         .word-token {
             display: inline-block;
-            padding: 2px 4px;
-            margin: 1px 2px;
+            padding: 1px 3px;
+            margin: 1px 1px;
             border-radius: 4px;
             cursor: pointer;
-            border-bottom: 1.5px dotted #666;
+            border-bottom: 1.5px dotted #777;
             user-select: none;
             -webkit-user-select: none;
             transition: background 0.15s, border-color 0.15s;
+            white-space: nowrap;
         }
 
         .word-token:hover {
@@ -360,17 +314,16 @@
             margin-top: 8px;
             border-top: 1px solid rgba(255,255,255,0.08);
             padding-top: 6px;
-            line-height: 1.4;
+            line-height: 1.45;
             word-break: break-word;
         }
 
         .grammar-card {
             background: #252528;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 14px;
             margin-bottom: 12px;
-            border-left: 5px solid #30d158;
-            position: relative;
+            border-left: 4px solid #30d158;
         }
 
         .grammar-title {
@@ -380,8 +333,8 @@
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 12px;
+            align-items: center;
+            gap: 8px;
             word-break: break-word;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             padding-bottom: 8px;
@@ -424,63 +377,27 @@
             word-break: break-word;
         }
 
-        /* 縦並びアクションボタン群 (上: 再生ボタン, 下: 付箋ボタン) */
-        .action-btn-group {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .sticky-btn {
-            background: #ffd60a;
-            border: 1px solid #ffe866;
-            color: #000;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
-            transition: transform 0.15s, opacity 0.15s;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-            white-space: nowrap;
-        }
-
-        .sticky-btn:hover {
-            opacity: 0.9;
-            transform: scale(1.03);
-        }
-
-        .sticky-btn.active-note {
-            background: #ffcc00;
-            color: #000;
-            border-color: #ffffff;
-        }
-
         .tts-action-btn {
-            width: 36px;
-            height: 32px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 34px;
+            height: 28px;
             padding: 0;
-            background: #007aff;
-            border: 1px solid #5ac8fa;
+            background: rgba(0, 122, 255, 0.14);
+            border: 1px solid rgba(0, 122, 255, 0.65);
             color: #fff;
-            border-radius: 8px;
-            font-size: 1.0rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.15s, transform 0.1s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.4);
         }
 
         .tts-action-btn:hover {
-            background: #0056b3;
+            background: rgba(0, 122, 255, 0.30);
         }
 
         .tts-action-btn:active {
@@ -493,15 +410,24 @@
         }
 
         .tts-action-btn.playing {
-            background: #ff3b30;
-            border-color: #ff8880;
+            background: rgba(255, 59, 48, 0.22);
+            border-color: rgba(255, 59, 48, 0.75);
         }
 
         .tts-action-btn.loading {
             width: auto;
-            min-width: 36px;
+            min-width: 34px;
             padding: 0 7px;
             font-size: 0.68rem;
+        }
+
+        .grammar-tts-btn {
+            flex-shrink: 0;
+            width: 34px;
+            height: 30px;
+            padding: 0 !important;
+            border-radius: 6px !important;
+            font-size: 0.9rem !important;
         }
 
         .flashcard-wrapper {
@@ -688,41 +614,9 @@
             background: var(--card-sub-bg);
             padding: 8px 12px;
             border-radius: 10px;
-            margin-bottom: 6px;
+            margin-bottom: 10px;
             gap: 10px;
             flex-shrink: 0;
-        }
-
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #1a1a1e;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid #333;
-            margin-bottom: 8px;
-            font-size: 0.8rem;
-        }
-
-        .filter-btn {
-            background: transparent;
-            border: 1px solid #555;
-            color: #ccc;
-            padding: 4px 10px;
-            border-radius: 6px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 0.78rem;
-            font-weight: 600;
-        }
-
-        .filter-btn.active {
-            background: #ffd60a;
-            color: #000;
-            border-color: #ffd60a;
         }
 
         .audio-btn {
@@ -759,12 +653,11 @@
             padding: 20px;
             border-radius: 14px;
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             display: flex;
             flex-direction: column;
             gap: 14px;
             border: 1px solid #444;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         .modal-title {
@@ -772,9 +665,6 @@
             font-weight: bold;
             margin: 0;
             color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         input[type="password"],
@@ -787,39 +677,6 @@
             color: #fff;
             font-size: 0.9rem;
         }
-
-        .color-selector {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .color-opt {
-            flex: 1;
-            height: 40px;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-        }
-
-        .color-opt:hover { transform: scale(1.05); }
-        .color-opt.selected {
-            border-color: #ffffff !important;
-            transform: scale(1.08);
-            box-shadow: 0 0 10px rgba(255,255,255,0.8);
-        }
-
-        /* くっきり濃い塗りつぶしカラー */
-        .color-opt[data-color="yellow"] { background: #ffd60a; color: #000; }
-        .color-opt[data-color="pink"]   { background: #ff2d55; color: #fff; }
-        .color-opt[data-color="green"]  { background: #30d158; color: #000; }
-        .color-opt[data-color="blue"]   { background: #007aff; color: #fff; }
 
         .loading-spinner {
             display: inline-block;
@@ -854,33 +711,76 @@
             box-shadow: 0 8px 24px rgba(0,0,0,0.6);
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 640px) {
             #app-container {
                 padding: 8px;
             }
 
-            h1 {
-                font-size: 0.9rem;
-            }
-
-            .icon-btn {
-                padding: 5px 9px;
+            .content-area {
+                padding: 8px;
             }
 
             .line-item {
-                padding: 13px 12px;
+                padding: 12px 10px;
+                margin-bottom: 8px;
             }
 
             .id-text {
-                padding-right: 76px;
+                padding-right: 38px;
+                line-height: 1.75;
+            }
+
+            .word-token {
+                padding: 1px 2px;
+                margin: 0.5px 1px;
+                font-size: var(--font-size-id);
+            }
+
+            .tts-action-btn {
+                top: 8px;
+                right: 8px;
+                width: 30px;
+                height: 26px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 0.88rem;
+            }
+
+            .icon-btn {
+                padding: 5px 8px;
+                font-size: 0.8rem;
+            }
+
+            .line-item {
+                padding: 10px 8px;
+            }
+
+            .id-text {
+                padding-right: 36px;
+            }
+
+            .word-token {
+                padding: 0 2px;
+                margin: 0 0.5px;
+            }
+
+            .tts-action-btn {
+                right: 6px;
+                top: 8px;
+                width: 28px;
+                height: 25px;
+                font-size: 0.8rem;
             }
 
             .audio-controls-bar {
-                padding: 7px;
+                padding: 6px 8px;
             }
 
             .audio-btn {
-                padding: 6px 10px;
+                padding: 5px 8px;
                 font-size: 0.75rem;
             }
         }
@@ -892,7 +792,7 @@
 
     <header id="main-header">
         <div id="header-left" style="display:flex;align-items:center;">
-            <h1 id="app-title">🇮🇩 AIシャドーイング (付箋タグ付き)</h1>
+            <h1 id="app-title">🇮🇩 AIシャドーイング (Gemini TTS)</h1>
 
             <button
                 class="icon-btn"
@@ -1035,14 +935,6 @@
 
         </div>
 
-        <!-- フィルター・コントロールバー -->
-        <div class="filter-bar" id="filter-bar">
-            <span style="color:#aaa;">文節絞り込み:</span>
-            <button class="filter-btn" id="filter-notes-btn" type="button">
-                📌 付箋・要練習のみ表示 <span id="notes-count-badge" style="font-size:0.7rem;background:rgba(255,255,255,0.2);padding:1px 5px;border-radius:10px;">0</span>
-            </button>
-        </div>
-
         <div
             class="audio-controls-bar"
             id="audio-bar"
@@ -1100,43 +992,6 @@
 
     </div>
 
-    <!-- STICKY NOTE EDIT MODAL -->
-    <div class="modal-overlay" id="sticky-modal">
-        <div class="modal-body">
-            <div class="modal-title">
-                📌 文節付箋タグ・メモの編集
-            </div>
-
-            <div style="font-size:0.8rem;color:#aaa;" id="sticky-modal-preview">
-                <!-- 対象の文節テキスト -->
-            </div>
-
-            <div>
-                <label style="margin-bottom:6px;">付箋タグのカラー:</label>
-                <div class="color-selector">
-                    <button class="color-opt selected" data-color="yellow" type="button">📌</button>
-                    <button class="color-opt" data-color="pink" type="button">🏷️</button>
-                    <button class="color-opt" data-color="green" type="button">💡</button>
-                    <button class="color-opt" data-color="blue" type="button">⭐</button>
-                </div>
-            </div>
-
-            <div>
-                <label for="sticky-text-input">練習メモ / 補足メモ:</label>
-                <input type="text" id="sticky-text-input" placeholder="例: 発音注意、me-動詞、重要フレーズ" maxlength="60" />
-            </div>
-
-            <div style="display:flex;gap:8px;margin-top:8px;">
-                <button class="btn btn-secondary" id="sticky-delete-btn" type="button" style="flex:1;background:#5c1d1d;color:#ff8888;">
-                    付箋を削除
-                </button>
-                <button class="btn" id="sticky-save-btn" type="button" style="flex:1;">
-                    保存
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- SETTINGS MODAL -->
     <div
         class="modal-overlay"
@@ -1155,7 +1010,7 @@
                     margin:0;
                 "
             >
-                APIキーや学習履歴・付箋メモはこのブラウザに保存されます。
+                APIキーや学習履歴はこのブラウザに保存されます。
             </p>
 
             <div>
@@ -1333,7 +1188,6 @@
         apiKey: 'gemini_api_key',
         history: 'indo_shadowing_history_v30',
         tapCounts: 'indo_shadowing_tapcounts_v13',
-        notes: 'indo_shadowing_sticky_notes_v1',
         rpm: 'rpm_timestamps_v13',
         cachePrefix: 'indo_shadowing_cache_v30_'
     };
@@ -1356,12 +1210,7 @@
     };
 
     let wordTapCounts = {};
-    let stickyNotes = {}; // 各文章/文節テキストまたはキーに関連付けられたメモデータ
     let currentMode = 'sentence';
-    let filterNotesOnly = false;
-    let activeEditingLineIndex = null;
-    let selectedColor = 'yellow';
-
     let cardIndex = 0;
     let searchDebounceTimer = null;
     let currentFilteredVocab = [];
@@ -1376,12 +1225,12 @@
 
     /* 全6段階のフォントサイズ設定 */
     const fontSizes = [
-        { label: '小', id: 0.9, jp: 0.75 },
+        { label: '小', id: 0.95, jp: 0.8 },
         { label: '標準', id: 1.1, jp: 0.9 },
-        { label: '大', id: 1.3, jp: 1.05 },
-        { label: '特大', id: 1.5, jp: 1.2 },
-        { label: '超特大', id: 1.7, jp: 1.35 },
-        { label: '極大', id: 1.9, jp: 1.5 }
+        { label: '大', id: 1.25, jp: 1.0 },
+        { label: '特大', id: 1.4, jp: 1.1 },
+        { label: '超特大', id: 1.55, jp: 1.25 },
+        { label: '極大', id: 1.75, jp: 1.4 }
     ];
 
     let currentFontSizeIndex = 1;
@@ -1451,7 +1300,6 @@
             $('settings-open-btn').style.display = 'none';
             $('setup-card').style.display = 'none';
             $('player-area').style.display = 'flex';
-            updateNotesBadgeCount();
         }
     }
 
@@ -1651,21 +1499,11 @@
             rpmTimestamps = Array.isArray(storedRpm) ? storedRpm.filter(Number.isFinite) : [];
             const storedCounts = safeJsonParse(localStorage.getItem(STORAGE.tapCounts), {});
             wordTapCounts = storedCounts && typeof storedCounts === 'object' ? storedCounts : {};
-            const storedNotes = safeJsonParse(localStorage.getItem(STORAGE.notes), {});
-            stickyNotes = storedNotes && typeof storedNotes === 'object' ? storedNotes : {};
         } catch (_) {
             rpmTimestamps = [];
             wordTapCounts = {};
-            stickyNotes = {};
         }
         pruneRpm();
-    }
-
-    function saveStickyNotesState() {
-        try {
-            localStorage.setItem(STORAGE.notes, JSON.stringify(stickyNotes));
-        } catch (_) {}
-        updateNotesBadgeCount();
     }
 
     function pruneRpm() {
@@ -1811,7 +1649,6 @@
             japanese: aiSentences[idx]?.japanese || aiSentences[idx]?.meaning || '（日本語訳なし）'
         }));
 
-        /* 4段階分解構造 */
         result.grammar = preprocessedSegments.map((indonesianText, idx) => {
             const g = aiGrammar[idx] || {};
             return {
@@ -2397,7 +2234,6 @@
         $('tab-sentence')?.classList.toggle('active', currentMode === 'sentence');
         $('tab-grammar')?.classList.toggle('active', currentMode === 'grammar');
         $('tab-word')?.classList.toggle('active', currentMode === 'word');
-        $('filter-bar').style.display = currentMode === 'word' ? 'none' : 'flex';
     }
 
     function switchMode(mode) {
@@ -2418,115 +2254,30 @@
         }
     }
 
-    function getNoteKey(text) {
-        return cleanWordKey(text);
-    }
-
-    function openStickyModal(lineIndex, itemText) {
-        activeEditingLineIndex = lineIndex;
-        const key = getNoteKey(itemText);
-        const existingNote = stickyNotes[key] || { text: '', color: 'yellow' };
-
-        $('sticky-modal-preview').textContent = itemText;
-        $('sticky-text-input').value = existingNote.text || '';
-        selectedColor = existingNote.color || 'yellow';
-
-        document.querySelectorAll('.color-opt').forEach(opt => {
-            opt.classList.toggle('selected', opt.dataset.color === selectedColor);
-        });
-
-        $('sticky-modal').style.display = 'flex';
-        $('sticky-text-input').focus();
-    }
-
-    function closeStickyModal() {
-        $('sticky-modal').style.display = 'none';
-        activeEditingLineIndex = null;
-    }
-
-    function saveStickyNote() {
-        if (activeEditingLineIndex === null) return;
-        const item = parsedData.sentences[activeEditingLineIndex];
-        if (!item) return;
-
-        const key = getNoteKey(item.indonesian);
-        const textVal = $('sticky-text-input').value.trim();
-
-        if (textVal || selectedColor) {
-            stickyNotes[key] = {
-                text: textVal,
-                color: selectedColor,
-                updatedAt: Date.now()
-            };
-        } else {
-            delete stickyNotes[key];
-        }
-
-        saveStickyNotesState();
-        closeStickyModal();
-
-        if (currentMode === 'sentence') renderSentenceList();
-        if (currentMode === 'grammar') renderGrammarList();
-        showToast('📌 付箋メモを保存しました。');
-    }
-
-    function deleteStickyNote() {
-        if (activeEditingLineIndex === null) return;
-        const item = parsedData.sentences[activeEditingLineIndex];
-        if (!item) return;
-
-        const key = getNoteKey(item.indonesian);
-        delete stickyNotes[key];
-
-        saveStickyNotesState();
-        closeStickyModal();
-
-        if (currentMode === 'sentence') renderSentenceList();
-        if (currentMode === 'grammar') renderGrammarList();
-        showToast('📌 付箋メモを削除しました。');
-    }
-
-    function updateNotesBadgeCount() {
-        const badge = $('notes-count-badge');
-        if (!badge) return;
-        const count = Object.keys(stickyNotes).length;
-        badge.textContent = count;
-    }
-
-    function toggleNotesFilter() {
-        filterNotesOnly = !filterNotesOnly;
-        $('filter-notes-btn').classList.toggle('active', filterNotesOnly);
-
-        if (currentMode === 'sentence') renderSentenceList();
-        if (currentMode === 'grammar') renderGrammarList();
-    }
-
     function renderSentenceList() {
         const container = $('content-area');
         if (!container) return;
         container.textContent = '';
 
-        let visibleCount = 0;
-
         parsedData.sentences.forEach((item, index) => {
-            const noteKey = getNoteKey(item.indonesian);
-            const noteData = stickyNotes[noteKey];
-
-            if (filterNotesOnly && !noteData) {
-                return;
-            }
-            visibleCount++;
-
             const div = document.createElement('div');
             div.className = 'line-item';
-            if (noteData && noteData.color) {
-                div.classList.add('sticky-tag-' + noteData.color);
-            }
             div.id = 'line-' + index;
 
-            /* メインコンテンツ（左側） */
-            const mainContent = document.createElement('div');
-            mainContent.className = 'line-main-content';
+            /* TTSボタン（文全体再生） */
+            const ttsBtn = document.createElement('button');
+            ttsBtn.type = 'button';
+            ttsBtn.className = 'tts-action-btn';
+            ttsBtn.innerHTML = '🔊';
+            ttsBtn.title = 'Gemini TTSで文全体を再生';
+
+            ttsBtn.addEventListener('click', async e => {
+                e.stopPropagation();
+                document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
+                div.classList.add('active');
+
+                await speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
+            });
 
             /* Indonesian text and Word Token creation */
             const idText = document.createElement('div');
@@ -2543,7 +2294,8 @@
                 span.textContent = rawWord;
                 span.title = '1回タップ: 単語のみ再生 | 2回タップ: その単語以降も再生 | 長押し: 一時停止/再開';
 
-                attachWordTokenGesture(span, index, wIdx, cleanW, item, null);
+                /* 1回タップ / 2回タップ / 長押し(500ms)のジェスチャー処理 */
+                attachWordTokenGesture(span, index, wIdx, cleanW, item, ttsBtn);
 
                 idText.appendChild(span);
             });
@@ -2553,50 +2305,10 @@
             jpText.className = 'jp-text';
             jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-            mainContent.append(idText, jpText);
-
-            /* 付箋メモがある場合のバッジ表示 */
-            if (noteData) {
-                const noteBadge = document.createElement('div');
-                noteBadge.className = 'sticky-note-badge color-' + (noteData.color || 'yellow');
-                noteBadge.innerHTML = '📌 <strong>' + (noteData.text || '要練習文節') + '</strong>';
-                mainContent.appendChild(noteBadge);
-            }
-
-            /* 右側アクション群（上: 再生ボタン, 下: 付箋ボタン） */
-            const btnGroup = document.createElement('div');
-            btnGroup.className = 'action-btn-group';
-
-            const ttsBtn = document.createElement('button');
-            ttsBtn.type = 'button';
-            ttsBtn.className = 'tts-action-btn';
-            ttsBtn.innerHTML = '🔊';
-            ttsBtn.title = 'Gemini TTSで文全体を再生';
-
-            ttsBtn.addEventListener('click', async e => {
-                e.stopPropagation();
-                document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
-                div.classList.add('active');
-
-                await speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
-            });
-
-            const stickyBtn = document.createElement('button');
-            stickyBtn.type = 'button';
-            stickyBtn.className = 'sticky-btn' + (noteData ? ' active-note' : '');
-            stickyBtn.innerHTML = noteData ? '📌 付箋' : '📌 メモ';
-            stickyBtn.title = 'この文節に付箋タグ・練習メモを追加';
-            stickyBtn.addEventListener('click', e => {
-                e.stopPropagation();
-                openStickyModal(index, item.indonesian);
-            });
-
-            btnGroup.append(ttsBtn, stickyBtn);
-
-            div.append(mainContent, btnGroup);
+            div.append(ttsBtn, idText, jpText);
 
             div.addEventListener('click', event => {
-                if (event.target.closest('.word-token, .action-btn-group, .sticky-btn')) {
+                if (event.target.closest('.word-token, .tts-action-btn')) {
                     return;
                 }
                 document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
@@ -2606,10 +2318,6 @@
 
             container.appendChild(div);
         });
-
-        if (visibleCount === 0 && filterNotesOnly) {
-            container.innerHTML = '<div style="text-align:center;color:#888;padding:40px;">📌 付箋・メモが登録された文節はありません。</div>';
-        }
     }
 
     function attachWordTokenGesture(span, lineIndex, wordIndex, cleanToken, sentenceItem, sentenceTtsBtn) {
@@ -2708,36 +2416,19 @@
             return;
         }
 
-        let visibleCount = 0;
-
         grammarArray.forEach((gItem, index) => {
-            const noteKey = getNoteKey(gItem.indonesian);
-            const noteData = stickyNotes[noteKey];
-
-            if (filterNotesOnly && !noteData) {
-                return;
-            }
-            visibleCount++;
-
             const card = document.createElement('div');
             card.className = 'grammar-card';
-            if (noteData && noteData.color) {
-                card.classList.add('sticky-tag-' + noteData.color);
-            }
 
             const title = document.createElement('div');
             title.className = 'grammar-title';
 
             const titleSpan = document.createElement('span');
-            titleSpan.style.flex = '1';
             titleSpan.textContent = '文節 ' + (index + 1) + ': ' + (gItem.indonesian || '');
-
-            const btnGroup = document.createElement('div');
-            btnGroup.className = 'action-btn-group';
 
             const ttsGrammarBtn = document.createElement('button');
             ttsGrammarBtn.type = 'button';
-            ttsGrammarBtn.className = 'tts-action-btn';
+            ttsGrammarBtn.className = 'icon-btn grammar-tts-btn';
             ttsGrammarBtn.innerHTML = '🔊';
             ttsGrammarBtn.title = 'この文節をTTS再生';
 
@@ -2746,18 +2437,7 @@
                 await speakWithGeminiTTS(gItem.indonesian || '', ttsGrammarBtn, ttsSentenceCache);
             });
 
-            const stickyBtn = document.createElement('button');
-            stickyBtn.type = 'button';
-            stickyBtn.className = 'sticky-btn' + (noteData ? ' active-note' : '');
-            stickyBtn.innerHTML = noteData ? '📌 付箋' : '📌 メモ';
-            stickyBtn.title = 'この文節に付箋タグ・練習メモを追加';
-            stickyBtn.addEventListener('click', e => {
-                e.stopPropagation();
-                openStickyModal(index, gItem.indonesian);
-            });
-
-            btnGroup.append(ttsGrammarBtn, stickyBtn);
-            title.append(titleSpan, btnGroup);
+            title.append(titleSpan, ttsGrammarBtn);
             card.appendChild(title);
 
             const sections = [
@@ -2787,21 +2467,8 @@
             });
 
             card.appendChild(grid);
-
-            if (noteData) {
-                const noteBadge = document.createElement('div');
-                noteBadge.className = 'sticky-note-badge color-' + (noteData.color || 'yellow');
-                noteBadge.style.marginTop = '12px';
-                noteBadge.innerHTML = '📌 <strong>' + (noteData.text || '要練習文節') + '</strong>';
-                card.appendChild(noteBadge);
-            }
-
             container.appendChild(card);
         });
-
-        if (visibleCount === 0 && filterNotesOnly) {
-            container.innerHTML = '<div style="text-align:center;color:#888;padding:40px;">📌 付箋・メモが登録された文節はありません。</div>';
-        }
     }
 
     function renderFlashcard() {
@@ -3045,11 +2712,7 @@
 
     function exportAppData() {
         try {
-            const data = {
-                history: getHistory(),
-                tapCounts: wordTapCounts,
-                stickyNotes: stickyNotes
-            };
+            const data = { history: getHistory(), tapCounts: wordTapCounts };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -3083,12 +2746,7 @@
                     wordTapCounts = json.tapCounts;
                     localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts));
                 }
-                if (json.stickyNotes && typeof json.stickyNotes === 'object') {
-                    stickyNotes = json.stickyNotes;
-                    localStorage.setItem(STORAGE.notes, JSON.stringify(stickyNotes));
-                }
                 updateHistoryUI();
-                updateNotesBadgeCount();
                 closeSettings();
                 showToast('インポート成功しました。');
             } catch (_) {
@@ -3132,19 +2790,6 @@
         $('history-modal-open-btn')?.addEventListener('click', openHistoryModal);
         $('history-close-btn')?.addEventListener('click', closeHistoryModal);
 
-        /* Sticky Notes Modal Events */
-        $('sticky-save-btn')?.addEventListener('click', saveStickyNote);
-        $('sticky-delete-btn')?.addEventListener('click', deleteStickyNote);
-        $('filter-notes-btn')?.addEventListener('click', toggleNotesFilter);
-
-        document.querySelectorAll('.color-opt').forEach(opt => {
-            opt.addEventListener('click', () => {
-                document.querySelectorAll('.color-opt').forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
-                selectedColor = opt.dataset.color;
-            });
-        });
-
         /* Main Setup */
         $('analyze-btn')?.addEventListener('click', startApp);
         $('refresh-text-btn')?.addEventListener('click', () => {
@@ -3185,11 +2830,10 @@
         /* Modal outside clicks */
         setupModalOutsideClose('settings-modal');
         setupModalOutsideClose('history-modal');
-        setupModalOutsideClose('sticky-modal');
 
         document.addEventListener('keydown', event => {
             if (event.key !== 'Escape') return;
-            ['settings-modal', 'history-modal', 'sticky-modal'].forEach(id => {
+            ['settings-modal', 'history-modal'].forEach(id => {
                 const modal = $(id);
                 if (modal) modal.style.display = 'none';
             });
@@ -3205,3 +2849,4 @@
 
 </body>
 </html>
+```
