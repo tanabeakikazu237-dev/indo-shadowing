@@ -20,8 +20,8 @@
             --accent-color: #007aff;
             --text-main: #f0f0f0;
             --text-sub: #aaaaaa;
-            --font-size-id: 1.1rem;
-            --font-size-jp: 0.9rem;
+            --font-size-id: 1.05rem;
+            --font-size-jp: 0.88rem;
         }
 
         body {
@@ -261,12 +261,14 @@
         }
 
         .line-item {
-            padding: 14px 16px;
+            padding: 12px 14px;
             margin-bottom: 10px;
             border-radius: 10px;
             background: #252528;
             border-left: 4px solid transparent;
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .line-item.active {
@@ -274,28 +276,36 @@
             border-left: 4px solid var(--accent-color) !important;
         }
 
+        .line-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+            width: 100%;
+        }
+
         .id-text {
             font-size: var(--font-size-id);
-            font-weight: bold;
+            font-weight: 600;
             color: #ffffff;
-            line-height: 1.7;
-            overflow-wrap: break-word;
-            word-break: normal;
-            padding-right: 42px;
-            text-align: left;
+            line-height: 1.5;
+            word-break: break-word;
+            flex: 1;
+            padding-right: 0;
         }
 
         .word-token {
-            display: inline-block;
-            padding: 1px 3px;
-            margin: 1px 1px;
-            border-radius: 4px;
+            display: inline;
+            padding: 1px 2px;
+            margin: 0;
+            border-radius: 3px;
             cursor: pointer;
             border-bottom: 1.5px dotted #777;
             user-select: none;
             -webkit-user-select: none;
             transition: background 0.15s, border-color 0.15s;
-            white-space: nowrap;
+            box-decoration-break: clone;
+            -webkit-box-decoration-break: clone;
         }
 
         .word-token:hover {
@@ -378,22 +388,21 @@
         }
 
         .tts-action-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 34px;
-            height: 28px;
+            flex-shrink: 0;
+            width: 32px;
+            height: 30px;
             padding: 0;
             background: rgba(0, 122, 255, 0.14);
             border: 1px solid rgba(0, 122, 255, 0.65);
             color: #fff;
             border-radius: 6px;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             transition: background 0.15s, transform 0.1s;
+            margin-top: 2px;
         }
 
         .tts-action-btn:hover {
@@ -416,9 +425,9 @@
 
         .tts-action-btn.loading {
             width: auto;
-            min-width: 34px;
-            padding: 0 7px;
-            font-size: 0.68rem;
+            min-width: 32px;
+            padding: 0 6px;
+            font-size: 0.65rem;
         }
 
         .grammar-tts-btn {
@@ -712,8 +721,13 @@
         }
 
         @media (max-width: 640px) {
+            :root {
+                --font-size-id: 1.0rem;
+                --font-size-jp: 0.85rem;
+            }
+
             #app-container {
-                padding: 8px;
+                padding: 6px;
             }
 
             .content-area {
@@ -721,26 +735,18 @@
             }
 
             .line-item {
-                padding: 12px 10px;
+                padding: 10px 10px 8px 10px;
                 margin-bottom: 8px;
             }
 
-            .id-text {
-                padding-right: 38px;
-                line-height: 1.75;
-            }
-
             .word-token {
-                padding: 1px 2px;
-                margin: 0.5px 1px;
-                font-size: var(--font-size-id);
+                padding: 1px 1px;
+                margin: 0;
             }
 
             .tts-action-btn {
-                top: 8px;
-                right: 8px;
                 width: 30px;
-                height: 26px;
+                height: 28px;
             }
         }
 
@@ -751,27 +757,6 @@
 
             .icon-btn {
                 padding: 5px 8px;
-                font-size: 0.8rem;
-            }
-
-            .line-item {
-                padding: 10px 8px;
-            }
-
-            .id-text {
-                padding-right: 36px;
-            }
-
-            .word-token {
-                padding: 0 2px;
-                margin: 0 0.5px;
-            }
-
-            .tts-action-btn {
-                right: 6px;
-                top: 8px;
-                width: 28px;
-                height: 25px;
                 font-size: 0.8rem;
             }
 
@@ -1225,12 +1210,12 @@
 
     /* 全6段階のフォントサイズ設定 */
     const fontSizes = [
-        { label: '小', id: 0.95, jp: 0.8 },
-        { label: '標準', id: 1.1, jp: 0.9 },
-        { label: '大', id: 1.25, jp: 1.0 },
-        { label: '特大', id: 1.4, jp: 1.1 },
-        { label: '超特大', id: 1.55, jp: 1.25 },
-        { label: '極大', id: 1.75, jp: 1.4 }
+        { label: '小', id: 0.9, jp: 0.75 },
+        { label: '標準', id: 1.05, jp: 0.88 },
+        { label: '大', id: 1.2, jp: 1.0 },
+        { label: '特大', id: 1.35, jp: 1.15 },
+        { label: '超特大', id: 1.5, jp: 1.3 },
+        { label: '極大', id: 1.7, jp: 1.45 }
     ];
 
     let currentFontSizeIndex = 1;
@@ -2264,6 +2249,9 @@
             div.className = 'line-item';
             div.id = 'line-' + index;
 
+            const lineHeader = document.createElement('div');
+            lineHeader.className = 'line-header';
+
             /* TTSボタン（文全体再生） */
             const ttsBtn = document.createElement('button');
             ttsBtn.type = 'button';
@@ -2294,18 +2282,18 @@
                 span.textContent = rawWord;
                 span.title = '1回タップ: 単語のみ再生 | 2回タップ: その単語以降も再生 | 長押し: 一時停止/再開';
 
-                /* 1回タップ / 2回タップ / 長押し(500ms)のジェスチャー処理 */
                 attachWordTokenGesture(span, index, wIdx, cleanW, item, ttsBtn);
-
                 idText.appendChild(span);
             });
+
+            lineHeader.append(idText, ttsBtn);
 
             /* Japanese translation */
             const jpText = document.createElement('div');
             jpText.className = 'jp-text';
             jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-            div.append(ttsBtn, idText, jpText);
+            div.append(lineHeader, jpText);
 
             div.addEventListener('click', event => {
                 if (event.target.closest('.word-token, .tts-action-btn')) {
