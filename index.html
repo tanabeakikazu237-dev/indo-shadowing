@@ -279,7 +279,7 @@
             color: #ffffff;
             line-height: 1.6;
             word-break: break-word;
-            padding-right: 48px;
+            padding-right: 88px;
         }
 
         .note-action-btn {
@@ -787,7 +787,7 @@
             }
 
             .id-text {
-                padding-right: 42px;
+                padding-right: 82px;
             }
 
             .tts-action-btn {
@@ -1209,6 +1209,7 @@
         apiKey: 'gemini_api_key',
         history: 'indo_shadowing_history_v30',
         tapCounts: 'indo_shadowing_tapcounts_v13',
+        sentenceNotes: 'indo_shadowing_sentence_notes_v1',
         rpm: 'rpm_timestamps_v13',
         cachePrefix: 'indo_shadowing_cache_v30_'
     };
@@ -1231,11 +1232,34 @@
     };
 
     let wordTapCounts = {};
+    let sentenceNotes = {};
     let currentMode = 'sentence';
     let cardIndex = 0;
     let searchDebounceTimer = null;
     let currentFilteredVocab = [];
     let rpmTimestamps = [];
+
+    function sentenceNoteKey(sentence) {
+        return String(sentence || '').trim().replace(/\s+/g, ' ').toLocaleLowerCase();
+    }
+
+    function loadSentenceNotes() {
+        try {
+            const stored = localStorage.getItem(STORAGE.sentenceNotes);
+            const parsed = stored ? JSON.parse(stored) : {};
+            sentenceNotes = parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        } catch (_) {
+            sentenceNotes = {};
+        }
+    }
+
+    function saveSentenceNotes() {
+        try {
+            localStorage.setItem(STORAGE.sentenceNotes, JSON.stringify(sentenceNotes));
+        } catch (e) {
+            showToast('付箋の保存に失敗しました。端末の保存容量を確認してください。');
+        }
+    }
 
     const ttsSentenceCache = new Map();
     const ttsWordCache = new Map();
