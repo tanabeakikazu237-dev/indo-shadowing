@@ -282,6 +282,68 @@
             padding-right: 48px;
         }
 
+        .note-action-btn {
+            position: absolute;
+            top: 10px;
+            right: 52px;
+            width: 30px;
+            height: 28px;
+            padding: 0;
+            border: 1px solid #666;
+            border-radius: 6px;
+            background: rgba(255, 204, 0, 0.10);
+            color: #ffcc66;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+        }
+        .note-action-btn.has-note {
+            background: rgba(255, 204, 0, 0.22);
+            border-color: #d6a83d;
+        }
+        .sentence-note {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid rgba(255, 204, 0, 0.35);
+            border-radius: 8px;
+            background: rgba(255, 204, 0, 0.06);
+        }
+        .sentence-note.open { display: block; }
+        .sentence-note textarea {
+            min-height: 64px;
+            max-height: 150px;
+            flex: initial;
+            resize: vertical;
+            font-size: 0.9rem;
+            padding: 8px;
+        }
+        .sentence-note-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 6px;
+            margin-top: 7px;
+        }
+        .sentence-note-actions button {
+            border: 1px solid #555;
+            border-radius: 6px;
+            padding: 5px 10px;
+            background: #333;
+            color: #eee;
+            font-size: 0.78rem;
+            cursor: pointer;
+        }
+        .sentence-note-actions .note-save { background: #5b4a16; border-color: #8b7025; }
+        .note-preview {
+            color: #ffdc80;
+            font-size: 0.78rem;
+            margin-top: 7px;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
         .word-token {
             display: inline-block;
             padding: 2px 4px;
@@ -2240,6 +2302,57 @@
                 await speakWithGeminiTTS(item.indonesian, ttsBtn, ttsSentenceCache);
             });
 
+            /* 任意の文節に付箋を付ける（TTS操作とは独立） */
+            const noteKey = sentenceNoteKey(item.indonesian);
+            const noteBtn = document.createElement('button');
+            noteBtn.type = 'button';
+            noteBtn.className = 'note-action-btn' + (sentenceNotes[noteKey] ? ' has-note' : '');
+            noteBtn.textContent = sentenceNotes[noteKey] ? '📝' : '＋';
+            noteBtn.title = sentenceNotes[noteKey] ? '付箋を編集' : 'この文節に付箋を追加';
+            noteBtn.setAttribute('aria-label', noteBtn.title);
+
+            const notePanel = document.createElement('div');
+            notePanel.className = 'sentence-note';
+            const noteInput = document.createElement('textarea');
+            noteInput.placeholder = '練習したい点、発音、文法などをメモ…';
+            noteInput.setAttribute('aria-label', '文節の付箋メモ');
+            noteInput.value = sentenceNotes[noteKey] || '';
+
+            const noteActions = document.createElement('div');
+            noteActions.className = 'sentence-note-actions';
+            const cancelNoteBtn = document.createElement('button');
+            cancelNoteBtn.type = 'button';
+            cancelNoteBtn.textContent = '閉じる';
+            const saveNoteBtn = document.createElement('button');
+            saveNoteBtn.type = 'button';
+            saveNoteBtn.className = 'note-save';
+            saveNoteBtn.textContent = '保存';
+            noteActions.append(cancelNoteBtn, saveNoteBtn);
+            notePanel.append(noteInput, noteActions);
+
+            noteBtn.addEventListener('click', event => {
+                event.stopPropagation();
+                const isOpening = !notePanel.classList.contains('open');
+                notePanel.classList.toggle('open', isOpening);
+                if (isOpening) noteInput.focus();
+            });
+            notePanel.addEventListener('click', event => event.stopPropagation());
+            cancelNoteBtn.addEventListener('click', () => {
+                noteInput.value = sentenceNotes[noteKey] || '';
+                notePanel.classList.remove('open');
+            });
+            saveNoteBtn.addEventListener('click', () => {
+                const value = noteInput.value.trim();
+                if (value) sentenceNotes[noteKey] = value;
+                else delete sentenceNotes[noteKey];
+                saveSentenceNotes();
+                noteBtn.classList.toggle('has-note', !!value);
+                noteBtn.textContent = value ? '📝' : '＋';
+                noteBtn.title = value ? '付箋を編集' : 'この文節に付箋を追加';
+                notePanel.classList.remove('open');
+                showToast(value ? '付箋を保存しました。' : '付箋を削除しました。');
+            });
+
             /* Indonesian text and Word Token creation */
             const idText = document.createElement('div');
             idText.className = 'id-text';
@@ -2266,10 +2379,17 @@
             jpText.className = 'jp-text';
             jpText.textContent = '💬 ' + (item.japanese || '（日本語訳なし）');
 
-            div.append(ttsBtn, idText, jpText);
+            div.append(ttsBtn, noteBtn, idText, jpText);
+            if (sentenceNotes[noteKey]) {
+                const preview = document.createElement('div');
+                preview.className = 'note-preview';
+                preview.textContent = '📝 ' + sentenceNotes[noteKey];
+                div.appendChild(preview);
+            }
+            div.appendChild(notePanel);
 
             div.addEventListener('click', event => {
-                if (event.target.closest('.word-token, .tts-action-btn')) {
+                if (event.target.closest('.word-token, .tts-action-btn, .note-action-btn, .sentence-note')) {
                     return;
                 }
                 document.querySelectorAll('.line-item').forEach(el => el.classList.remove('active'));
@@ -2681,7 +2801,7 @@
 
     function exportAppData() {
         try {
-            const data = { history: getHistory(), tapCounts: wordTapCounts };
+            const data = { history: getHistory(), tapCounts: wordTapCounts, sentenceNotes };
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2711,6 +2831,10 @@
                 if (Array.isArray(json.history)) {
                     localStorage.setItem(STORAGE.history, JSON.stringify(json.history));
                 }
+                if (json.sentenceNotes && typeof json.sentenceNotes === 'object' && !Array.isArray(json.sentenceNotes)) {
+                    sentenceNotes = json.sentenceNotes;
+                    saveSentenceNotes();
+                }
                 if (json.tapCounts && typeof json.tapCounts === 'object') {
                     wordTapCounts = json.tapCounts;
                     localStorage.setItem(STORAGE.tapCounts, JSON.stringify(wordTapCounts));
@@ -2736,6 +2860,7 @@
 
     window.addEventListener('load', () => {
         loadPersistentState();
+        loadSentenceNotes();
         checkApiKeyStatus();
         updateHistoryUI();
         applyFontSize();
